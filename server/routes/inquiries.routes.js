@@ -20,7 +20,7 @@ function inquiriesRouter(state) {
     }
   });
 
-  router.post("/", requireAuth, async (req, res) => {
+  router.post("/", async (req, res) => {
      const { product, quantity, targetPrice, location, notes = "" } = req.body || {};
 
      if (!product || !quantity || !targetPrice || !location) {
@@ -47,7 +47,7 @@ function inquiriesRouter(state) {
        toAdmins: true,
        type: 'new_inquiry',
        title: '📋 New Bulk Inquiry',
-       body: `${req.user.name || 'A buyer'} wants ${inquiryPayload.quantity}kg of ${inquiryPayload.product}`,
+       body: `${req.user?.name || 'A buyer'} wants ${inquiryPayload.quantity}kg of ${inquiryPayload.product}`,
        data: { inquiryId: String(inquiry._id) }
      });
 

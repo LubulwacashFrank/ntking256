@@ -3,165 +3,106 @@ const API = {
     try {
       const data = await response.json();
       return data.error || fallbackMessage;
-    } catch (error) {
+    } catch (e) {
       return fallbackMessage;
     }
   },
 
-  getToken() {
-    return localStorage.getItem("agro_token") || "";
-  },
+  getToken() { return localStorage.getItem("agro_token") || ""; },
+  setToken(token) { localStorage.setItem("agro_token", token); },
+  clearToken() { localStorage.removeItem("agro_token"); },
 
-  setToken(token) {
-    localStorage.setItem("agro_token", token);
-  },
-
-  clearToken() {
-    localStorage.removeItem("agro_token");
-  },
-
-  // Decode JWT to get user info
   getUser() {
     const token = this.getToken();
     if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload;
-    } catch (e) {
-      return null;
-    }
+    try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
   },
 
   async register(payload) {
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-      throw new Error(await this.parseError(response, "Registration failed"));
-    }
-    return response.json();
+    const r = await fetch("/api/auth/register", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
+    if (!r.ok) throw new Error(await this.parseError(r, "Registration failed"));
+    return r.json();
   },
 
   async login(payload) {
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-      throw new Error(await this.parseError(response, "Login failed"));
-    }
-    return response.json();
+    const r = await fetch("/api/auth/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
+    if (!r.ok) throw new Error(await this.parseError(r, "Login failed"));
+    return r.json();
   },
 
   async getBootstrap() {
-    const response = await fetch("/api/bootstrap");
-    if (!response.ok) throw new Error("Failed to load bootstrap data");
-    return response.json();
+    const r = await fetch("/api/bootstrap");
+    if (!r.ok) throw new Error("Failed to load bootstrap data");
+    return r.json();
   },
 
-  async getProducts({ q = "", district = "" } = {}) {
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (district) params.set("district", district);
-    const response = await fetch(`/api/products?${params.toString()}`);
-    if (!response.ok) throw new Error("Failed to load products");
-    return response.json();
+  async getProducts({ q="", district="" } = {}) {
+    const p = new URLSearchParams();
+    if (q) p.set("q", q);
+    if (district) p.set("district", district);
+    const r = await fetch(`/api/products?${p.toString()}`);
+    if (!r.ok) throw new Error("Failed to load products");
+    return r.json();
   },
 
   async getMyProducts() {
-    const response = await fetch("/api/products/farmer/my-products", {
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (response.status === 401) {
-      this.clearToken();
-      window.location.href = "/auth";
-      throw new Error("Not authenticated");
-    }
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to load products"));
-    return response.json();
+    const r = await fetch("/api/products/farmer/my-products", { headers:{ Authorization:`Bearer ${this.getToken()}` } });
+    if (r.status === 401) { this.clearToken(); window.location.href="/auth"; throw new Error("Not authenticated"); }
+    if (!r.ok) throw new Error(await this.parseError(r, "Failed to load products"));
+    return r.json();
   },
 
   async createProduct(product) {
-    const response = await fetch("/api/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.getToken()}`
-      },
-      body: JSON.stringify(product)
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to create product"));
-    return response.json();
+    const r = await fetch("/api/products", { method:"POST", headers:{"Content-Type":"application/json", Authorization:`Bearer ${this.getToken()}`}, body:JSON.stringify(product) });
+    if (!r.ok) throw new Error(await this.parseError(r, "Failed to create product"));
+    return r.json();
   },
 
   async updateProduct(id, updates) {
-    const response = await fetch(`/api/products/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.getToken()}`
-      },
-      body: JSON.stringify(updates)
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to update product"));
-    return response.json();
+    const r = await fetch(`/api/products/${id}`, { method:"PUT", headers:{"Content-Type":"application/json", Authorization:`Bearer ${this.getToken()}`}, body:JSON.stringify(updates) });
+    if (!r.ok) throw new Error(await this.parseError(r, "Failed to update product"));
+    return r.json();
   },
 
   async deleteProduct(id) {
-    const response = await fetch(`/api/products/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to delete product"));
-    return response.json();
+    const r = await fetch(`/api/products/${id}`, { method:"DELETE", headers:{ Authorization:`Bearer ${this.getToken()}` } });
+    if (!r.ok) throw new Error(await this.parseError(r, "Failed to delete product"));
+    return r.json();
   },
 
   async getLivePrices() {
-    const response = await fetch("/api/live-prices");
-    if (!response.ok) throw new Error("Failed to load live prices");
-    return response.json();
+    const r = await fetch("/api/live-prices");
+    if (!r.ok) throw new Error("Failed to load live prices");
+    return r.json();
   },
 
   async sendMessage(payload) {
-    const response = await fetch("/api/chat/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to send message"));
-    return response.json();
+    const r = await fetch("/api/chat/messages", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
+    if (!r.ok) throw new Error(await this.parseError(r, "Failed to send message"));
+    return r.json();
   },
 
   async submitFeedback(payload) {
-    const response = await fetch("/api/feedback", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to submit feedback"));
-    return response.json();
+    const r = await fetch("/api/feedback", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
+    if (!r.ok) throw new Error(await this.parseError(r, "Failed to submit feedback"));
+    return r.json();
   },
 
+  // Used by buyer dashboard and homepage negotiation hub
   async submitInquiry(payload) {
-    const response = await fetch("/api/bulk-inquiries", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.getToken()}`
-      },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to submit inquiry"));
-    return response.json();
+    const headers = { "Content-Type":"application/json" };
+    const token = this.getToken();
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const r = await fetch("/api/bulk-inquiries", { method:"POST", headers, body:JSON.stringify(payload) });
+    if (!r.ok) throw new Error(await this.parseError(r, "Failed to submit inquiry"));
+    return r.json();
   },
 
+  // Used by homepage Buy Now button (guest checkout)
   async placeOrder(payload) {
-    const response = await fetch("/api/bulk-inquiries", {
+    const r = await fetch("/api/bulk-inquiries", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type":"application/json" },
       body: JSON.stringify({
         product: payload.productName,
         quantity: payload.quantity,
@@ -170,124 +111,20 @@ const API = {
         notes: "Payment: " + payload.method + (payload.guestEmail ? " | Email: " + payload.guestEmail : "")
       })
     });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to place order"));
-    return response.json();
+    if (!r.ok) throw new Error(await this.parseError(r, "Failed to place order"));
+    return r.json();
   },
 
+  // Fetch buyer's own inquiries
   async getInquiries() {
-    const response = await fetch("/api/bulk-inquiries", {
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error("Failed to load inquiries");
-    return response.json();
-  },
-
-  async initiatePayment(payload) {
-    const response = await fetch("/api/payments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.getToken()}` },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Payment failed"));
-    return response.json();
-  },
-
-  async getPayments() {
-    const response = await fetch("/api/payments", {
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error("Failed to load payments");
-    return response.json();
-  },
-
-  async confirmPayment(id) {
-    const response = await fetch(`/api/payments/${id}/confirm`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to confirm payment"));
-    return response.json();
-  },
-
-  async rejectPayment(id) {
-    const response = await fetch(`/api/payments/${id}/reject`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to reject payment"));
-    return response.json();
-  },
-
-  async getReviews(productId) {
-    const url = productId ? `/api/reviews?productId=${productId}` : '/api/reviews';
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to load reviews");
-    return response.json();
-  },
-
-  async submitReview(payload) {
-    const response = await fetch("/api/reviews", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.getToken()}` },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to submit review"));
-    return response.json();
-  },
-
-  async getAllReviews() {
-    const response = await fetch("/api/reviews/all", {
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error("Failed to load reviews");
-    return response.json();
-  },
-
-  async deleteReview(id) {
-    const response = await fetch(`/api/reviews/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error("Failed to delete review");
-    return response.json();
-  },
-
-  async placeOrder(payload) {
-    const headers = { "Content-Type": "application/json" };
+    const headers = {};
     const token = this.getToken();
     if (token) headers.Authorization = `Bearer ${token}`;
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) throw new Error(await this.parseError(response, "Failed to place order"));
-    return response.json();
+    const r = await fetch("/api/bulk-inquiries", { headers });
+    if (!r.ok) throw new Error("Failed to load inquiries");
+    return r.json();
   },
 
-  async getOrders() {
-    const response = await fetch("/api/orders", {
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error("Failed to load orders");
-    return response.json();
-  },
-
-  async confirmOrder(id) {
-    const response = await fetch(`/api/orders/${id}/confirm`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error("Failed to confirm order");
-    return response.json();
-  },
-
-  async rejectOrder(id) {
-    const response = await fetch(`/api/orders/${id}/reject`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${this.getToken()}` }
-    });
-    if (!response.ok) throw new Error("Failed to reject order");
-    return response.json();
-  }
+  // Alias used by buyer dashboard orders tab
+  async getOrders() { return this.getInquiries(); }
 };
