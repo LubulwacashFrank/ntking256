@@ -158,6 +158,22 @@ const API = {
     return response.json();
   },
 
+  async placeOrder(payload) {
+    const response = await fetch("/api/bulk-inquiries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product: payload.productName,
+        quantity: payload.quantity,
+        targetPrice: payload.pricePerUnit,
+        location: payload.guestName + " | " + payload.phone,
+        notes: "Payment: " + payload.method + (payload.guestEmail ? " | Email: " + payload.guestEmail : "")
+      })
+    });
+    if (!response.ok) throw new Error(await this.parseError(response, "Failed to place order"));
+    return response.json();
+  },
+
   async getInquiries() {
     const response = await fetch("/api/bulk-inquiries", {
       headers: { Authorization: `Bearer ${this.getToken()}` }
