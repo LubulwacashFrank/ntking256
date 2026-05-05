@@ -1,0 +1,660 @@
+// Admin Panel JavaScript - Full API Integration
+// Covers CRUD for products, users, orders, and price management
+
+// ==================== API LAYER ====================
+const API_BASE = "/api";
+const API = {
+  getToken() {
+    return localStorage.getItem("agro_token") || "";
+  },
+
+  async getUsers() {
+    const response = await fetch(`${API_BASE}/admin/users`);
+    if (!response.ok) throw new Error("Failed to fetch users");
+    return response.json();
+  },
+
+  async getProducts() {
+    const response = await fetch(`${API_BASE}/admin/products`);
+    if (!response.ok) throw new Error("Failed to fetch products");
+    return response.json();
+  },
+
+  async getInquiries() {
+    const response = await fetch(`${API_BASE}/admin/inquiries`);
+    if (!response.ok) throw new Error("Failed to fetch inquiries");
+    return response.json();
+  },
+
+  async getPrices() {
+    const response = await fetch(`${API_BASE}/admin/prices`);
+    if (!response.ok) throw new Error("Failed to fetch prices");
+    return response.json();
+  },
+
+  async getStats() {
+    const response = await fetch(`${API_BASE}/admin/stats`);
+    if (!response.ok) throw new Error("Failed to fetch stats");
+    return response.json();
+  },
+
+  async getTransactions() {
+    const response = await fetch(`${API_BASE}/admin/transactions`);
+    if (!response.ok) throw new Error("Failed to fetch transactions");
+    return response.json();
+  },
+
+  async createTransaction(payload) {
+    const response = await fetch(`${API_BASE}/admin/transactions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) throw new Error("Failed to create transaction");
+    return response.json();
+  },
+
+  async updateTransaction(id, updates) {
+    const response = await fetch(`${API_BASE}/admin/transactions/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!response.ok) throw new Error("Failed to update transaction");
+    return response.json();
+  },
+
+  async createProduct(product) {
+    const response = await fetch(`${API_BASE}/admin/products`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(product)
+    });
+    if (!response.ok) throw new Error("Failed to create product");
+    return response.json();
+  },
+
+  async updateProduct(id, updates) {
+    const response = await fetch(`${API_BASE}/admin/products/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!response.ok) throw new Error("Failed to update product");
+    return response.json();
+  },
+
+  async deleteProduct(id) {
+    const response = await fetch(`${API_BASE}/admin/products/${id}`, {
+      method: "DELETE"
+    });
+    if (!response.ok) throw new Error("Failed to delete product");
+    return response.json();
+  },
+
+  async updateUser(id, updates) {
+    const response = await fetch(`${API_BASE}/admin/users/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!response.ok) throw new Error("Failed to update user");
+    return response.json();
+  },
+
+  async deleteUser(id) {
+    const response = await fetch(`${API_BASE}/admin/users/${id}`, {
+      method: "DELETE"
+    });
+    if (!response.ok) throw new Error("Failed to delete user");
+    return response.json();
+  },
+
+  async updateInquiry(id, status) {
+    const response = await fetch(`${API_BASE}/admin/inquiries/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ status })
+    });
+    if (!response.ok) throw new Error("Failed to update inquiry");
+    return response.json();
+  },
+
+  async updatePrice(crop, price) {
+    const response = await fetch(`${API_BASE}/admin/prices/${encodeURIComponent(crop)}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ price })
+    });
+    if (!response.ok) throw new Error("Failed to update price");
+    return response.json();
+  },
+
+  async adminLogin(payload) {
+    const response = await fetch(`${API_BASE}/auth/admin-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || "Admin login failed");
+    }
+    const data = await response.json();
+    localStorage.setItem("agro_token", data.token);
+    return data;
+  },
+
+  async createBroadcast(message, type = "info") {
+    const response = await fetch(`${API_BASE}/admin/broadcast`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message, type })
+    });
+    if (!response.ok) throw new Error("Failed to create broadcast");
+    return response.json();
+  },
+
+  async getBroadcasts() {
+    const response = await fetch(`${API_BASE}/admin/broadcast`);
+    if (!response.ok) throw new Error("Failed to fetch broadcasts");
+    return response.json();
+  },
+
+  async deleteBroadcast(id) {
+    const response = await fetch(`${API_BASE}/admin/broadcast/${id}`, {
+      method: "DELETE"
+    });
+    if (!response.ok) throw new Error("Failed to delete broadcast");
+    return response.json();
+  },
+
+  logout() {
+    localStorage.removeItem("agro_token");
+    window.location.href = "/";
+  }
+};
+
+// Emoji mapping for crops
+const cropEmojis = {
+  Maize: 'dYO«',
+  Matooke: 'dY?O',
+  Cassava: 'dY"',
+  Tomatoes: 'dY?.',
+  Beans: 'dY®~',
+  Coffee: 'ƒ~',
+  Rice: 'dYO_',
+  Cabbage: 'dYª'
+};
+
+// Global data store
+let statsData = {};
+let usersData = [];
+let productsData = [];
+let inquiriesData = [];
+let pricesData = [];
+let chatData = [];
+let broadcastData = [];
+let financeData = {};
+let transactionsData = [];
+
+// ==================== INITIALIZATION ====================
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    await loadAllData();
+  } catch (e) {
+    console.error(e);
+    showToast(e.message, true);
+  }
+});
+
+// ==================== DATA LOADING ====================
+async function loadAllData() {
+  showToast("Loading data...");
+  try {
+    const [stats, users, products, inquiries, prices, broadcasts, transactions] = await Promise.all([
+      API.getStats(),
+      API.getUsers(),
+      API.getProducts(),
+      API.getInquiries(),
+      API.getPrices(),
+      API.getBroadcasts(),
+      API.getTransactions()
+    ]);
+
+    statsData = stats;
+    usersData = users;
+    productsData = products;
+    inquiriesData = inquiries;
+    pricesData = prices;
+    broadcastData = broadcasts;
+    financeData = { totalIncome: stats.totalIncome || 0, totalOutgoing: stats.totalOutgoing || 0, netFlow: stats.netFlow || 0 };
+    transactionsData = transactions;
+
+    // Try to load chat messages (optional)
+    try {
+      const chatRes = await fetch("/api/chat/messages");
+      if (chatRes.ok) {
+        chatData = await chatRes.json();
+      }
+    } catch (e) { /* noop */ }
+
+    renderDashboard();
+    renderProductsTable();
+    renderFarmersTable();
+    renderBuyersTable();
+    renderOrdersTable();
+    renderTransactionsTable();
+    renderChatConversations();
+    renderPricesTable();
+    renderBroadcasts();
+    initCharts();
+
+    showToast("Data loaded successfully!");
+  } catch (err) {
+    showToast(err.message, true);
+  }
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard() {
+  // Stat cards
+  document.getElementById("totalFarmers").textContent = (statsData.farmers || 0).toLocaleString();
+  document.getElementById("totalProducts").textContent = productsData.length.toLocaleString();
+  document.getElementById("totalOrders").textContent = inquiriesData.length.toLocaleString();
+
+  const verifiedFarmers = usersData.filter(u => u.role === "farmer" && u.isVerified).length;
+  const pendingFarmers = usersData.filter(u => u.role === "farmer" && !u.isVerified).length;
+  document.getElementById("verifiedFarmers").textContent = verifiedFarmers;
+  document.getElementById("pendingFarmers").textContent = pendingFarmers;
+
+  // Recent Orders (latest 5)
+  const recentOrdersList = document.getElementById("recentOrdersList");
+  recentOrdersList.innerHTML = inquiriesData.slice(0, 5).map(order => `
+    <div class="activity-item">
+      <div class="activity-icon" style="background:${getStatusColor(order.status)};color:white;">
+        <i class="fas ${getStatusIcon(order.status)}"></i>
+      </div>
+      <div class="activity-content">
+        <div class="activity-text"><strong>${order._id?.slice(-8) || "N/A"}</strong> - ${order.createdBy?.name || "Unknown"}</div>
+        <div class="activity-time">${order.product} ƒ?› UGX ${Number(order.targetPrice).toLocaleString()}</div>
+      </div>
+      <span class="status-badge status-${order.status}">${order.status}</span>
+    </div>
+  `).join("");
+
+  // Latest Products (Dashboard table)
+  const productsTableBody = document.getElementById("productsTableBody");
+  productsTableBody.innerHTML = productsData.slice(0, 6).map(p => `
+    <tr>
+      <td>
+        <div class="product-cell">
+          <div class="product-image-small" style="background:${getCategoryGradient(p.category)}">${getCategoryEmoji(p.category)}</div>
+          <div>
+            <div class="product-name-cell">${p.name}</div>
+            <div class="product-meta-cell">${p.district}</div>
+          </div>
+        </div>
+      </td>
+      <td>${p.farmer}</td>
+      <td><strong>UGX ${Number(p.price).toLocaleString()}</strong></td>
+      <td>${p.stock || "N/A"}</td>
+      <td><span class="status-badge ${p.status === "active" ? "status-active" : p.status === "pending" ? "status-pending" : "status-inactive"}">${p.status}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn view" title="View"><i class="fas fa-eye"></i></button>
+          <button class="action-btn edit" title="Edit" onclick="editProduct('${p._id}')"><i class="fas fa-edit"></i></button>
+          <button class="action-btn delete" title="Delete" onclick="deleteProduct('${p._id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+
+  // Top Farmers (by product count)
+  const topFarmersList = document.getElementById("topFarmersList");
+  const topFarmers = usersData
+    .filter(u => u.role === "farmer")
+    .map(f => ({
+      ...f,
+      productCount: productsData.filter(p => p.farmer === f.name).length
+    }))
+    .sort((a, b) => b.productCount - a.productCount)
+    .slice(0, 5);
+
+  topFarmersList.innerHTML = topFarmers.map((f, idx) => `
+    <div class="activity-item">
+      <div class="activity-icon" style="background:${idx === 0 ? "#FFD700" : idx === 1 ? "#C0C0C0" : idx === 2 ? "#CD7F32" : "#f0fdf4"};color:${idx < 3 ? "white" : "var(--neon-green)"};">
+        ${idx < 3 ? '<i class="fas fa-trophy"></i>' : '<i class="fas fa-user"></i>'}
+      </div>
+      <div class="activity-content">
+        <div class="activity-text"><strong>${f.name}</strong></div>
+        <div class="activity-time">${f.productCount} products ƒ?› ${f.district}</div>
+      </div>
+      <div style="font-weight:800;color:var(--warning);font-size:1.1rem;">${f.rating || "-"} ƒ-?</div>
+    </div>
+  `).join("");
+
+  // Activity Feed
+  const activityFeed = document.getElementById("activityFeed");
+  const activities = [
+    { icon: "fa-cogs", color: "#00D4FF", text: "Admin dashboard loaded", time: "Just now" }
+  ];
+  activityFeed.innerHTML = activities.map(act => `
+    <div class="activity-item">
+      <div class="activity-icon" style="background:${act.color};color:white;">
+        <i class="fas ${act.icon}"></i>
+      </div>
+      <div class="activity-content">
+        <div class="activity-text">${act.text}</div>
+        <div class="activity-time">${act.time}</div>
+      </div>
+    </div>
+  `).join("");
+
+  // Nav badges
+  const productBadge = document.querySelector('[data-section="products"] .nav-badge');
+  if (productBadge) productBadge.textContent = productsData.length;
+  const farmerBadge = document.querySelector('[data-section="farmers"] .nav-badge');
+  if (farmerBadge) farmerBadge.textContent = pendingFarmers;
+  const orderBadge = document.querySelector('[data-section="orders"] .nav-badge');
+  if (orderBadge) orderBadge.textContent = inquiriesData.length;
+}
+
+// ==================== PRODUCTS ====================
+function renderProductsTable(filterData = {}) {
+  let filtered = productsData.slice();
+
+  if (filterData.search) {
+    const term = filterData.search.toLowerCase();
+    filtered = filtered.filter(p =>
+      p.name.toLowerCase().includes(term) ||
+      p.farmer.toLowerCase().includes(term) ||
+      p.district.toLowerCase().includes(term)
+    );
+  }
+  if (filterData.category) {
+    filtered = filtered.filter(p => p.category === filterData.category);
+  }
+  if (filterData.status) {
+    filtered = filtered.filter(p => p.status === filterData.status);
+  }
+
+  const tbody = document.getElementById("allProductsTableBody");
+  tbody.innerHTML = filtered.map(p => `
+    <tr>
+      <td><strong>#${String(p._id).slice(-6)}</strong></td>
+      <td>
+        <div class="product-cell">
+          <div class="product-image-small" style="background:${getCategoryGradient(p.category)}">${getCategoryEmoji(p.category)}</div>
+          <div><div class="product-name-cell">${p.name}</div></div>
+        </div>
+      </td>
+      <td style="text-transform:capitalize;">${p.category}</td>
+      <td>${p.farmer}</td>
+      <td>${p.district}</td>
+      <td><strong>UGX ${Number(p.price).toLocaleString()}</strong>/${p.unit}</td>
+      <td>${p.stock}</td>
+      <td><span class="status-badge ${p.status === "active" ? "status-active" : p.status === "pending" ? "status-pending" : "status-inactive"}">${p.status}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn view" title="View"><i class="fas fa-eye"></i></button>
+          <button class="action-btn edit" title="Edit" onclick="editProduct('${p._id}')"><i class="fas fa-edit"></i></button>
+          <button class="action-btn delete" title="Delete" onclick="deleteProduct('${p._id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+
+  const badge = document.querySelector('[data-section="products"] .nav-badge');
+  if (badge) badge.textContent = filtered.length;
+}
+
+function filterProducts() {
+  const search = document.getElementById("productSearchInput").value;
+  const category = document.getElementById("productCategoryFilter").value;
+  const status = document.getElementById("productStatusFilter").value;
+  renderProductsTable({ search, category, status });
+}
+
+function openProductModal(productId = null) {
+  const modal = document.getElementById("productModal");
+  const title = document.getElementById("productModalTitle");
+  const f = {
+    id: document.getElementById("productId"),
+    name: document.getElementById("productName"),
+    category: document.getElementById("productCategory"),
+    price: document.getElementById("productPrice"),
+    unit: document.getElementById("productUnit"),
+    farmer: document.getElementById("productFarmer"),
+    district: document.getElementById("productDistrict"),
+    stock: document.getElementById("productStock"),
+    status: document.getElementById("productStatus"),
+    verified: document.getElementById("badgeVerified"),
+    featured: document.getElementById("badgeFeatured"),
+    fresh: document.getElementById("badgeFresh")
+  };
+
+  if (productId) {
+    const p = productsData.find(p => String(p._id) === String(productId));
+    if (p) {
+      title.textContent = "Edit Product";
+      f.id.value = p._id;
+      f.name.value = p.name;
+      f.category.value = p.category;
+      f.price.value = p.price;
+      f.unit.value = p.unit;
+      f.farmer.value = p.farmer;
+      f.district.value = p.district;
+      f.stock.value = p.stock;
+      f.status.value = p.status;
+      f.verified.checked = p.verified;
+      f.featured.checked = p.featured;
+      f.fresh.checked = p.fresh;
+    }
+  } else {
+    title.textContent = "Add New Product";
+    f.id.value = "";
+    f.name.value = "";
+    f.category.value = "";
+    f.price.value = "";
+    f.unit.value = "kg";
+    f.farmer.value = "";
+    f.district.value = "";
+    f.stock.value = "";
+    f.status.value = "active";
+    f.verified.checked = false;
+    f.featured.checked = false;
+    f.fresh.checked = false;
+  }
+  modal.classList.add("active");
+}
+
+async function saveProduct() {
+  const id = document.getElementById("productId").value;
+  const name = document.getElementById("productName").value.trim();
+  const category = document.getElementById("productCategory").value;
+  const price = parseInt(document.getElementById("productPrice").value, 10);
+  const unit = document.getElementById("productUnit").value;
+  const farmer = document.getElementById("productFarmer").value.trim();
+  const district = document.getElementById("productDistrict").value.trim();
+  const stock = document.getElementById("productStock").value.trim();
+  const status = document.getElementById("productStatus").value;
+  const verified = document.getElementById("badgeVerified").checked;
+  const featured = document.getElementById("badgeFeatured").checked;
+  const fresh = document.getElementById("badgeFresh").checked;
+
+  if (!name || !category || !price || !farmer || !district) {
+    showToast("Please fill all required fields", "error");
+    return;
+  }
+
+  try {
+    if (id) {
+      await API.updateProduct(id, { name, category, price, unit, farmer, district, stock, status, verified, featured, fresh });
+      showToast("Product updated successfully");
+    } else {
+      await API.createProduct({ name, category, price, unit, farmer, district, stock, status, verified, featured, fresh });
+      showToast("Product added successfully");
+    }
+    closeModal("productModal");
+    loadAllData();
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function deleteProduct(id) {
+  if (!confirm("Are you sure you want to delete this product?")) return;
+  try {
+    await API.deleteProduct(id);
+    showToast("Product deleted successfully");
+    loadAllData();
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+function editProduct(id) {
+  openProductModal(id);
+}
+
+// ==================== FARMERS ====================
+function renderFarmersTable(searchTerm = "") {
+  let farmers = usersData.filter(u => u.role === "farmer");
+
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    farmers = farmers.filter(
+      f => f.name.toLowerCase().includes(term) || f.email.toLowerCase().includes(term) || f.district.toLowerCase().includes(term)
+    );
+  }
+
+  const farmersWithStats = farmers.map(f => ({
+    ...f,
+    productCount: productsData.filter(p => p.farmer === f.name).length
+  }));
+
+  const tbody = document.getElementById("farmersTableBody");
+  tbody.innerHTML = farmersWithStats.map(f => `
+    <tr>
+      <td>
+        <div class="product-cell">
+          <div class="product-image-small" style="background:linear-gradient(135deg,var(--neon-green),var(--electric-green));color:var(--dark-bg);font-weight:800;">${f.name.split(" ").map(n => n[0]).join("").substring(0,2)}</div>
+          <div>
+            <div class="product-name-cell">${f.name}</div>
+            <div class="product-meta-cell">${f.email}</div>
+          </div>
+        </div>
+      </td>
+      <td>${f.district}</td>
+      <td><strong>${f.productCount}</strong></td>
+      <td><span style="color:var(--warning);font-weight:700;">${f.rating || "-"} ƒ-?</span></td>
+      <td><span class="status-badge ${f.isVerified ? "status-verified" : "status-pending"}">${f.isVerified ? "Verified" : "Pending"}</span></td>
+      <td>${f.createdAt ? new Date(f.createdAt).toLocaleDateString() : "-"}</td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn view" title="View"><i class="fas fa-eye"></i></button>
+          ${!f.isVerified ? `<button class="action-btn approve" title="Approve" onclick="approveFarmer('${f._id || f.id}')"><i class="fas fa-check"></i></button>` : ""}
+          <button class="action-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+
+  document.getElementById("verifiedFarmers").textContent = usersData.filter(u => u.role === "farmer" && u.isVerified).length;
+  document.getElementById("pendingFarmers").textContent = usersData.filter(u => u.role === "farmer" && !u.isVerified).length;
+}
+
+function filterFarmers() {
+  const term = document.getElementById("farmerSearchInput").value;
+  renderFarmersTable(term);
+}
+
+async function approveFarmer(userId) {
+  try {
+    await API.updateUser(userId, { isVerified: true });
+    showToast("Farmer approved!");
+    loadAllData();
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+// ==================== BUYERS ====================
+function renderBuyersTable(searchTerm = "") {
+  let buyers = usersData.filter(u => u.role === "bulk_buyer");
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    buyers = buyers.filter(b =>
+      b.name.toLowerCase().includes(term) ||
+      b.email.toLowerCase().includes(term) ||
+      (b.district || "").toLowerCase().includes(term)
+    );
+  }
+  const tbody = document.getElementById("buyersTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = buyers.map(b => `
+    <tr>
+      <td>
+        <div class="product-cell">
+          <div class="product-image-small" style="background:linear-gradient(135deg,var(--ocean-blue),#0099ff);color:white;font-weight:800;font-size:1rem;">${b.name.split(" ").map(n=>n[0]).join("").substring(0,2)}</div>
+          <div>
+            <div class="product-name-cell">${b.name}</div>
+            <div class="product-meta-cell">${b.organization || ""}</div>
+          </div>
+        </div>
+      </td>
+      <td>${b.email}</td>
+      <td>${b.district || "-"}</td>
+      <td>${b.organization || "-"}</td>
+      <td>${inquiriesData.filter(i => i.createdBy && (i.createdBy._id === b._id || i.createdBy === b._id)).length}</td>
+      <td>${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : "-"}</td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn delete" title="Delete" onclick="deleteUser('${b._id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function filterBuyers() {
+  const term = document.getElementById("buyerSearchInput")?.value || "";
+  renderBuyersTable(term);
+}
+
+async function deleteUser(id) {
+  if (!confirm("Delete this user?")) return;
+  try {
+    await API.deleteUser(id);
+    showToast("User deleted");
+    loadAllData();
+  } catch (err) {
+    showToast(err.message, true);
+  }
+}
+
+// ==================== ORDERS ====================
+function renderOrdersTable(statusFilter = "") {
+  let filtered = inquiriesData.slice();
+  if (statusFilter) {
+    filtered = filtered.filter(o => o.status === statusFilter);
+  }
+
+  const tbody = document.getElementById("ordersTableBody");

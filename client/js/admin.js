@@ -1,4 +1,4 @@
-// Admin Panel JavaScript - Full API Integration
+﻿// Admin Panel JavaScript - Full API Integration
 // Covers CRUD for products, users, orders, and price management
 
 // ==================== API LAYER ====================
@@ -193,14 +193,14 @@ const API = {
 
 // Emoji mapping for crops
 const cropEmojis = {
-  Maize: '🌽',
-  Matooke: '🍌',
-  Cassava: '🥔',
-  Tomatoes: '🍅',
-  Beans: '🫘',
-  Coffee: '☕',
-  Rice: '🌾',
-  Cabbage: '🥬'
+  Maize: 'ðŸŒ½',
+  Matooke: 'ðŸŒ',
+  Cassava: 'ðŸ¥”',
+  Tomatoes: 'ðŸ…',
+  Beans: 'ðŸ«˜',
+  Coffee: 'â˜•',
+  Rice: 'ðŸŒ¾',
+  Cabbage: 'ðŸ¥¬'
 };
 
 // Global data store
@@ -293,7 +293,7 @@ function renderDashboard() {
       </div>
       <div class="activity-content">
         <div class="activity-text"><strong>${order._id?.slice(-8) || "N/A"}</strong> - ${order.createdBy?.name || "Unknown"}</div>
-        <div class="activity-time">${order.product} • UGX ${Number(order.targetPrice).toLocaleString()}</div>
+        <div class="activity-time">${order.product} â€¢ UGX ${Number(order.targetPrice).toLocaleString()}</div>
       </div>
       <span class="status-badge status-${order.status}">${order.status}</span>
     </div>
@@ -344,9 +344,9 @@ function renderDashboard() {
       </div>
       <div class="activity-content">
         <div class="activity-text"><strong>${f.name}</strong></div>
-        <div class="activity-time">${f.productCount} products • ${f.district}</div>
+        <div class="activity-time">${f.productCount} products â€¢ ${f.district}</div>
       </div>
-      <div style="font-weight:800;color:var(--warning);font-size:1.1rem;">${f.rating || "-"} ⭐</div>
+      <div style="font-weight:800;color:var(--warning);font-size:1.1rem;">${f.rating || "-"} â­</div>
     </div>
   `).join("");
 
@@ -564,7 +564,7 @@ function renderFarmersTable(searchTerm = "") {
       </td>
       <td>${f.district}</td>
       <td><strong>${f.productCount}</strong></td>
-      <td><span style="color:var(--warning);font-weight:700;">${f.rating || "-"} ⭐</span></td>
+      <td><span style="color:var(--warning);font-weight:700;">${f.rating || "-"} â­</span></td>
       <td><span class="status-badge ${f.isVerified ? "status-verified" : "status-pending"}">${f.isVerified ? "Verified" : "Pending"}</span></td>
       <td>${f.createdAt ? new Date(f.createdAt).toLocaleDateString() : "-"}</td>
       <td>
@@ -651,32 +651,144 @@ async function deleteUser(id) {
 }
 
 // ==================== ORDERS ====================
+// ==================== ORDERS ====================
 function renderOrdersTable(statusFilter = "") {
   let filtered = inquiriesData.slice();
-  if (statusFilter) {
-    filtered = filtered.filter(o => o.status === statusFilter);
-  }
+  if (statusFilter) filtered = filtered.filter(o => o.status === statusFilter);
+
+  const el = id => document.getElementById(id);
+  if (el("ordersCompleted")) el("ordersCompleted").textContent = inquiriesData.filter(o => o.status === "completed").length;
+  if (el("ordersProcessing")) el("ordersProcessing").textContent = inquiriesData.filter(o => o.status === "processing").length;
+  if (el("ordersPending")) el("ordersPending").textContent = inquiriesData.filter(o => o.status === "pending").length;
 
   const tbody = document.getElementById("ordersTableBody");
-  tbody.innerHTML = filtered.map(o => `
-    <tr>
-      <td><strong>${o._id?.slice(-8)}</strong></td>
-      <td>${o.createdBy?.name || "Unknown"}</td>
+  tbody.innerHTML = filtered.map(o => {
+    const total = Number(o.targetPrice || 0) * Number(o.quantity || 0);
+    const buyer = o.createdBy?.name || "Guest";
+    const phone = o.notes?.match(/Phone:\s*([^|]+)/)?.[1]?.trim() || o.location || "-";
+    const method = o.notes?.match(/Payment:\s*([^|]+)/)?.[1]?.trim() || "-";
+    const pid = o.product.replace(/'/g, "\\'");
+    const approveBtn = o.status === "pending"
+      ? `<button class="action-btn approve" style="background:#10B981;color:white" title="Approve" onclick="updateOrderStatus('${o._id}','processing')"><i class="fas fa-play"></i></button>`
+      : "";
+    const completeBtn = o.status === "processing"
+      ? `<button class="action-btn approve" style="background:#059669;color:white" title="Complete" onclick="confirmComplete('${o._id}','${pid}',${total})"><i class="fas fa-check"></i></button>`
+      : "";
+    const cancelBtn = (o.status === "pending" || o.status === "processing")
+      ? `<button class="action-btn delete" title="Cancel" onclick="updateOrderStatus('${o._id}','cancelled')"><i class="fas fa-times"></i></button>`
+      : "";
+    return `<tr>
+      <td><strong>#${o._id?.slice(-8)}</strong></td>
+      <td><div style="font-weight:700">${buyer}</div><div style="font-size:11px;color:#6B7280">${phone}</div></td>
       <td>${o.product}</td>
-      <td>${o.quantity}kg</td>
-      <td><strong>UGX ${Number(o.targetPrice).toLocaleString()}</strong></td>
-      <td>${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : "-"}</td>
+      <td>${o.quantity} kg</td>
+      <td><div style="font-size:11px;color:#6B7280">@ UGX ${Number(o.targetPrice).toLocaleString()}/kg</div><div style="font-weight:800;color:#059669">UGX ${total.toLocaleString()}</div></td>
+      <td><div>${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : "-"}</div><div style="font-size:11px;color:#6B7280">${method}</div></td>
       <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="action-btn view" title="View"><i class="fas fa-eye"></i></button>
-          ${o.status === "pending" ? `<button class="action-btn approve" title="Process" onclick="updateOrderStatus('${o._id}', 'processing')"><i class="fas fa-play"></i></button>` : ""}
-          ${o.status === "processing" ? `<button class="action-btn approve" title="Complete" onclick="updateOrderStatus('${o._id}', 'completed')"><i class="fas fa-check"></i></button>` : ""}
-          ${(o.status === "pending" || o.status === "processing") ? `<button class="action-btn delete" title="Cancel" onclick="updateOrderStatus('${o._id}', 'cancelled')"><i class="fas fa-times"></i></button>` : ""}
-        </div>
-      </td>
-    </tr>
-  `).join("");
+      <td><div class="action-btns">
+        <button class="action-btn view" title="View" onclick="viewOrderDetail('${o._id}')"><i class="fas fa-eye"></i></button>
+        ${approveBtn}${completeBtn}${cancelBtn}
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+
+function viewOrderDetail(orderId) {
+  const o = inquiriesData.find(x => x._id === orderId);
+  if (!o) return;
+  const total = Number(o.targetPrice || 0) * Number(o.quantity || 0);
+  const commission = Math.round(total * 0.05);
+  const payout = total - commission;
+  const buyer = o.createdBy?.name || "Guest";
+  const farmerPayout = o.createdBy?.payoutPhone || o.createdBy?.payoutAccount
+    ? `<div style="background:#EFF6FF;border-radius:12px;padding:14px;border-left:4px solid #3B82F6">
+        <div style="font-weight:700;font-size:12px;color:#1D4ED8;margin-bottom:8px"><i class="fas fa-university"></i> Farmer Payout Details</div>
+        ${o.createdBy?.payoutPhone ? `<div style="font-size:12px;color:#374151;margin-bottom:4px"><strong>Mobile Money:</strong> ${o.createdBy.payoutPhone}</div>` : ""}
+        ${o.createdBy?.payoutAccount ? `<div style="font-size:12px;color:#374151;margin-bottom:4px"><strong>Account:</strong> ${o.createdBy.payoutAccount}</div>` : ""}
+        ${o.createdBy?.payoutBank ? `<div style="font-size:12px;color:#374151"><strong>Bank:</strong> ${o.createdBy.payoutBank}</div>` : ""}
+      </div>`
+    : `<div style="background:#FEF3C7;border-radius:10px;padding:12px;font-size:12px;color:#92400E"><i class="fas fa-exclamation-triangle"></i> Farmer has not provided payout details.</div>`;
+  const sc = { pending: "#F59E0B", processing: "#3B82F6", completed: "#10B981", cancelled: "#EF4444" };
+  const pid = o.product.replace(/'/g, "\\'");
+  const approveAction = o.status === "pending"
+    ? `<button onclick="updateOrderStatus('${o._id}','processing');this.closest('.modal-overlay').remove()" style="flex:1;padding:10px;background:#10B981;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer">Approve</button>`
+    : "";
+  const completeAction = o.status === "processing"
+    ? `<button onclick="confirmComplete('${o._id}','${pid}',${total},'${o.createdBy?.payoutPhone||""}','${o.createdBy?.payoutAccount||""}','${o.createdBy?.payoutBank||""}');this.closest('.modal-overlay').remove()" style="flex:1;padding:10px;background:#059669;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer">Mark Completed</button>`
+    : "";
+  const m = document.createElement("div");
+  m.className = "modal-overlay active";
+  m.innerHTML = `<div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h3 class="modal-title">Order #${o._id?.slice(-8)}</h3>
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;font-size:1.1rem">${o.product}</span>
+        <span style="background:${sc[o.status]};color:white;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">${o.status.toUpperCase()}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="font-size:11px;color:#6B7280">Buyer</div><div style="font-weight:700">${buyer}</div></div>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="font-size:11px;color:#6B7280">Quantity</div><div style="font-weight:700">${o.quantity} kg</div></div>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="font-size:11px;color:#6B7280">Price/kg</div><div style="font-weight:700">UGX ${Number(o.targetPrice).toLocaleString()}</div></div>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="font-size:11px;color:#6B7280">Location</div><div style="font-weight:700">${o.location || "-"}</div></div>
+      </div>
+      <div style="background:#FFF9C4;border-radius:12px;padding:14px;border-left:4px solid #F59E0B">
+        <div style="font-weight:700;font-size:12px;color:#92400E;margin-bottom:6px"><i class="fas fa-building-columns"></i> Payment Received Into</div>
+        <div style="font-size:13px;color:#374151"><strong>Equity Bank &mdash; Acc: 1003102577764</strong></div>
+        <div style="font-size:12px;color:#6B7280">Account Name: Daniel Seryazi (Platform Account)</div>
+      </div>
+      <div style="background:#f0fdf4;border-radius:12px;padding:16px;border-left:4px solid #10B981">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7280">Order Total</span><span style="font-weight:900;font-size:1.2rem;color:#059669">UGX ${total.toLocaleString()}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#6B7280">Platform Commission (5%)</span><span style="font-size:12px;font-weight:700;color:#F59E0B">UGX ${commission.toLocaleString()}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#6B7280">Farmer Payout (95%)</span><span style="font-size:12px;font-weight:700;color:#059669">UGX ${payout.toLocaleString()}</span></div>
+      </div>
+      ${farmerPayout}
+      ${o.notes ? `<div style="background:#F3F4F6;border-radius:10px;padding:12px;font-size:13px"><strong>Notes:</strong> ${o.notes}</div>` : ""}
+      <div style="display:flex;gap:8px">
+        ${approveAction}${completeAction}
+        <button onclick="this.closest('.modal-overlay').remove()" style="flex:1;padding:10px;background:#F3F4F6;color:#374151;border:none;border-radius:8px;font-weight:700;cursor:pointer">Close</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+}
+
+function confirmComplete(orderId, product, total, payoutPhone, payoutAccount, payoutBank) {
+  const commission = Math.round(total * 0.05);
+  const payout = total - commission;
+  const payoutInfo = (payoutPhone || payoutAccount)
+    ? `<div style="background:#EFF6FF;border-radius:10px;padding:12px;margin-bottom:16px;text-align:left">
+        <div style="font-weight:700;font-size:12px;color:#1D4ED8;margin-bottom:6px"><i class="fas fa-paper-plane"></i> Send UGX ${payout.toLocaleString()} to Farmer via:</div>
+        ${payoutPhone ? `<div style="font-size:13px;color:#374151;margin-bottom:3px"><i class="fas fa-mobile-alt" style="color:#10B981;width:16px"></i> Mobile Money: <strong>${payoutPhone}</strong></div>` : ""}
+        ${payoutAccount ? `<div style="font-size:13px;color:#374151;margin-bottom:3px"><i class="fas fa-university" style="color:#3B82F6;width:16px"></i> Account: <strong>${payoutAccount}</strong></div>` : ""}
+        ${payoutBank ? `<div style="font-size:13px;color:#374151"><i class="fas fa-building" style="color:#6B7280;width:16px"></i> Bank: <strong>${payoutBank}</strong></div>` : ""}
+      </div>`
+    : `<div style="background:#FEF3C7;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#92400E"><i class="fas fa-exclamation-triangle"></i> No payout details on file. Contact farmer directly.</div>`;
+  const m = document.createElement("div");
+  m.className = "modal-overlay active";
+  m.innerHTML = `<div class="modal" style="max-width:440px">
+    <div class="modal-body" style="padding:28px">
+      <div style="font-size:2.5rem;margin-bottom:12px;text-align:center">&#x2705;</div>
+      <h3 style="font-weight:900;margin-bottom:8px;text-align:center">Complete Order?</h3>
+      <p style="color:#6B7280;margin-bottom:16px;text-align:center;font-size:14px">Completing <strong>${product}</strong> will record these transactions:</p>
+      <div style="background:#f0fdf4;border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7280">Total Received</span><span style="font-weight:800;color:#059669">UGX ${total.toLocaleString()}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7280">Platform keeps (5%)</span><span style="font-weight:700;color:#F59E0B">UGX ${commission.toLocaleString()}</span></div>
+        <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid #D1FAE5"><span style="color:#6B7280;font-weight:700">Send to Farmer</span><span style="font-weight:800;color:#3B82F6;font-size:1.1rem">UGX ${payout.toLocaleString()}</span></div>
+      </div>
+      ${payoutInfo}
+      <div style="background:#FFF9C4;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#92400E">
+        <i class="fas fa-building-columns"></i> <strong>Platform Account:</strong> Equity Bank &mdash; 1003102577764 (Daniel Seryazi)
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="updateOrderStatus('${orderId}','completed');this.closest('.modal-overlay').remove()" style="flex:1;padding:12px;background:#059669;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px"><i class="fas fa-check"></i> Confirm &amp; Complete</button>
+        <button onclick="this.closest('.modal-overlay').remove()" style="flex:1;padding:12px;background:#F3F4F6;color:#374151;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
 }
 
 function filterOrders() {
@@ -689,33 +801,9 @@ async function updateOrderStatus(orderId, newStatus) {
     await API.updateInquiry(orderId, newStatus);
     showToast(`Order marked as ${newStatus}`);
     loadAllData();
-  } catch (err) {
-    showToast(err.message, "error");
-  }
+  } catch (err) { showToast(err.message, "error"); }
 }
 
-// ==================== TRANSACTIONS ====================
-function renderTransactionsTable() {
-  const tbody = document.getElementById("transactionsTableBody");
-  tbody.innerHTML = transactionsData.map(t => `
-    <tr>
-      <td><span class="status-badge ${t.type === "income" ? "status-verified" : "status-pending"}">${t.type}</span></td>
-      <td><strong>UGX ${Number(t.amount).toLocaleString()}</strong></td>
-      <td>${t.party}</td>
-      <td>${t.category}</td>
-      <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}</td>
-      <td>${t.notes || "-"}</td>
-      <td>
-        <div class="action-btns">
-          <button class="action-btn view" title="View"><i class="fas fa-eye"></i></button>
-          <button class="action-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join("");
-
-  // Update stats
-  document.getElementById("totalIncome").textContent = `UGX ${financeData.totalIncome.toLocaleString()}`;
   document.getElementById("totalOutgoing").textContent = `UGX ${financeData.totalOutgoing.toLocaleString()}`;
   document.getElementById("netFlow").textContent = `UGX ${financeData.netFlow.toLocaleString()}`;
   document.getElementById("transactionCount").textContent = transactionsData.length;
@@ -753,7 +841,7 @@ function renderPricesTable() {
       <td style="color:var(--text-secondary);">UGX ${p.previousPrice ? Number(p.previousPrice).toLocaleString() : "-"}</td>
       <td>
         <span class="${p.trend === "up" ? "trend-up" : "trend-down"}" style="padding:4px 10px;border-radius:8px;font-weight:700;font-size:0.85rem;">
-          ${p.trend === "up" ? "↑" : "↓"} ${p.change}%
+          ${p.trend === "up" ? "â†‘" : "â†“"} ${p.change}%
         </span>
       </td>
       <td>${p.lastUpdated || "Just now"}</td>
@@ -894,8 +982,8 @@ function getCategoryGradient(category) {
 }
 
 function getCategoryEmoji(category) {
-  const map = { grains: "🌾", fruits: "🍎", vegetables: "🥬", tubers: "🥔", legumes: "🫘", coffee: "☕" };
-  return map[category] || "📦";
+  const map = { grains: "ðŸŒ¾", fruits: "ðŸŽ", vegetables: "ðŸ¥¬", tubers: "ðŸ¥”", legumes: "ðŸ«˜", coffee: "â˜•" };
+  return map[category] || "ðŸ“¦";
 }
 
 function formatDate(dateStr) {
@@ -1148,7 +1236,7 @@ async function loadAndRenderReviews() {
       return;
     }
     el.innerHTML = reviews.map(r => {
-      const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+      const stars = 'â˜…'.repeat(r.rating) + 'â˜†'.repeat(5 - r.rating);
       return `<tr>
         <td><strong>${r.productId?.name || 'Product'}</strong></td>
         <td>${r.reviewerId?.name || 'Buyer'}</td>
@@ -1190,7 +1278,7 @@ async function loadAndRenderPayments() {
       <td>${p.buyerId?.name || 'Buyer'}</td>
       <td>${p.inquiryId?.product || '-'} &bull; ${p.inquiryId?.quantity || 0}kg</td>
       <td><strong>UGX ${Number(p.amount).toLocaleString()}</strong></td>
-      <td>${p.method === 'mobile_money' ? '📱 Mobile Money' : '🏦 Bank'} &bull; ${p.phone || '-'}</td>
+      <td>${p.method === 'mobile_money' ? 'ðŸ“± Mobile Money' : 'ðŸ¦ Bank'} &bull; ${p.phone || '-'}</td>
       <td><span style="background:${statusBg[p.status]||'#F3F4F6'};color:${statusColor[p.status]||'#374151'};padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">${p.status}</span></td>
       <td>${p.createdAt ? new Date(p.createdAt).toLocaleDateString() : '-'}</td>
       <td>

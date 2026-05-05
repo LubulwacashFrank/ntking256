@@ -98,7 +98,7 @@ function adminRouter(state) {
   // ── INQUIRIES ──────────────────────────────────────────
   router.get('/inquiries', async (req, res) => {
     const inquiries = await BulkInquiry.find()
-      .populate('createdBy', 'name email district organization')
+      .populate('createdBy', 'name email district organization payoutPhone payoutAccount payoutBank')
       .sort({ createdAt: -1 }).lean();
     return res.json(inquiries);
   });

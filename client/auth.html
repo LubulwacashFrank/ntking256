@@ -81,6 +81,18 @@
           <div class="form-group"><label>District</label><input id="regDistrict" placeholder="e.g. Kampala"></div>
           <div class="form-group" id="orgGroup"><label>Organization</label><input id="regOrganization" placeholder="Company name (optional)"></div>
         </div>
+        <!-- Farmer payout fields -->
+        <div id="payoutGroup" style="border:2px solid #FDE68A;border-radius:12px;padding:16px;background:#FFFBEB;margin-bottom:16px">
+          <div style="font-weight:700;font-size:.88rem;color:#92400E;margin-bottom:12px"><i class="fas fa-money-bill-wave" style="color:#F59E0B"></i> Payout Details <span style="font-weight:400;color:#B45309">(required for farmers)</span></div>
+          <div style="font-size:.8rem;color:#78350F;background:#FEF3C7;border-radius:8px;padding:10px;margin-bottom:12px">
+            <i class="fas fa-info-circle"></i> Buyers pay into our platform account: <strong>Equity Bank — 1003102577764 (Daniel Seryazi)</strong>. Admin will send your payout to the details below after order completion.
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Mobile Money Phone</label><input id="regPayoutPhone" placeholder="e.g. 0772123456"></div>
+            <div class="form-group"><label>Bank Account Number</label><input id="regPayoutAccount" placeholder="e.g. 1003102577764"></div>
+          </div>
+          <div class="form-group"><label>Bank Name</label><input id="regPayoutBank" placeholder="e.g. Equity Bank, Stanbic, MTN Mobile Money"></div>
+        </div>
         <button type="submit" class="btn-submit" id="regBtn"><i class="fas fa-user-plus"></i> Create Account</button>
         <div class="status-msg" id="regStatus"></div>
       </form>
@@ -114,6 +126,7 @@
     function toggleOrgField() {
       const role = document.getElementById('regRole').value;
       document.getElementById('orgGroup').style.display = role === 'bulk_buyer' ? 'block' : 'none';
+      document.getElementById('payoutGroup').style.display = role === 'farmer' ? 'block' : 'none';
       document.getElementById('roleHint').textContent = role === 'farmer'
         ? 'Farmers require admin verification before login.'
         : 'Bulk buyers get instant access after registration.';
@@ -138,7 +151,10 @@
           password: document.getElementById('regPassword').value,
           role: document.getElementById('regRole').value,
           district: document.getElementById('regDistrict').value,
-          organization: document.getElementById('regOrganization').value
+          organization: document.getElementById('regOrganization').value,
+          payoutPhone: document.getElementById('regPayoutPhone').value,
+          payoutAccount: document.getElementById('regPayoutAccount').value,
+          payoutBank: document.getElementById('regPayoutBank').value
         });
         if (result.pending) {
           document.getElementById('registerForm').style.display = 'none';

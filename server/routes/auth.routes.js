@@ -15,7 +15,7 @@ function authRouter() {
   const router = express.Router();
 
   router.post("/register", async (req, res) => {
-    const { name, email, password, role, district = "", organization = "" } = req.body || {};
+    const { name, email, password, role, district = "", organization = "", payoutPhone = "", payoutAccount = "", payoutBank = "" } = req.body || {};
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: "name, email, password and role are required." });
@@ -31,7 +31,6 @@ function authRouter() {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    // Farmers require admin verification before they can log in
     const isVerified = role === 'bulk_buyer';
     const user = await User.create({
       name: String(name).trim(),
@@ -40,6 +39,9 @@ function authRouter() {
       role,
       district: String(district).trim(),
       organization: String(organization).trim(),
+      payoutPhone: String(payoutPhone).trim(),
+      payoutAccount: String(payoutAccount).trim(),
+      payoutBank: String(payoutBank).trim(),
       isVerified
     });
 
