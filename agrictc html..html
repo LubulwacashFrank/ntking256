@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Tech Connect | Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --neon-green: #00FF41;
+            --electric-green: #39FF14;
+            --sunset-orange: #FF6B35;
+            --hot-pink: #FF1493;
+            --ocean-blue: #00D4FF;
+            --purple-vivid: #BF00FF;
+            --dark-bg: #0A0E27;
+            --sidebar-bg: #0d1117;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #fef3c7 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* ═══ LAYOUT ═══ */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ═══ SIDEBAR ═══ */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #1a1f3d 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 3px solid var(--neon-green);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background: linear-gradient(135deg, rgba(0,255,65,0.15), rgba(57,255,20,0.05));
+            border-bottom: 1px solid rgba(0,255,65,0.2);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0,255,65,0.5); }
+            50% { box-shadow: 0 0 35px rgba(0,255,65,0.8); }
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .admin-badge {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            padding-left: 57px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            padding: 20px 12px;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.4);
+            padding: 12px 12px 8px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.75);
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(0,255,65,0.1);
+            color: var(--neon-green);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(0,255,65,0.2), transparent);
+            color: var(--neon-green);
+            border-left: 3px solid var(--neon-green);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--sunset-orange);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* ═══ MAIN CONTENT ═══ */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 24px 32px;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 20px 28px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border-left: 5px solid var(--neon-green);
+        }
+
+        .header-left h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9fafb;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0,255,65,0.1);
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.9rem;
+            width: 200px;
+        }
+
+        .notification-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .notification-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(245,158,11,0.3);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,255,65,0.2);
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--dark-bg);
+        }
+
+        .admin-info {
+            line-height: 1.3;
+        }
+
+        .admin-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .admin-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* ═══ STATS CARDS ═══ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, currentColor 0%, transparent 70%);
+            opacity: 0.05;
+            transform: translate(30%, -30%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+        }
+
+        .stat-card.green { border-color: var(--neon-green); color: var(--neon-green); }
+        .stat-card.blue { border-color: var(--ocean-blue); color: var(--ocean-blue); }
+        .stat-card.orange { border-color: var(--sunset-orange); color: var(--sunset-orange); }
+        .stat-card.purple { border-color: var(--purple-vivid); color: var(--purple-vivid); }
+        .stat-card.pink { border-color: var(--hot-pink); color: var(--hot-pink); }
+        .stat-card.yellow { border-color: var(--warning); color: var(--warning); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: currentColor;
+            background: linear-gradient(135deg, currentColor, transparent);
+            opacity: 0.15;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        .trend-up {
+            color: var(--success);
+            background: #ecfdf5;
+        }
+
+        .trend-down {
+            color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* ═══ CONTENT SECTIONS ═══ */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid Layout for Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0,255,65,0.2);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--neon-green);
+        }
+
+        .card-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .card-action:hover {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        }
+
+        .data-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--neon-green);
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9rem;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f9fafb;
+            transform: scale(1.01);
+        }
+
+        .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .product-image-small {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .product-name-cell {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .product-meta-cell {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-verified {
+            background: linear-gradient(135deg, #00FF41, #39FF14);
+            color: var(--dark-bg);
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .action-btn.view {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .action-btn.edit {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .action-btn.delete {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-btn.approve {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Recent Activity List */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 12px;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: #f0fdf4;
+            transform: translateX(5px);
+        }
+
+        .activity-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .activity-time {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        /* Full Width Section */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            width: 95%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(50px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 2px solid var(--neon-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f0fdf4, white);
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, var(--sunset-orange), var(--hot-pink));
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .modal-body {
+            padding: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.92rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0,255,65,0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,255,65,0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239,68,68,0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-footer {
+            padding: 20px 28px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(0,255,65,0.4);
+            z-index: 99999;
+            display: none;
+            animation: toastSlide 0.4s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        @keyframes toastSlide {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .page-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            border-color: var(--neon-green);
+            background: var(--neon-green);
+            color: var(--dark-bg);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .header-right {
+                flex-wrap: wrap;
+            }
+            
+            .search-box input {
+                width: 150px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,255,65,0.4);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-green);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--electric-green);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Mobile Toggle Button -->
+<button class="mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div class="admin-layout">
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="logo-text">Agro Tech</div>
+            </div>
+            <div class="admin-badge">Admin Panel v2.0</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Main Menu</div>
+            
+            <div class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </div>
+            
+            <div class="nav-item" data-section="products" onclick="showSection('products')">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+                <span class="nav-badge">128</span>
+            </div>
+            
+            <div class="nav-item" data-section="farmers" onclick="showSection('farmers')">
+                <i class="fas fa-users"></i>
+                <span>Farmers</span>
+                <span class="nav-badge">56</span>
+            </div>
+            
+            <div class="nav-item" data-section="buyers" onclick="showSection('buyers')">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Buyers</span>
+            </div>
+            
+            <div class="nav-item" data-section="orders" onclick="showSection('orders')">
+                <i class="fas fa-receipt"></i>
+                <span>Orders</span>
+                <span class="nav-badge">23</span>
+            </div>
+
+            <div class="nav-section-title">Management</div>
+            
+            <div class="nav-item" data-section="chats" onclick="showSection('chats')">
+                <i class="fas fa-comments"></i>
+                <span>Chat Monitor</span>
+                <span class="nav-badge">8</span>
+            </div>
+            
+            <div class="nav-item" data-section="prices" onclick="showSection('prices')">
+                <i class="fas fa-dollar-sign"></i>
+                <span>Price Management</span>
+            </div>
+            
+            <div class="nav-item" data-section="reviews" onclick="showSection('reviews')">
+                <i class="fas fa-star"></i>
+                <span>Reviews & Ratings</span>
+            </div>
+
+            <div class="nav-section-title">System</div>
+            
+            <div class="nav-item" data-section="analytics" onclick="showSection('analytics')">
+                <i class="fas fa-chart-pie"></i>
+                <span>Analytics</span>
+            </div>
+            
+            <div class="nav-item" data-section="settings" onclick="showSection('settings')">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <h1 id="pageTitle">Dashboard Overview</h1>
+                <p id="pageSubtitle">Welcome back! Here's what's happening today.</p>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search" style="color:var(--text-secondary)"></i>
+                    <input type="text" placeholder="Search anything..." id="globalSearch">
+                </div>
+                <button class="notification-btn">
+                    <i class="fas fa-bell" style="color:#92400e;font-size:1.1rem;"></i>
+                    <div class="notification-dot"></div>
+                </button>
+                <div class="admin-profile">
+                    <div class="admin-avatar">AD</div>
+                    <div class="admin-info">
+                        <div class="admin-name">Admin User</div>
+                        <div class="admin-role">Super Admin</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ DASHBOARD SECTION ═══ -->
+        <section class="content-section active" id="section-dashboard">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card green">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 12.5%</div>
+                    </div>
+                    <div class="stat-value" id="totalFarmers">1,247</div>
+                    <div class="stat-label">Total Farmers</div>
+                </div>
+
+                <div class="stat-card blue">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 8.3%</div>
+                    </div>
+                    <div class="stat-value" id="totalProducts">1,178</div>
+                    <div class="stat-label">Active Products</div>
+                </div>
+
+                <div class="stat-card orange">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-handshake"></i></div>
+                        <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 23.1%</div>
+                    </div>
+                    <div class="stat-value" id="totalOrders">3,891</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+
+                <div class="stat-card purple">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="stat-trend trend-down"><i class="fas fa-arrow-down"></i> 2.4%</div>
+                    </div>
+                    <div class="stat-value">UGX 45.2M</div>
+                    <div class="stat-label">Revenue This Month</div>
+                </div>
+
+                <div class="stat-card pink">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-comments"></i></div>
+                        <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 18.7%</div>
+                    </div>
+                    <div class="stat-value">892</div>
+                    <div class="stat-label">Active Chats</div>
+                </div>
+
+                <div class="stat-card yellow">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 5.2%</div>
+                    </div>
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">Avg. Rating</div>
+                </div>
+            </div>
+
+            <!-- Charts and Tables Grid -->
+            <div class="dashboard-grid">
+                <!-- Sales Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-chart-area"></i> Sales Overview</h3>
+                        <select class="card-action" onchange="updateChart(this.value)">
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-clock"></i> Recent Orders</h3>
+                        <button class="card-action" onclick="showSection('orders')">View All</button>
+                    </div>
+                    <div class="activity-list" id="recentOrdersList">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-box"></i> Latest Products</h3>
+                        <button class="card-action" onclick="openProductModal()">+ Add Product</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Farmer</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <!-- Generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Top Farmers & Activity Feed -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-trophy"></i> Top Farmers</h3>
+                    </div>
+                    <div class="activity-list" id="topFarmersList">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-bolt"></i> Recent Activity</h3>
+                    </div>
+                    <div class="activity-list" id="activityFeed">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ PRODUCTS SECTION ═══ -->
+        <section class="content-section" id="section-products">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-box"></i> All Products</h3>
+                    <div style="display:flex;gap:12px;">
+                        <input type="text" class="form-input" placeholder="Search products..." style="width:250px;" id="productSearchInput" oninput="filterProducts()">
+                        <select class="form-select" style="width:150px;" id="productCategoryFilter" onchange="filterProducts()">
+                            <option value="">All Categories</option>
+                            <option value="grains">Grains</option>
+                            <option value="fruits">Fruits</option>
+                            <option value="vegetables">Vegetables</option>
+                            <option value="tubers">Tubers</option>
+                            <option value="legumes">Legumes</option>
+                            <option value="coffee">Coffee</option>
+                        </select>
+                        <select class="form-select" style="width:140px;" id="productStatusFilter" onchange="filterProducts()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="openProductModal()">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Farmer</th>
+                            <th>District</th>
+                            <th>Price (UGX)</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allProductsTableBody">
+                        <!-- Generated by JS -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="productsPagination">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ FARMERS SECTION ═══ -->
+        <section class="content-section" id="section-farmers">
+            <div class="stats-grid" style="margin-bottom:24px;">
+                <div class="stat-card green">
+                    <div class="stat-value" id="verifiedFarmers">892</div>
+                    <div class="stat-label">Verified Farmers</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-value" id="pendingFarmers">156</div>
+                    <div class="stat-label">Pending Verification</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-value">199</div>
+                    <div class="stat-label">New This Month</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-users"></i> Farmer Management</h3>
+                    <input type="text" class="form-input" placeholder="Search farmers..." style="width:250px;" id="farmerSearchInput" oninput="filterFarmers()">
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Farmer</th>
+                            <th>Contact</th>
+                            <th>District</th>
+                            <th>Products</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="farmersTableBody">
+                        <!-- Generated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══ ORDERS SECTION ═══ -->
+        <section class="content-section" id="section-orders">
+            <div class="stats-grid" style="margin-bottom:24px;">
+                <div class="stat-card green">
+                    <div class="stat-value">1,234</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">Processing</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-value">45</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card pink">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Cancelled</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-receipt"></i> Order Management</h3>
+                    <select class="form-select" style="width:160px;" id="orderStatusFilter" onchange="filterOrders()">
+                        <option value="">All Orders</option>
+                        <option value="completed">Completed</option>
+                        <option value="processing">Processing</option>
+                        <option value="pending">Pending</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Total (UGX)</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- Generated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══ CHATS SECTION ═══ -->
+        <section class="content-section" id="section-chats">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-comments"></i> Active Conversations</h3>
+                    </div>
+                    <div class="activity-list" id="chatConversationsList">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-chart-bar"></i> Chat Statistics</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chatStatsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ PRICES SECTION ═══ -->
+        <section class="content-section" id="section-prices">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-dollar-sign"></i> Market Price Management</h3>
+                    <button class="btn btn-primary" onclick="openPriceModal()">
+                        <i class="fas fa-plus"></i> Update Price
+                    </button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Crop</th>
+                            <th>Current Price (UGX)</th>
+                            <th>Previous Price</th>
+                            <th>Change</th>
+                            <th>Last Updated</th>
+                            <th>Trend</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pricesTableBody">
+                        <!-- Generated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══ ANALYTICS SECTION ═══ -->
+        <section class="content-section" id="section-analytics">
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-chart-line"></i> Revenue Analytics</h3>
+                    </div>
+                    <div class="chart-container" style="height:400px;">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-map-marked-alt"></i> Sales by Region</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="regionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-tags"></i> Category Distribution</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SETTINGS SECTION ═══ -->
+        <section class="content-section" id="section-settings">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-cog"></i> System Settings</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Platform Name</label>
+                        <input type="text" class="form-input" value="Agro Tech Connect">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Support Email</label>
+                        <input type="email" class="form-input" value="support@agrotechconnect.ug">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Commission Rate (%)</label>
+                            <input type="number" class="form-input" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Min Order Amount (UGX)</label>
+                            <input type="number" class="form-input" value="5000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Platform Description</label>
+                        <textarea class="form-textarea" rows="4">Uganda's #1 farm-to-market platform connecting farmers directly with buyers.</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ═══ PRODUCT MODAL ═══ -->
+<div class="modal-overlay" id="productModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="productModalTitle">Add New Product</h3>
+            <button class="modal-close" onclick="closeModal('productModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="productId">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Product Name *</label>
+                    <input type="text" class="form-input" id="productName" placeholder="e.g., Fresh Cassava">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select class="form-select" id="productCategory">
+                        <option value="">Select Category</option>
+                        <option value="grains">Grains & Cereals</option>
+                        <option value="fruits">Fruits</option>
+                        <option value="vegetables">Vegetables</option>
+                        <option value="tubers">Tubers & Roots</option>
+                        <option value="legumes">Legumes & Pulses</option>
+                        <option value="coffee">Coffee & Others</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Price (UGX) *</label>
+                    <input type="number" class="form-input" id="productPrice" placeholder="e.g., 1200">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Unit *</label>
+                    <select class="form-select" id="productUnit">
+                        <option value="kg">Kilogram (kg)</option>
+                        <option value="bunch">Bunch</option>
+                        <option value="piece">Piece</option>
+                        <option value="head">Head</option>
+                        <option value="bag">Bag (50kg)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Farmer Name *</label>
+                    <input type="text" class="form-input" id="productFarmer" placeholder="e.g., Sarah Ema">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">District *</label>
+                    <select class="form-select" id="productDistrict">
+                        <option value="">Select District</option>
+                        <option value="Kampala">Kampala</option>
+                        <option value="Jinja">Jinja</option>
+                        <option value="Mukono">Mukono</option>
+                        <option value="Mbale">Mbale</option>
+                        <option value="Mbarara">Mbarara</option>
+                        <option value="Gulu">Gulu</option>
+                        <option value="Soroti">Soroti</option>
+                        <option value="Arua">Arua</option>
+                        <option value="Kabale">Kabale</option>
+                        <option value="Wakiso">Wakiso</option>
+                        <option value="Bugisu">Bugisu</option>
+                        <option value="Lira">Lira</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Stock Quantity</label>
+                <input type="text" class="form-input" id="productStock" placeholder="e.g., 500kg available">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select class="form-select" id="productStatus">
+                    <option value="active">Active</option>
+                    <option value="pending">Pending Review</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Badges</label>
+                <div style="display:flex;gap:12px;margin-top:8px;">
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="badgeVerified"> Verified
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="badgeFeatured"> Featured
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="badgeFresh"> Fresh
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('productModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveProduct()">
+                <i class="fas fa-save"></i> Save Product
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PRICE MODAL ═══ -->
+<div class="modal-overlay" id="priceModal">
+    <div class="modal" style="max-width:500px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Update Market Price</h3>
+            <button class="modal-close" onclick="closeModal('priceModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Crop/Product *</label>
+                <select class="form-select" id="priceCrop">
+                    <option value="🌽 Maize">Maize</option>
+                    <option value="🍌 Matooke">Matooke</option>
+                    <option value="🥔 Cassava">Cassava</option>
+                    <option value="🍅 Tomatoes">Tomatoes</option>
+                    <option value="🫘 Beans">Beans</option>
+                    <option value="☕ Coffee">Coffee</option>
+                    <option value="🌾 Rice">Rice</option>
+                    <option value="🥬 Cabbage">Cabbage</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Price (UGX) *</label>
+                <input type="number" class="form-input" id="priceValue" placeholder="Enter new price per kg">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea class="form-textarea" rows="3" id="priceNotes" placeholder="Reason for price change..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('priceModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="savePrice()">
+                <i class="fas fa-save"></i> Update Price
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TOAST NOTIFICATION ═══ -->
+<div class="toast" id="toastNotification"></div>
+
+<script>
+// ==================== DATA STORE ====================
+let products = [
+    { id: 1, name: "Cassava - Fresh", category: "tubers", farmer: "Sarah Ema", district: "Jinja", price: 1200, unit: "kg", stock: "500kg available", status: "active", verified: true, featured: false, fresh: true },
+    { id: 2, name: "Maize - Dried", category: "grains", farmer: "John Okello", district: "Mukono", price: 1500, unit: "kg", stock: "2 tons available", status: "active", verified: true, featured: true, fresh: false },
+    { id: 3, name: "Matooke - Kisansa", category: "fruits", farmer: "Mary Nakamya", district: "Mukono", price: 1500, unit: "bunch", stock: "15 bunches", status: "active", verified: true, featured: true, fresh: true },
+    { id: 4, name: "Tomatoes - Fresh", category: "vegetables", farmer: "David Mugisha", district: "Wakiso", price: 2000, unit: "kg", stock: "200kg available", status: "active", verified: true, featured: false, fresh: true },
+    { id: 5, name: "Beans - Kanyebwa", category: "legumes", farmer: "Grace Robert", district: "Mbale", price: 2800, unit: "kg", stock: "800kg available", status: "active", verified: true, featured: false, fresh: false },
+    { id: 6, name: "Cabbage - Fresh", category: "vegetables", farmer: "Peter Tumusiime", district: "Kabale", price: 800, unit: "head", stock: "150 heads", status: "pending", verified: false, featured: false, fresh: true },
+    { id: 7, name: "Sweet Potatoes", category: "tubers", farmer: "Samuel Ongom", district: "Soroti", price: 1800, unit: "kg", stock: "1 ton available", status: "active", verified: true, featured: false, fresh: false },
+    { id: 8, name: "Coffee - Robusta", category: "coffee", farmer: "Joseph Mwanga", district: "Bugisu", price: 8500, unit: "kg", stock: "500kg available", status: "active", verified: true, featured: true, fresh: false },
+    { id: 9, name: "Rice - Super", category: "grains", farmer: "Alice Namutebi", district: "Mbarara", price: 4500, unit: "kg", stock: "300kg available", status: "inactive", verified: true, featured: false, fresh: false },
+    { id: 10, name: "Mangoes - Fresh", category: "fruits", farmer: "Francis Otim", district: "Soroti", price: 500, unit: "piece", stock: "100 pieces", status: "active", verified: true, featured: false, fresh: true },
+    { id: 11, name: "Groundnuts", category: "legumes", farmer: "Grace Akello", district: "Lira", price: 3500, unit: "kg", stock: "400kg available", status: "active", verified: true, featured: false, fresh: false },
+    { id: 12, name: "Onions", category: "vegetables", farmer: "Mohammed Ssempijja", district: "Kampala", price: 2500, unit: "kg", stock: "150kg available", status: "active", verified: true, featured: false, fresh: true }
+];
+
+let farmers = [
+    { id: 1, name: "Sarah Ema", email: "sarah@email.com", phone: "+256 700 123456", district: "Jinja", products: 5, rating: 4.8, status: "verified", joined: "2023-06-15" },
+    { id: 2, name: "John Okello", email: "john@email.com", phone: "+256 701 234567", district: "Mukono", products: 8, rating: 4.9, status: "verified", joined: "2023-04-22" },
+    { id: 3, name: "Mary Nakamya", email: "mary@email.com", phone: "+256 702 345678", district: "Mukono", products: 3, rating: 4.7, status: "verified", joined: "2023-08-10" },
+    { id: 4, name: "David Mugishi", email: "david@email.com", phone: "+256 703 456789", district: "Wakiso", products: 6, rating: 4.6, status: "verified", joined: "2023-09-01" },
+    { id: 5, name: "Grace Robert", email: "grace@email.com", phone: "+256 704 567890", district: "Mbale", products: 4, rating: 4.5, status: "pending", joined: "2024-01-05" },
+    { id: 6, name: "Peter Tumusiime", email: "peter@email.com", phone: "+256 705 678901", district: "Kabale", products: 2, rating: 4.4, status: "pending", joined: "2024-01-12" },
+    { id: 7, name: "Samuel Ongom", email: "samuel@email.com", phone: "+256 706 789012", district: "Soroti", products: 7, rating: 4.7, status: "verified", joined: "2023-11-20" },
+    { id: 8, name: "Joseph Mwanga", email: "joseph@email.com", phone: "+256 707 890123", district: "Bugisu", products: 3, rating: 4.9, status: "verified", joined: "2023-03-15" }
+];
+
+let orders = [
+    { id: "ORD-001", customer: "Restaurant Kampala", product: "Cassava - Fresh", quantity: "200kg", total: 240000, date: "2024-01-20", status: "completed" },
+    { id: "ORD-002", customer: "Market Trader Jinja", product: "Maize - Dried", quantity: "500kg", total: 750000, date: "2024-01-19", status: "processing" },
+    { id: "ORD-003", customer: "Hotel Entebbe", product: "Matooke - Kisansa", quantity: "10 bunches", total: 15000, date: "2024-01-19", status: "pending" },
+    { id: "ORD-004", customer: "Supermarket Chain", product: "Tomatoes - Fresh", quantity: "100kg", total: 200000, date: "2024-01-18", status: "completed" },
+    { id: "ORD-005", customer: "Wholesale Buyer", product: "Beans - Kanyebwa", quantity: "300kg", total: 840000, date: "2024-01-18", status: "processing" },
+    { id: "ORD-006", customer: "Local Shop", product: "Coffee - Robusta", quantity: "50kg", total: 425000, date: "2024-01-17", status: "cancelled" },
+    { id: "ORD-007", customer: "Export Company", product: "Coffee - Robusta", quantity: "1000kg", total: 8500000, date: "2024-01-17", status: "completed" },
+    { id: "ORD-008", customer: "School Kitchen", product: "Rice - Super", quantity: "200kg", total: 900000, date: "2024-01-16", status: "pending" }
+];
+
+let marketPrices = [
+    { crop: "🌽 Maize", price: 1500, previousPrice: 1420, lastUpdated: "2 hours ago", trend: "up", change: 5.6 },
+    { crop: "🍌 Matooke", price: 1500, previousPrice: 1530, lastUpdated: "1 hour ago", trend: "down", change: 2.0 },
+    { crop: "🥔 Cassava", price: 1200, previousPrice: 1150, lastUpdated: "3 hours ago", trend: "up", change: 4.3 },
+    { crop: "🍅 Tomatoes", price: 2000, previousPrice: 2180, lastUpdated: "30 mins ago", trend: "down", change: 8.3 },
+    { crop: "🫘 Beans", price: 2800, previousPrice: 2700, lastUpdated: "4 hours ago", trend: "up", change: 3.7 },
+    { crop: "☕ Coffee", price: 8500, previousPrice: 8600, lastUpdated: "1 day ago", trend: "down", change: 1.2 }
+];
+
+let chatConversations = [
+    { id: 1, participants: "Sarah Ema ↔ Restaurant Owner", messages: 24, lastMessage: "Deal confirmed for 200kg weekly", time: "2 mins ago", status: "active" },
+    { id: 2, participants: "John Okello ↔ Wholesale Buyer", messages: 15, lastMessage: "Can you deliver to Kampala?", time: "15 mins ago", status: "active" },
+    { id: 3, participants: "Mary Nakamya ↔ Hotel Manager", messages: 8, lastMessage: "What's your best price?", time: "1 hour ago", status: "waiting" },
+    { id: 4, participants: "David Mugishi ↔ Market Trader", messages: 32, lastMessage: "Order dispatched!", time: "2 hours ago", status: "resolved" },
+    { id: 5, participants: "Grace Robert ↔ Export Company", messages: 45, lastMessage: "Contract signed successfully", time: "3 hours ago", status: "resolved" }
+];
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', function() {
+    renderDashboard();
+    renderProductsTable();
+    renderFarmersTable();
+    renderOrdersTable();
+    renderChatConversations();
+    renderPricesTable();
+    initCharts();
+});
+
+// ==================== NAVIGATION ====================
+function showSection(sectionId) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    
+    // Show selected section
+    document.getElementById(`section-${sectionId}`).classList.add('active');
+    
+    // Update nav items
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelector(`[data-section="${sectionId}"]`)?.classList.add('active');
+    
+    // Update header
+    const titles = {
+        dashboard: ['Dashboard Overview', 'Welcome back! Here\'s what\'s happening today.'],
+        products: ['Product Management', 'Manage all products on the platform'],
+        farmers: ['Farmer Management', 'Verify and manage farmer accounts'],
+        buyers: ['Buyer Management', 'View and manage buyer accounts'],
+        orders: ['Order Management', 'Track and manage all orders'],
+        chats: ['Chat Monitor', 'Monitor conversations between farmers and buyers'],
+        prices: ['Price Management', 'Update and monitor market prices'],
+        reviews: ['Reviews & Ratings', 'Manage user reviews and feedback'],
+        analytics: ['Analytics & Reports', 'Detailed platform analytics'],
+        settings: ['System Settings', 'Configure platform settings']
+    };
+    
+    if (titles[sectionId]) {
+        document.getElementById('pageTitle').textContent = titles[sectionId][0];
+        document.getElementById('pageSubtitle').textContent = titles[sectionId][1];
+    }
+    
+    // Close mobile sidebar
+    document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ==================== DASHBOARD RENDERING ====================
+function renderDashboard() {
+    // Recent Orders
+    const recentOrdersList = document.getElementById('recentOrdersList');
+    recentOrdersList.innerHTML = orders.slice(0, 5).map(order => `
+        <div class="activity-item">
+            <div class="activity-icon" style="background:${getStatusColor(order.status)};color:white;">
+                <i class="fas ${getStatusIcon(order.status)}"></i>
+            </div>
+            <div class="activity-content">
+                <div class="activity-text"><strong>${order.id}</strong> - ${order.customer}</div>
+                <div class="activity-time">${order.product} • UGX ${order.total.toLocaleString()}</div>
+            </div>
+            <span class="status-badge status-${order.status}">${order.status}</span>
+        </div>
+    `).join('');
+    
+    // Products Table (Dashboard)
+    const productsTableBody = document.getElementById('productsTableBody');
+    productsTableBody.innerHTML = products.slice(0, 6).map(product => `
+        <tr>
+            <td>
+                <div class="product-cell">
+                    <div class="product-image-small" style="background:${getCategoryGradient(product.category)}">${getCategoryEmoji(product.category)}</div>
+                    <div>
+                        <div class="product-name-cell">${product.name}</div>
+                        <div class="product-meta-cell">${product.district}</div>
+                    </div>
+                </div>
+            </td>
+            <td>${product.farmer}</td>
+            <td><strong>UGX ${product.price.toLocaleString()}</strong></td>
+            <td>${product.stock}</td>
+            <td><span class="status-badge ${product.status === 'active' ? 'status-active' : product.status === 'pending' ? 'status-pending' : 'status-inactive'}">${product.status}</span></td>
+            <td>
+                <div class="action-btns">
+                    <button class="action-btn view" title="View"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit" title="Edit" onclick="editProduct(${product.id})"><i class="fas fa-edit"></i></button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    
+    // Top Farmers
+    const topFarmersList = document.getElementById('topFarmersList');
+    topFarmersList.innerHTML = farmers.sort((a, b) => b.rating - a.rating).slice(0, 5).map((farmer, index) => `
+        <div class="activity-item">
+            <div class="activity-icon" style="background:${index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#f0fdf4'};color:${index < 3 ? 'white' : 'var(--neon-green)'};">
+                ${index < 3 ? `<i class="fas fa-trophy"></i>` : `<i class="fas fa-user"></i>`}
+            </div>
+            <div class="activity-content">
+                <div class="activity-text"><strong>${farmer.name}</strong></div>
+                <div class="activity-time">${farmer.products} products • ${farmer.district}</div>
+            </div>
+            <div style="font-weight:800;color:var(--warning);font-size:1.1rem;">${farmer.rating} ⭐</div>
+        </div>
+    `).join('');
+    
+    // Activity Feed
+    const activityFeed = document.getElementById('activityFeed');
+    const activities = [
+        { icon: 'fa-user-plus', color: '#00D4FF', text: 'New farmer registered: Grace Akello from Lira', time: '5 mins ago' },
+        { icon: 'fa-shopping-cart', color: '#FF6B35', text: 'Large order placed: UGX 8.5M for Coffee', time: '15 mins ago' },
+        { icon: 'fa-check-circle', color: '#00FF41', text: 'Product verified: Sweet Potatoes by Samuel Ongom', time: '30 mins ago' },
+        { icon: 'fa-star', color: '#FFFF00', text: 'New review: 5 stars from Restaurant Kampala', time: '1 hour ago' },
+        { icon: 'fa-comment', color: '#BF00FF', text: 'Chat started between Mary Nakamya and Hotel Manager', time: '2 hours ago' }
+    ];
+    activityFeed.innerHTML = activities.map(act => `
+        <div class="activity-item">
+            <div class="activity-icon" style="background:${act.color};color:white;">
+                <i class="fas ${act.icon}"></i>
+            </div>
+            <div class="activity-content">
+                <div class="activity-text">${act.text}</div>
+                <div class="activity-time">${act.time}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ==================== PRODUCTS MANAGEMENT ====================
+function renderProductsTable(filterData = {}) {
+    let filteredProducts = [...products];
+    
+    // Apply filters
+    if (filterData.search) {
+        filteredProducts = filteredProducts.filter(p => 
+            p.name.toLowerCase().includes(filterData.search.toLowerCase()) ||
+            p.farmer.toLowerCase().includes(filterData.search.toLowerCase()) ||
+            p.district.toLowerCase().includes(filterData.search.toLowerCase())
+        );
+    }
+    
+    if (filterData.category) {
+        filteredProducts = filteredProducts.filter(p => p.category === filterData.category);
+    }
+    
+    if (filterData.status) {
+        filteredProducts = filteredProducts.filter(p => p.status === filterData.status);
+    }
+    
+    const tbody = document.getElementById('allProductsTableBody');
+    tbody.innerHTML = filteredProducts.map(product => `
+        <tr>
+            <td><strong>#${product.id.toString().padStart(3, '0')}</strong></td>
+            <td>
+                <div class="product-cell">
+                    <div class="product-image-small" style="background:${getCategoryGradient(product.category)}">${getCategoryEmoji(product.category)}</div>
+                    <div>
+                        <div class="product-name-cell">${product.name}</div>
+                    </div>
+                </div>
+            </td>
+            <td style="text-transform:capitalize;">${product.category}</td>
+            <td>${product.farmer}</td>
+            <td>${product.district}</td>
+            <td><strong>UGX ${product.price.toLocaleString()}</strong>/${product.unit}</td>
+            <td>${product.stock}</td>
+            <td><span class="status-badge ${product.status === 'active' ? 'status-active' : product.status === 'pending' ? 'status-pending' : 'status-inactive'}">${product.status}</span></td>
+            <td>
+                <div class="action-btns">
+                    <button class="action-btn view" title="View Details"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit" title="Edit" onclick="editProduct(${product.id})"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete" title="Delete" onclick="deleteProduct(${product.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    
+    // Update count in nav badge
+    document.querySelector('[data-section="products"] .nav-badge').textContent = filteredProducts.length;
+}
+
+function filterProducts() {
+    const search = document.getElementById('productSearchInput').value;
+    const category = document.getElementById('productCategoryFilter').value;
+    const status = document.getElementById('productStatusFilter').value;
+    
+    renderProductsTable({ search, category, status });
+}
+
+function openProductModal(productId = null) {
+    const modal = document.getElementById('productModal');
+    const title = document.getElementById('productModalTitle');
+    
+    if (productId) {
+        // Edit mode
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            title.textContent = 'Edit Product';
+            document.getElementById('productId').value = product.id;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productCategory').value = product.category;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productUnit').value = product.unit;
+            document.getElementById('productFarmer').value = product.farmer;
+            document.getElementById('productDistrict').value = product.district;
+            document.getElementById('productStock').value = product.stock;
+            document.getElementById('productStatus').value = product.status;
+            document.getElementById('badgeVerified').checked = product.verified;
+            document.getElementById('badgeFeatured').checked = product.featured;
+            document.getElementById('badgeFresh').checked = product.fresh;
+        }
+    } else {
+        // Add mode
+        title.textContent = 'Add New Product';
+        document.getElementById('productId').value = '';
+        document.getElementById('productName').value = '';
+        document.getElementById('productCategory').value = '';
+        document.getElementById('productPrice').value = '';
+        document.getElementById('productUnit').value = 'kg';
+        document.getElementById('productFarmer').value = '';
+        document.getElementById('productDistrict').value = '';
+        document.getElementById('productStock').value = '';
+        document.getElementById('productStatus').value = 'active';
+        document.getElementById('badgeVerified').checked = false;
+        document.getElementById('badgeFeatured').checked = false;
+        document.getElementById('badgeFresh').checked = false;
+    }
+    
+    modal.classList.add('active');
+}
+
+function editProduct(id) {
+    openProductModal(id);
+}
+
+function saveProduct() {
+    const id = document.getElementById('productId').value;
+    const name = document.getElementById('productName').value.trim();
+    const category = document.getElementById('productCategory').value;
+    const price = parseInt(document.getElementById('productPrice').value);
+    const unit = document.getElementById('productUnit').value;
+    const farmer = document.getElementById('productFarmer').value.trim();
+    const district = document.getElementById('productDistrict').value;
+    const stock = document.getElementById('productStock').value.trim();
+    const status = document.getElementById('productStatus').value;
+    const verified = document.getElementById('badgeVerified').checked;
+    const featured = document.getElementById('badgeFeatured').checked;
+    const fresh = document.getElementById('badgeFresh').checked;
+    
+    // Validation
+    if (!name || !category || !price || !farmer || !district) {
+        showToast('Please fill in all required fields!', 'error');
+        return;
+    }
+    
+    if (id) {
+        // Update existing
+        const index = products.findIndex(p => p.id === parseInt(id));
+        if (index !== -1) {
+            products[index] = { ...products[index], name, category, price, unit, farmer, district, stock, status, verified, featured, fresh };
+            showToast(`Product "${name}" updated successfully!`);
+        }
+    } else {
+        // Add new
+        const newId = Math.max(...products.map(p => p.id)) + 1;
+        products.push({ id: newId, name, category, price, unit, farmer, district, stock, status, verified, featured, fresh });
+        showToast(`Product "${name}" added successfully!`);
+    }
+    
+    closeModal('productModal');
+    renderProductsTable();
+    renderDashboard();
+}
+
+function deleteProduct(id) {
+    if (confirm('Are you sure you want to delete this product?')) {
+        products = products.filter(p => p.id !== id);
+        showToast('Product deleted successfully!');
+        renderProductsTable();
+        renderDashboard();
+    }
+}
+
+// ==================== FARMERS MANAGEMENT ====================
+function renderFarmersTable(searchTerm = '') {
+    let filteredFarmers = [...farmers];
+    
+    if (searchTerm) {
+        filteredFarmers = filteredFarmers.filter(f =>
+            f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            f.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            f.district.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+    
+    const tbody = document.getElementById('farmersTableBody');
+    tbody.innerHTML = filteredFarmers.map(farmer => `
+        <tr>
+            <td>
+                <div class="product-cell">
+                    <div class="product-image-small" style="background:linear-gradient(135deg,var(--neon-green),var(--electric-green));color:var(--dark-bg);font-weight:800;">${farmer.name.split(' ').map(n=>n[0]).join('')}</div>
+                    <div>
+                        <div class="product-name-cell">${farmer.name}</div>
+                        <div class="product-meta-cell">${farmer.email}</div>
+                    </div>
+                </div>
+            </td>
+            <td>${farmer.phone}</td>
+            <td>${farmer.district}</td>
+            <td><strong>${farmer.products}</strong></td>
+            <td><span style="color:var(--warning);font-weight:700;">${farmer.rating} ⭐</span></td>
+            <td><span class="status-badge ${farmer.status === 'verified' ? 'status-verified' : 'status-pending'}">${farmer.status}</span></td>
+            <td>${formatDate(farmer.joined)}</td>
+            <td>
+                <div class="action-btns">
+                    <button class="action-btn view" title="View"><i class="fas fa-eye"></i></button>
+                    ${farmer.status === 'pending' ? `<button class="action-btn approve" title="Approve" onclick="approveFarmer(${farmer.id})"><i class="fas fa-check"></i></button>` : ''}
+                    <button class="action-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    
+    // Update stats
+    document.getElementById('verifiedFarmers').textContent = farmers.filter(f => f.status === 'verified').length;
+    document.getElementById('pendingFarmers').textContent = farmers.filter(f => f.status === 'pending').length;
+    document.querySelector('[data-section="farmers"] .nav-badge').textContent = farmers.filter(f => f.status === 'pending').length;
+}
+
+function filterFarmers() {
+    const searchTerm = document.getElementById('farmerSearchInput').value;
+    renderFarmersTable(searchTerm);
+}
+
+function approveFarmer(id) {
+    const farmer = farmers.find(f => f.id === id);
+    if (farmer && confirm(`Approve farmer ${farmer.name}?`)) {
+        farmer.status = 'verified';
+        showToast(`${farmer.name} has been approved!`);
+        renderFarmersTable();
+    }
+}
+
+// ==================== ORDERS MANAGEMENT ====================
+function renderOrdersTable(statusFilter = '') {
+    let filteredOrders = [...orders];
+    
+    if (statusFilter) {
+        filteredOrders = filteredOrders.filter(o => o.status === statusFilter);
+    }
+    
+    const tbody = document.getElementById('ordersTableBody');
+    tbody.innerHTML = filteredOrders.map(order => `
+        <tr>
+            <td><strong>${order.id}</strong></td>
+            <td>${order.customer}</td>
+            <td>${order.product}</td>
+            <td>${order.quantity}</td>
+            <td><strong>UGX ${order.total.toLocaleString()}</strong></td>
+            <td>${formatDate(order.date)}</td>
+            <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+            <td>
+                <div class="action-btns">
+                    <button class="action-btn view" title="View Details"><i class="fas fa-eye"></i></button>
+                    ${order.status === 'pending' ? '<button class="action-btn approve" title="Process"><i class="fas fa-play"></i></button>' : ''}
+                    ${order.status === 'processing' ? '<button class="action-btn approve" title="Complete"><i class="fas fa-check"></i></button>' : ''}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function filterOrders() {
+    const status = document.getElementById('orderStatusFilter').value;
+    renderOrdersTable(status);
+}
+
+// ==================== CHAT MONITORING ====================
+function renderChatConversations() {
+    const list = document.getElementById('chatConversationsList');
+    list.innerHTML = chatConversations.map(chat => `
+        <div class="activity-item">
+            <div class="activity-icon" style="background:${chat.status === 'active' ? 'linear-gradient(135deg,#00FF41,#39FF14)' : chat.status === 'waiting' ? 'linear-gradient(135deg,#FF6B35,#FF1493)' : '#e5e7eb'};color:${chat.status === 'resolved' ? 'var(--text-secondary)' : 'white'};">
+                <i class="fas ${chat.status === 'active' ? 'fa-comments' : chat.status === 'waiting' ? 'fa-clock' : 'fa-check-circle'}"></i>
+            </div>
+            <div class="activity-content">
+                <div class="activity-text"><strong>${chat.participants}</strong></div>
+                <div class="activity-time">${chat.lastMessage}</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:0.78rem;color:var(--text-secondary);">${chat.time}</div>
+                <div style="font-size:0.75rem;font-weight:700;color:var(--neon-green);">${chat.messages} msgs</div>
+            </div>
+        </div>
+    `).join('');
+    
+    document.querySelector('[data-section="chats"] .nav-badge').textContent = chatConversations.filter(c => c.status === 'active').length;
+}
+
+// ==================== PRICE MANAGEMENT ====================
+function renderPricesTable() {
+    const tbody = document.getElementById('pricesTableBody');
+    tbody.innerHTML = marketPrices.map(price => `
+        <tr>
+            <td><strong>${price.crop}</strong></td>
+            <td style="font-size:1.1rem;font-weight:800;color:var(--neon-green);">UGX ${price.price.toLocaleString()}</td>
+            <td style="color:var(--text-secondary);">UGX ${price.previousPrice.toLocaleString()}</td>
+            <td>
+                <span class="${price.trend === 'up' ? 'trend-up' : 'trend-down'}" style="padding:4px 10px;border-radius:8px;font-weight:700;font-size:0.85rem;">
+                    ${price.trend === 'up' ? '↑' : '↓'} ${price.change}%
+                </span>
+            </td>
+            <td>${price.lastUpdated}</td>
+            <td><i class="fas fa-arrow-${price.trend === 'up' ? 'up text-success' : 'down text-danger'}"></i></td>
+            <td>
+                <div class="action-btns">
+                    <button class="action-btn edit" title="Edit Price" onclick="editPrice('${price.crop}')"><i class="fas fa-edit"></i></button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openPriceModal() {
+    document.getElementById('priceModal').classList.add('active');
+}
+
+function editPrice(crop) {
+    document.getElementById('priceCrop').value = crop;
+    openPriceModal();
+}
+
+function savePrice() {
+    const crop = document.getElementById('priceCrop').value;
+    const price = parseInt(document.getElementById('priceValue').value);
+    
+    if (!price || price <= 0) {
+        showToast('Please enter a valid price!', 'error');
+        return;
+    }
+    
+    const index = marketPrices.findIndex(p => p.crop === crop);
+    if (index !== -1) {
+        const oldPrice = marketPrices[index].price;
+        marketPrices[index].previousPrice = oldPrice;
+        marketPrices[index].price = price;
+        marketPrices[index].trend = price > oldPrice ? 'up' : 'down';
+        marketPrices[index].change = Math.abs(((price - oldPrice) / oldPrice * 100)).toFixed(1);
+        marketPrices[index].lastUpdated = 'Just now';
+        
+        showToast(`${crop} price updated to UGX ${price.toLocaleString()}!`);
+    }
+    
+    closeModal('priceModal');
+    renderPricesTable();
+}
+
+// ==================== CHARTS INITIALIZATION ====================
+function initCharts() {
+    // Sales Chart
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Sales (UGX Millions)',
+                data: [4.2, 5.1, 4.8, 6.2, 5.9, 7.3, 6.8],
+                borderColor: '#00FF41',
+                backgroundColor: 'rgba(0, 255, 65, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#00FF41',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Chat Stats Chart
+    const chatCtx = document.getElementById('chatStatsChart').getContext('2d');
+    new Chart(chatCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Active', 'Waiting', 'Resolved'],
+            datasets: [{
+                data: [5, 3, 8],
+                backgroundColor: ['#00FF41', '#FF6B35', '#BF00FF'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Revenue (Millions UGX)',
+                data: [32, 38, 35, 42, 48, 45, 52, 58, 55, 62, 68, 72],
+                backgroundColor: [
+                    'rgba(0, 255, 65, 0.8)',
+                    'rgba(0, 212, 255, 0.8)',
+                    'rgba(255, 107, 53, 0.8)',
+                    'rgba(191, 0, 255, 0.8)'
+                ],
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Region Chart
+    const regionCtx = document.getElementById('regionChart').getContext('2d');
+    new Chart(regionCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Central', 'Eastern', 'Western', 'Northern'],
+            datasets: [{
+                data: [35, 28, 22, 15],
+                backgroundColor: ['#00FF41', '#00D4FF', '#FF6B35', '#BF00FF'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Category Chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'polarArea',
+        data: {
+            labels: ['Grains', 'Fruits', 'Vegetables', 'Tubers', 'Legumes', 'Coffee'],
+            datasets: [{
+                data: [245, 189, 312, 156, 178, 98],
+                backgroundColor: [
+                    'rgba(0, 255, 65, 0.7)',
+                    'rgba(255, 107, 53, 0.7)',
+                    'rgba(0, 212, 255, 0.7)',
+                    'rgba(191, 0, 255, 0.7)',
+                    'rgba(255, 20, 147, 0.7)',
+                    'rgba(245, 158, 11, 0.7)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+}
+
+function updateChart(period) {
+    showToast(`Chart updated to show ${period} data`);
+}
+
+// ==================== UTILITY FUNCTIONS ====================
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toastNotification');
+    toast.textContent = message;
+    toast.className = `toast show ${type === 'error' ? 'error' : ''}`;
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+function saveSettings() {
+    showToast('Settings saved successfully!');
+}
+
+function getStatusColor(status) {
+    const colors = {
+        completed: '#10b981',
+        processing: '#f59e0b',
+        pending: '#8b5cf6',
+        cancelled: '#ef4444'
+    };
+    return colors[status] || '#6b7280';
+}
+
+function getStatusIcon(status) {
+    const icons = {
+        completed: 'fa-check-circle',
+        processing: 'fa-spinner',
+        pending: 'fa-clock',
+        cancelled: 'fa-times-circle'
+    };
+    return icons[status] || 'fa-circle';
+}
+
+function getCategoryGradient(category) {
+    const gradients = {
+        grains: 'linear-gradient(135deg, #FFF9C4, #FFF176)',
+        fruits: 'linear-gradient(135deg, #FFCCBC, #FFAB91)',
+        vegetables: 'linear-gradient(135deg, #C8E6C9, #A5D6A7)',
+        tubers: 'linear-gradient(135deg, #FFE0B2, #FFCC80)',
+        legumes: 'linear-gradient(135deg, #DCEDC8, #C5E1A5)',
+        coffee: 'linear-gradient(135deg, #EFEBE9, #D7CCC8)'
+    };
+    return gradients[category] || '#e5e7eb';
+}
+
+function getCategoryEmoji(category) {
+    const emojis = {
+        grains: '🌾',
+        fruits: '🍎',
+        vegetables: '🥬',
+        tubers: '🥔',
+        legumes: '🫘',
+        coffee: '☕'
+    };
+    return emojis[category] || '📦';
+}
+
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+</script>
+
+</body>
+</html>

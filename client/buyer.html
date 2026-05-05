@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agitech Connect | Bulk Buyer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fraunces:ital,opsz,wght@0,9..144,100..900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        crop: {
+                            50:'#ECFDF5',100:'#D1FAE5',200:'#A7F3D0',300:'#6EE7B7',
+                            400:'#34D399',500:'#10B981',600:'#059669',700:'#047857',
+                            800:'#065F46',900:'#064E3B',950:'#022C22'
+                        },
+                        harvest: {
+                            50:'#FFFBEB',100:'#FEF3C7',200:'#FDE68A',300:'#FCD34D',
+                            400:'#FBBF24',500:'#F59E0B',600:'#D97706',700:'#B45309',
+                            800:'#92400E',900:'#78350F',950:'#451A03'
+                        },
+                        soil: {
+                            50:'#FEF7F0',100:'#FDEBD2',200:'#F9D5B0',300:'#F4B98A',
+                            400:'#ED935E',500:'#E07030',600:'#C2511A',700:'#9A3E14',
+                            800:'#6E2C0E',900:'#4A1D08',950:'#2A0F04'
+                        }
+                    },
+                    fontFamily: {
+                        display:['Fraunces','serif'],
+                        body:['DM Sans','sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'DM Sans',sans-serif;background:#F8FAF8;color:#022C22;overflow-x:hidden}
+        ::-webkit-scrollbar{width:5px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:#D1FAE5;border-radius:3px}
+        ::-webkit-scrollbar-thumb:hover{background:#059669}
+
+        /* Sidebar - bold gradient */
+        #sidebar{
+            position:fixed;left:0;top:0;bottom:0;width:260px;
+            background:linear-gradient(175deg,#064E3B 0%,#022C22 60%,#1A0F00 100%);
+            z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1);
+            display:flex;flex-direction:column;
+            box-shadow:6px 0 32px rgba(0,0,0,.2);
+            border-right:1px solid rgba(16,185,129,.15);
+        }
+        #sidebar.collapsed{transform:translateX(-260px)}
+        .nav-link{
+            display:flex;align-items:center;gap:12px;padding:11px 18px;margin:2px 10px;
+            border-radius:10px;color:rgba(167,243,208,.7);font-size:13.5px;font-weight:500;
+            cursor:pointer;transition:all .2s;text-decoration:none;position:relative;
+        }
+        .nav-link:hover{background:rgba(16,185,129,.12);color:#A7F3D0}
+        .nav-link.active{
+            background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(245,158,11,.1));
+            color:#6EE7B7;font-weight:700;
+        }
+        .nav-link.active::before{
+            content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);
+            width:3px;height:22px;background:linear-gradient(180deg,#10B981,#F59E0B);
+            border-radius:0 3px 3px 0;
+        }
+        .nav-link i{width:18px;text-align:center;font-size:14px}
+        .nav-badge{
+            margin-left:auto;background:linear-gradient(135deg,#F59E0B,#D97706);
+            color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:8px;
+        }
+
+        /* Main */
+        #main{margin-left:260px;min-height:100vh;transition:margin-left .3s cubic-bezier(.4,0,.2,1)}
+        #main.expanded{margin-left:0}
+
+        /* Pages */
+        .page{display:none;animation:fadeUp .3s ease}
+        .page.active{display:block}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+        /* Stat cards - each with bold color identity */
+        .stat-card{
+            border-radius:16px;padding:22px;position:relative;overflow:hidden;
+            border:1px solid transparent;transition:all .25s;cursor:default;
+        }
+        .stat-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.1)}
+        .stat-card.green{background:linear-gradient(135deg,#064E3B,#065F46);border-color:rgba(16,185,129,.2)}
+        .stat-card.gold{background:linear-gradient(135deg,#78350F,#92400E);border-color:rgba(245,158,11,.2)}
+        .stat-card.orange{background:linear-gradient(135deg,#7C2D12,#9A3412);border-color:rgba(251,146,60,.2)}
+        .stat-card.teal{background:linear-gradient(135deg,#134E4A,#115E59);border-color:rgba(20,184,166,.2)}
+
+        /* Product card */
+        .product-card{
+            background:#fff;border-radius:14px;overflow:hidden;
+            box-shadow:0 2px 12px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.05);
+            transition:all .25s;
+        }
+        .product-card:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.15)}
+
+        /* Form inputs */
+        .form-input{
+            width:100%;padding:10px 14px;border:1px solid #D1D5DB;border-radius:8px;
+            font-size:14px;color:#374151;background:#fff;outline:none;
+            transition:border-color .2s;
+        }
+        .form-input:focus{border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,.1)}
+
+        /* Buttons */
+        .btn-primary{
+            background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;
+            padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;
+            transition:all .2s;font-size:14px;
+        }
+        .btn-primary:hover{background:linear-gradient(135deg,#059669,#047857);transform:translateY(-1px)}
+        .btn-secondary{
+            background:#fff;color:#6B7280;border:1px solid #D1D5DB;
+            padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;
+            transition:all .2s;font-size:14px;
+        }
+        .btn-secondary:hover{background:#F9FAFB;border-color:#9CA3AF}
+        .btn-sm{padding:6px 12px;font-size:12px}
+
+        /* Badges */
+        .badge{background:#E5E7EB;color:#374151;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600}
+        .badge-active{background:#D1FAE5;color:#065F46}
+        .badge-pending{background:#FEF3C7;color:#92400E}
+        .badge-soldout{background:#FEE2E2;color:#DC2626}
+        .badge-draft{background:#F3F4F6;color:#6B7280}
+
+        /* Category badges */
+        .cat-grains{background:linear-gradient(135deg,#10B981,#059669);color:#fff}
+        .cat-vegetables{background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff}
+        .cat-fruits{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff}
+        .cat-livestock{background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff}
+        .cat-dairy{background:linear-gradient(135deg,#06B6D4,#0891B2);color:#fff}
+        .cat-poultry{background:linear-gradient(135deg,#F97316,#EA580C);color:#fff}
+        .cat-cashcrops{background:linear-gradient(135deg,#84CC16,#65A30D);color:#fff}
+        .cat-organic{background:linear-gradient(135deg,#14B8A6,#0F766E);color:#fff}
+
+        /* Modal */
+        #modal-overlay{
+            position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+            display:flex;align-items:center;justify-content:center;padding:20px;
+            opacity:0;pointer-events:none;transition:opacity .3s;
+        }
+        #modal-overlay.show{opacity:1;pointer-events:auto}
+        .modal-content{
+            background:#fff;border-radius:16px;max-width:500px;width:100%;
+            max-height:90vh;overflow-y:auto;padding:24px;
+            box-shadow:0 20px 60px rgba(0,0,0,.3);
+        }
+
+        /* Toast */
+        #toast-container{position:fixed;top:20px;right:20px;z-index:300}
+        .toast{
+            background:#fff;border-radius:8px;padding:12px 16px;margin-bottom:8px;
+            box-shadow:0 4px 16px rgba(0,0,0,.15);border-left:4px solid #10B981;
+            display:flex;align-items:center;gap:8px;font-size:14px;animation:slideIn .3s ease;
+        }
+        .toast-error{border-left-color:#EF4444}
+        .toast-info{border-left-color:#3B82F6}
+        .toast-success{border-left-color:#10B981}
+        @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+
+        /* Sidebar overlay for mobile */
+        #sidebar-overlay{
+            position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;
+            opacity:0;pointer-events:none;transition:opacity .3s;
+        }
+        #sidebar-overlay.show{opacity:1;pointer-events:auto}
+
+        /* Mobile */
+        @media(max-width:1023px){
+            #sidebar{transform:translateX(-260px)}
+            #sidebar.open{transform:translateX(0)}
+            #main{margin-left:0}
+            #main.expanded{margin-left:0}
+        }
+
+        /* Line clamp */
+        .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    </style>
+<style id="rt-notif-style">
+#rt-notif-container{position:fixed;bottom:24px;left:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:340px}
+.rt-notif{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.18);border-left:4px solid #10B981;display:flex;align-items:flex-start;gap:12px;animation:rtSlideIn .3s ease}
+.rt-notif-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.rt-notif-body{flex:1;min-width:0}
+.rt-notif-title{font-weight:700;font-size:13px;color:#111827;margin-bottom:2px}
+.rt-notif-text{font-size:12px;color:#6B7280;line-height:1.4}
+.rt-notif-close{background:none;border:none;color:#9CA3AF;font-size:18px;cursor:pointer;padding:0;line-height:1;flex-shrink:0}
+@keyframes rtSlideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+</style></head>
+<body>
+    <!-- Sidebar -->
+    <aside id="sidebar">
+        <div style="padding:24px 20px 16px;border-bottom:1px solid rgba(167,243,208,.2)">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#10B981,#F59E0B);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:16px">A</div>
+                <div>
+                    <div style="font-weight:900;color:#A7F3D0;font-size:16px">Agro Tech Connect</div>
+                    <div style="font-size:11px;color:rgba(167,243,208,.6)">Bulk Buyer Dashboard</div>
+                </div>
+            </div>
+        </div>
+        <nav style="flex:1;padding:16px 0">
+            <div class="nav-link active" data-page="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-link" data-page="products">
+                <i class="fas fa-boxes"></i>
+                <span>Browse Products</span>
+            </div>
+            <div class="nav-link" data-page="inquiries">
+                <i class="fas fa-clipboard-list"></i>
+                <span>My Inquiries</span>
+                <span class="nav-badge" id="inquiry-count-badge">0</span>
+            </div>
+            <div class="nav-link" data-page="messages">
+                <i class="fas fa-comments"></i>
+                <span>Messages</span>
+                <span class="nav-badge" id="message-count-badge">0</span>
+            </div>
+            <div class="nav-link" data-page="orders">
+                <i class="fas fa-shopping-bag"></i>
+                <span>My Orders</span>
+                <span class="nav-badge" id="order-count-badge">0</span>
+            </div>
+            <div class="nav-link" data-page="favorites">
+                <i class="fas fa-heart"></i>
+                <span>Favorites</span>
+            </div>
+        </nav>
+        <div style="padding:16px 20px;border-top:1px solid rgba(167,243,208,.2)">
+            <div class="nav-link" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+            <div class="nav-link" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Sidebar overlay for mobile -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main content -->
+    <main id="main">
+        <header style="background:#fff;border-bottom:1px solid #E5E7EB;padding:16px 24px;display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:16px">
+                <button onclick="toggleSidebar()" style="display:none;background:none;border:none;color:#6B7280;font-size:18px;padding:8px;cursor:pointer;border-radius:6px" class="lg:hidden">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 id="page-title" style="font-size:24px;font-weight:900;color:#111827">Dashboard</h1>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+                <button onclick="toggleNotifications()" style="position:relative;background:none;border:none;color:#6B7280;font-size:18px;padding:8px;cursor:pointer;border-radius:6px">
+                    <i class="fas fa-bell"></i>
+                    <span id="notif-dot" style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:#EF4444;border-radius:50%;display:none"></span>
+                </button>
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#10B981,#F59E0B);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">B</div>
+            </div>
+        </header>
+
+        <!-- Notifications dropdown -->
+        <div id="notif-dropdown" style="position:absolute;top:64px;right:24px;width:320px;background:#fff;border-radius:12px;border:1px solid #E5E7EB;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:50;display:none">
+            <div style="padding:16px;border-bottom:1px solid #F3F4F6">
+                <h4 style="font-weight:700;color:#111827">Notifications</h4>
+            </div>
+            <div id="notif-list" style="max-height:300px;overflow-y:auto"></div>
+            <div style="padding:12px;border-top:1px solid #F3F4F6;text-align:center">
+                <button onclick="clearNotifications()" style="background:none;border:none;color:#6B7280;font-size:12px;cursor:pointer">Clear all</button>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="page-dashboard" class="page active">
+            <div style="padding:24px">
+                <!-- Stats -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px">
+                    <div class="stat-card green">
+                        <div style="display:flex;align-items:center;justify-content:space-between">
+                            <div>
+                                <p style="color:#A7F3D0;font-size:12px;font-weight:600;margin-bottom:4px">Active Inquiries</p>
+                                <p style="color:#fff;font-size:28px;font-weight:900" id="stat-inquiries">0</p>
+                            </div>
+                            <i class="fas fa-clipboard-list" style="color:#6EE7B7;font-size:24px"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card gold">
+                        <div style="display:flex;align-items:center;justify-content:space-between">
+                            <div>
+                                <p style="color:#FDE68A;font-size:12px;font-weight:600;margin-bottom:4px">Messages</p>
+                                <p style="color:#fff;font-size:28px;font-weight:900" id="stat-messages">0</p>
+                            </div>
+                            <i class="fas fa-comments" style="color:#FCD34D;font-size:24px"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div style="display:flex;align-items:center;justify-content:space-between">
+                            <div>
+                                <p style="color:#FED7AA;font-size:12px;font-weight:600;margin-bottom:4px">Favorites</p>
+                                <p style="color:#fff;font-size:28px;font-weight:900" id="stat-favorites">0</p>
+                            </div>
+                            <i class="fas fa-heart" style="color:#F97316;font-size:24px"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card teal">
+                        <div style="display:flex;align-items:center;justify-content:space-between">
+                            <div>
+                                <p style="color:#A7F3D0;font-size:12px;font-weight:600;margin-bottom:4px">Total Spent</p>
+                                <p style="color:#fff;font-size:28px;font-weight:900" id="stat-spent">UGX 0</p>
+                            </div>
+                            <i class="fas fa-dollar-sign" style="color:#5EEAD4;font-size:24px"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+                    <div style="background:#fff;border-radius:16px;border:1px solid #E5E7EB;padding:20px">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                            <h3 style="font-weight:900;color:#111827">Recent Inquiries</h3>
+                            <button style="color:#10B981;font-size:12px;font-weight:600" onclick="navigateTo('inquiries')">View all</button>
+                        </div>
+                        <div id="dashboard-inquiries" style="display:flex;flex-direction:column;gap:12px"></div>
+                    </div>
+                    <div style="background:#fff;border-radius:16px;border:1px solid #E5E7EB;padding:20px">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                            <h3 style="font-weight:900;color:#111827">Activity Feed</h3>
+                        </div>
+                        <div id="activity-feed" style="display:flex;flex-direction:column;gap:12px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Browse Products -->
+        <div id="page-products" class="page">
+            <div style="padding:24px">
+                <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+                    <input type="text" placeholder="Search products..." style="flex:1;min-width:200px" class="form-input" id="product-search" oninput="renderProducts()">
+                    <select class="form-input" style="width:150px" id="filter-category" onchange="renderProducts()">
+                        <option value="">All Categories</option>
+                    </select>
+                    <select class="form-input" style="width:150px" id="filter-district" onchange="renderProducts()">
+                        <option value="">All Districts</option>
+                    </select>
+                </div>
+                <div id="products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
+            </div>
+        </div>
+
+        <!-- My Inquiries -->
+        <div id="page-inquiries" class="page">
+            <div style="padding:24px">
+                <div style="background:#fff;border-radius:16px;border:1px solid #E5E7EB;padding:20px;margin-bottom:24px">
+                    <h3 style="font-weight:900;color:#111827;margin-bottom:16px">My Bulk Inquiries</h3>
+                    <div id="inquiries-list" style="display:flex;flex-direction:column;gap:16px"></div>
+                    <div id="inquiries-empty" style="display:none;text-align:center;padding:32px;color:#9CA3AF">No inquiries yet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <!-- Messages -->
+        <div id="page-messages" class="page">
+            <div style="padding:24px;height:calc(100vh - 80px);display:flex;gap:20px">
+                <!-- Contacts sidebar -->
+                <div style="width:280px;background:#fff;border-radius:16px;border:1px solid #E5E7EB;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0">
+                    <div style="padding:16px;border-bottom:1px solid #E5E7EB">
+                        <h4 style="font-weight:700;color:#111827;margin-bottom:10px">Conversations</h4>
+                        <input type="text" id="contact-search" placeholder="Search farmers..." class="form-input" style="font-size:13px" oninput="filterContacts()">
+                    </div>
+                    <div id="contacts-list" style="flex:1;overflow-y:auto"></div>
+                </div>
+                <!-- Chat area -->
+                <div style="flex:1;background:#fff;border-radius:16px;border:1px solid #E5E7EB;display:flex;flex-direction:column;overflow:hidden">
+                    <div id="chat-header" style="padding:16px 20px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:12px">
+                        <div id="chat-avatar" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#10B981,#F59E0B);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px">?</div>
+                        <div style="flex:1">
+                            <div id="chat-name" style="font-weight:700;color:#111827">Select a conversation</div>
+                            <div id="chat-status" style="font-size:12px;color:#9CA3AF">Choose a farmer to chat with</div>
+                        </div>
+                        <div id="chat-online-dot" style="width:10px;height:10px;border-radius:50%;background:#D1D5DB;display:none"></div>
+                    </div>
+                    <div id="chat-messages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:#F9FAFB">
+                        <div style="text-align:center;color:#9CA3AF;font-size:13px;margin-top:40px">Select a farmer from the left to start chatting</div>
+                    </div>
+                    <div id="chat-typing-indicator" style="padding:4px 20px;font-size:12px;color:#9CA3AF;min-height:20px"></div>
+                    <div style="padding:16px 20px;border-top:1px solid #E5E7EB;display:flex;gap:10px">
+                        <input type="text" id="chat-input" class="form-input" placeholder="Type a message..." style="flex:1" onkeypress="handleChatKey(event)" disabled>
+                        <button onclick="sendDirectMessage()" class="btn-primary" style="padding:10px 18px" id="chat-send-btn" disabled><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites -->
+        <div id="page-favorites" class="page">
+            <div style="padding:24px">
+                <div style="background:#fff;border-radius:16px;border:1px solid #E5E7EB;padding:20px">
+                    <h3 style="font-weight:900;color:#111827;margin-bottom:16px">Favorite Products</h3>
+                    <div id="favorites-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div id="page-settings" class="page">
+            <div style="padding:24px;max-width:600px">
+                <div style="background:#fff;border-radius:16px;border:1px solid #E5E7EB;padding:24px">
+                    <h3 style="font-weight:900;color:#111827;margin-bottom:20px">Account Settings</h3>
+                    <div style="display:flex;flex-direction:column;gap:16px">
+                        <input type="text" placeholder="Full Name" class="form-input">
+                        <input type="email" placeholder="Email" class="form-input">
+                        <input type="text" placeholder="Organization" class="form-input">
+                        <input type="text" placeholder="Phone" class="form-input">
+                        <button class="btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal & Toast -->
+    <div id="modal-overlay" onclick="closeModal(event)">
+        <div id="modal-content" onclick="event.stopPropagation()"></div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        // Data
+        let products = [];
+        let inquiries = []; let orders = [];
+        let conversations = [
+            {id:1, farmer:'John Kamau', messages:[{sender:'buyer',text:'Hi John, interested in your maize',time:'10:30 AM'}], unread:0}
+        ];
+        let favorites = [];
+        let notifications = [];
+
+        // Initialize
+        populateFilters();
+        loadProducts();
+
+        // Load real user from JWT
+        const _user = API.getUser();
+        if (!_user) { window.location.href = '/auth'; }
+        else {
+            const _initials = (_user.name || 'B').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            document.querySelector('[style*="border-radius:50%"][style*="background:linear-gradient(135deg,#10B981"]').textContent = _initials;
+            document.querySelector('header').querySelector('[style*="border-radius:50%"]').textContent = _initials;
+        }
+
+        loadInquiries();
+        renderDashboard();
+        updateBadges();
+
+        function populateFilters(){
+            // Categories
+            const cats = ['Grains & Cereals','Vegetables','Fruits','Dairy','Livestock'];
+            const catSelect = document.getElementById('filter-category');
+            cats.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                catSelect.appendChild(opt);
+            });
+
+            // Districts
+            const districts = ['Nakuru','Nairobi','Kisumu','Mombasa','Eldoret'];
+            const distSelect = document.getElementById('filter-district');
+            districts.forEach(dist => {
+                const opt = document.createElement('option');
+                opt.value = dist;
+                opt.textContent = dist;
+                distSelect.appendChild(opt);
+            });
+        }
+
+        async function loadProducts(){
+            try{
+                products = await API.getProducts({});
+                renderProducts();
+            }catch(err){
+                console.error('Failed to load products', err);
+            }
+        }
+
+        async function loadInquiries(){
+            try{ inquiries = await API.getInquiries(); renderDashboard(); updateBadges(); }catch(e){ console.error(e); }
+        }
+
+        function renderDashboard(){
+            animateNumber('stat-inquiries', inquiries.length);
+            animateNumber('stat-messages', conversations.reduce((s,c)=>s+c.unread,0));
+            animateNumber('stat-favorites', favorites.length);
+            const dp = document.getElementById('dashboard-inquiries');
+            dp.innerHTML = inquiries.slice(0,3).map(iq => {
+                const bg = iq.status==='pending'?'#F59E0B':iq.status==='completed'?'#10B981':'#3B82F6';
+                return '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;border:1px solid #E5E7EB"><div style="width:8px;height:8px;border-radius:50%;background:'+bg+'"></div><div style="flex:1"><p style="font-weight:600;color:#111827">'+(iq.product||'Product')+'</p><p style="font-size:12px;color:#6B7280">'+(iq.quantity||0)+'kg &bull; '+iq.status+'</p></div></div>';
+            }).join('') || '<p style="color:#6B7280;text-align:center">No inquiries yet</p>';
+            document.getElementById('activity-feed').innerHTML = '<div style="display:flex;align-items:center;gap:12px"><i class="fas fa-paper-plane" style="color:#10B981;width:16px"></i><p style="font-size:14px;color:#111827">Submit inquiries from Browse Products</p></div>';
+        }
+
+        function renderInquiries(){
+            const list = document.getElementById('inquiries-list');
+            const empty = document.getElementById('inquiries-empty');
+            if(!inquiries.length){ list.innerHTML=''; empty.style.display='block'; return; }
+            empty.style.display='none';
+            const sColor={pending:'#F59E0B',processing:'#3B82F6',completed:'#10B981',cancelled:'#EF4444'};
+            const sBg={pending:'#FEF3C7',processing:'#DBEAFE',completed:'#D1FAE5',cancelled:'#FEE2E2'};
+            list.innerHTML = inquiries.map(iq => {
+                const id = iq._id;
+                const qty = iq.quantity||0;
+                const tp = iq.targetPrice||0;
+                const prod = (iq.product||'').replace(/'/g,"\'");
+                const payBtn = iq.status==='pending' ? '<button onclick="openPayModal(\''+id+'\','+qty+','+tp+',\''+prod+'\')" class="btn-primary" style="font-size:12px;padding:7px 14px;border-radius:8px"><i class="fas fa-credit-card"></i> Pay Now</button>' : '';
+                const rateBtn = iq.status==='completed' ? '<button onclick="openRateModal(\''+id+'\')" class="btn-secondary" style="font-size:12px;padding:7px 14px;border-radius:8px"><i class="fas fa-star"></i> Rate Product</button>' : '';
+                const date = iq.createdAt ? new Date(iq.createdAt).toLocaleDateString() : '';
+                return '<div style="border:1px solid #E5E7EB;border-radius:12px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px"><div><h4 style="font-weight:700;color:#111827">'+(iq.product||'Product')+'</h4><p style="color:#6B7280;font-size:13px">'+qty+'kg &bull; UGX '+Number(tp).toLocaleString()+' target &bull; '+(iq.location||'')+'</p></div><span style="background:'+(sBg[iq.status]||'#F3F4F6')+';color:'+(sColor[iq.status]||'#6B7280')+';padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">'+(iq.status||'pending')+'</span></div><p style="font-size:12px;color:#9CA3AF;margin-bottom:12px">'+date+'</p><div style="display:flex;gap:8px;flex-wrap:wrap">'+payBtn+rateBtn+'</div></div>';
+            }).join('');
+        }
+
+        async function loadOrders(){
+            try{ orders = await API.getOrders(); renderOrders(); updateBadges(); }catch(e){ console.error(e); }
+        }
+
+        function renderOrders(){
+            const list = document.getElementById('orders-list');
+            const empty = document.getElementById('orders-empty');
+            if(!orders.length){ list.innerHTML=''; empty.style.display='block'; return; }
+            empty.style.display='none';
+            const sColor={pending:'#F59E0B',confirmed:'#10B981',rejected:'#EF4444'};
+            const sBg={pending:'#FEF3C7',confirmed:'#D1FAE5',rejected:'#FEE2E2'};
+            list.innerHTML = orders.map(o => {
+                const date = o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '';
+                return '<div style="border:1px solid #E5E7EB;border-radius:12px;padding:16px"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px"><div><h4 style="font-weight:700;color:#111827">'+(o.productName||'Product')+'</h4><p style="color:#6B7280;font-size:13px">'+(o.quantity||0)+' units &bull; UGX '+Number(o.totalAmount||0).toLocaleString()+' &bull; '+(o.method||'').replace('_',' ')+'</p></div><span style="background:'+(sBg[o.status]||'#F3F4F6')+';color:'+(sColor[o.status]||'#6B7280')+';padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700\">'+(o.status||'pending')+'</span></div><p style="font-size:12px;color:#9CA3AF">Ref: '+(o.reference||'')+'&nbsp;&bull;&nbsp;'+date+'</p></div>';
+            }).join('');
+        }
+
+        function renderProducts(){
+            const grid = document.getElementById('products-grid');
+            const q = document.getElementById('product-search').value.toLowerCase();
+            const cat = document.getElementById('filter-category').value;
+            const dist = document.getElementById('filter-district').value;
+            let filtered = products.filter(p => {
+                const matchQ = !q || (p.name||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q);
+                const matchCat = !cat || (p.category||'') === cat;
+                const matchDist = !dist || (p.district||'') === dist;
+                return matchQ && matchCat && matchDist;
+            });
+            grid.innerHTML = filtered.map(p => {
+                const id = String(p._id||p.id);
+                const price = Number(p.price||0);
+                const pJson = JSON.stringify(p).replace(/"/g,'&quot;');
+                return '<div class="product-card"><img src="'+(p.image||'https://picsum.photos/seed/'+id+'/400/200')+'" alt="'+p.name+'" style="width:100%;height:160px;object-fit:cover" onerror="this.src=\'https://picsum.photos/seed/'+id+'/400/200\'">'+'<div style="padding:16px"><h4 style="font-weight:700;color:#111827;margin-bottom:4px">'+p.name+'</h4><p style="font-size:12px;color:#6B7280;margin-bottom:8px">'+(p.category||'')+(p.district?' &bull; '+p.district:'')+'</p><p style="font-weight:700;color:#10B981;margin-bottom:12px">UGX '+price.toLocaleString()+'/'+(p.unit||'kg')+'</p><div style="display:flex;gap:8px"><button onclick="sendInquiry(\''+id+'\')" class="btn-secondary" style="flex:1;font-size:12px;padding:8px"><i class="fas fa-clipboard-list"></i> Inquiry</button><button onclick="openOrderModal('+pJson+')" class="btn-primary" style="flex:1;font-size:12px;padding:8px"><i class="fas fa-shopping-bag"></i> Order</button></div></div></div>';
+            }).join('') || '<p style="text-align:center;color:#9CA3AF;padding:32px">No products found</p>';
+        }
+
+        function openOrderModal(p){
+            if(typeof p === 'string') p = JSON.parse(p);
+            const id = String(p._id||p.id);
+            const price = Number(p.price||0);
+            openModal('<div style="padding:24px"><h3 style="font-weight:900;color:#111827;margin-bottom:4px">Place Order</h3><p style="color:#6B7280;font-size:13px;margin-bottom:20px">'+p.name+' &mdash; UGX '+price.toLocaleString()+'/'+(p.unit||'kg')+'</p><div style="display:flex;flex-direction:column;gap:12px"><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Quantity ('+(p.unit||'kg')+')</label><input type="number" id="ord-qty" class="form-input" min="1" placeholder="e.g. 50" required></div><div id="ord-total" style="background:#F0FDF4;border-radius:10px;padding:12px;text-align:center;display:none"><p style="font-size:12px;color:#6B7280;margin-bottom:2px">Total</p><p id="ord-total-val" style="font-size:22px;font-weight:900;color:#059669"></p></div><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Payment Method</label><select id="ord-method" class="form-input"><option value="mobile_money">&#128241; Mobile Money (MTN/Airtel)</option><option value="bank">&#127970; Bank Transfer</option></select></div><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Phone / Account Number</label><input type="text" id="ord-phone" class="form-input" placeholder="e.g. 0772123456"></div><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Notes (optional)</label><input type="text" id="ord-notes" class="form-input" placeholder="Delivery notes..."></div></div><div style="display:flex;gap:8px;margin-top:20px"><button onclick="submitOrder(\''+id+'\',\''+p.name.replace(/'/g,"\\'")+'\''+','+price+')" class="btn-primary" style="flex:1"><i class="fas fa-shopping-bag"></i> Confirm Order</button><button onclick="closeModal()" class="btn-secondary">Cancel</button></div></div>');
+            document.getElementById('ord-qty').addEventListener('input', function(){
+                const qty = Number(this.value);
+                const total = document.getElementById('ord-total');
+                const totalVal = document.getElementById('ord-total-val');
+                if(qty > 0){ total.style.display='block'; totalVal.textContent='UGX '+(qty*price).toLocaleString(); }
+                else total.style.display='none';
+            });
+        }
+
+        async function submitOrder(productId, productName, pricePerUnit){
+            const qty = Number(document.getElementById('ord-qty').value);
+            const method = document.getElementById('ord-method').value;
+            const phone = document.getElementById('ord-phone').value.trim();
+            const notes = document.getElementById('ord-notes').value.trim();
+            if(!qty || qty < 1){ showToast('Enter a valid quantity','error'); return; }
+            if(!phone){ showToast('Enter phone/account number','error'); return; }
+            try{
+                await API.placeOrder({ productId, productName, quantity: qty, pricePerUnit, method, phone, notes });
+                closeModal();
+                showToast('Order placed! Awaiting confirmation.','success');
+                await loadOrders();
+                renderOrders();
+            }catch(e){ showToast(e.message,'error'); }
+        }
+
+        function sendInquiry(productId){
+            const product = products.find(p => String(p._id||p.id) === String(productId));
+            if(!product) return;
+            openModal('<div style="padding:24px"><h3 style="font-weight:900;color:#111827;margin-bottom:16px">Send Bulk Inquiry</h3><p style="color:#6B7280;margin-bottom:16px">'+product.name+'</p><form onsubmit="submitInquiry(event,\''+productId+'\')"><input type="number" placeholder="Quantity (kg)" class="form-input" style="margin-bottom:12px" required><input type="number" placeholder="Target price per kg (UGX)" class="form-input" style="margin-bottom:12px" required><input type="text" placeholder="Your location" class="form-input" style="margin-bottom:12px" required><textarea placeholder="Notes..." class="form-input" rows="2" style="margin-bottom:16px"></textarea><div style="display:flex;gap:8px"><button type="submit" class="btn-primary">Send Inquiry</button><button type="button" onclick="closeModal()" class="btn-secondary">Cancel</button></div></form></div>');
+        }
+
+        async function submitInquiry(event, productId){
+            event.preventDefault();
+            const inputs = event.target.querySelectorAll('input');
+            const quantity = inputs[0].value;
+            const targetPrice = inputs[1].value;
+            const location = inputs[2].value;
+            const notes = event.target.querySelector('textarea').value;
+            const product = products.find(p => String(p._id||p.id) === String(productId));
+            try{
+                await API.submitInquiry({ product: product?.name||productId, quantity: Number(quantity), targetPrice: Number(targetPrice), location, notes });
+                await loadInquiries();
+                updateBadges();
+                closeModal();
+                showToast('Inquiry sent!', 'success');
+            }catch(e){ showToast(e.message,'error'); }
+        }
+
+        function openPayModal(inquiryId, quantity, targetPrice, product){
+            const amount = quantity * targetPrice;
+            openModal('<div style="padding:24px"><h3 style="font-weight:900;color:#111827;margin-bottom:4px">Complete Payment</h3><p style="color:#6B7280;font-size:13px;margin-bottom:20px">'+product+' &mdash; '+quantity+'kg</p><div style="background:#F0FDF4;border-radius:10px;padding:16px;margin-bottom:20px;text-align:center"><p style="font-size:12px;color:#6B7280;margin-bottom:4px">Total Amount</p><p style="font-size:28px;font-weight:900;color:#059669">UGX '+amount.toLocaleString()+'</p></div><div style="display:flex;flex-direction:column;gap:12px"><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Payment Method</label><select id="pay-method" class="form-input"><option value="mobile_money">&#128241; Mobile Money (MTN/Airtel)</option><option value="bank">&#127970; Bank Transfer</option></select></div><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Phone / Account Number</label><input type="text" id="pay-phone" class="form-input" placeholder="e.g. 0772123456"></div></div><div style="display:flex;gap:8px;margin-top:20px"><button onclick="submitPayment(\''+inquiryId+'\','+amount+')" class="btn-primary" style="flex:1">Confirm Payment</button><button onclick="closeModal()" class="btn-secondary">Cancel</button></div></div>');
+        }
+
+        async function submitPayment(inquiryId, amount){
+            const method = document.getElementById('pay-method').value;
+            const phone = document.getElementById('pay-phone').value.trim();
+            if(!phone){ showToast('Enter phone/account number','error'); return; }
+            try{
+                await API.initiatePayment({ inquiryId, amount, method, phone });
+                closeModal();
+                showToast('Payment initiated! Awaiting admin confirmation.','success');
+                await loadInquiries();
+                renderInquiries();
+            }catch(e){ showToast(e.message,'error'); }
+        }
+
+        function openRateModal(inquiryId){
+            window._selectedRating = 0;
+            openModal('<div style="padding:24px"><h3 style="font-weight:900;color:#111827;margin-bottom:4px">Rate this Product</h3><p style="color:#6B7280;font-size:13px;margin-bottom:20px">Share your experience</p><div style="text-align:center;margin-bottom:20px"><div style="display:flex;justify-content:center;gap:8px;font-size:32px;cursor:pointer"><span onclick="setRating(1)" id="star-1" style="color:#D1D5DB">&#9733;</span><span onclick="setRating(2)" id="star-2" style="color:#D1D5DB">&#9733;</span><span onclick="setRating(3)" id="star-3" style="color:#D1D5DB">&#9733;</span><span onclick="setRating(4)" id="star-4" style="color:#D1D5DB">&#9733;</span><span onclick="setRating(5)" id="star-5" style="color:#D1D5DB">&#9733;</span></div><p id="rating-label" style="font-size:13px;color:#9CA3AF;margin-top:8px">Click a star to rate</p></div><textarea id="review-comment" class="form-input" rows="3" placeholder="Optional comment..."></textarea><div style="display:flex;gap:8px;margin-top:16px"><button onclick="submitReview(\''+inquiryId+'\')" class="btn-primary" style="flex:1">Submit Review</button><button onclick="closeModal()" class="btn-secondary">Cancel</button></div></div>');
+        }
+
+        function setRating(val){
+            window._selectedRating = val;
+            const labels=['','Poor','Fair','Good','Very Good','Excellent'];
+            document.getElementById('rating-label').textContent = labels[val];
+            [1,2,3,4,5].forEach(i=>{ document.getElementById('star-'+i).style.color = i<=val?'#F59E0B':'#D1D5DB'; });
+        }
+
+        async function submitReview(inquiryId){
+            const rating = window._selectedRating;
+            if(!rating){ showToast('Please select a star rating','error'); return; }
+            const inq = inquiries.find(i=>String(i._id)===String(inquiryId));
+            const productId = inq?.productId || inquiryId;
+            const comment = document.getElementById('review-comment').value.trim();
+            try{
+                await API.submitReview({ productId, rating, comment });
+                closeModal();
+                showToast('Review submitted! Thank you.','success');
+            }catch(e){ showToast(e.message,'error'); }
+        }
+
+        function toggleFavorite(productId){
+            if(favorites.includes(productId)){
+                favorites = favorites.filter(id => id !== productId);
+            }else{
+                favorites.push(productId);
+            }
+            renderProducts();
+            renderFavorites();
+            updateBadges();
+        }
+
+        function renderFavorites(){
+            const grid = document.getElementById('favorites-grid');
+            const favProducts = products.filter(p => favorites.includes(p.id));
+            grid.innerHTML = favProducts.map(p => `
+                <div class="product-card">
+                    <img src="${p.image||'https://picsum.photos/seed/p/400/200'}" alt="${p.name}" style="width:100%;height:160px;object-fit:cover">
+                    <div style="padding:16px">
+                        <h4 style="font-weight:700;color:#111827;margin-bottom:4px">${p.name}</h4>
+                        <p style="font-size:12px;color:#6B7280;margin-bottom:8px">${p.category} • ${p.district||'Unknown'}</p>
+                        <p style="font-weight:700;color:#10B981;margin-bottom:8px">UGX ${p.price?.toLocaleString()||'N/A'}</p>
+                        <button onclick="toggleFavorite(${p.id})" class="btn-secondary" style="width:100%;font-size:12px">
+                            <i class="fas fa-heart" style="color:#EF4444"></i> Remove from Favorites
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function navigateTo(page){
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            const link = document.querySelector(`.nav-link[data-page="${page}"]`);
+            if(link) link.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById('page-' + page);
+            if(target) target.classList.add('active');
+            const titles = {
+                dashboard: 'Dashboard',
+                products: 'Browse Products',
+                inquiries: 'My Inquiries',
+                orders: 'My Orders',
+                messages: 'Messages',
+                favorites: 'Favorites',
+                settings: 'Settings'
+            };
+            document.getElementById('page-title').textContent = titles[page] || 'Dashboard';
+
+            if(page === 'products') renderProducts();
+            if(page === 'inquiries') renderInquiries();
+            if(page === 'orders') renderOrders();
+            if(page === 'favorites') renderFavorites();
+        }
+
+        function updateBadges(){
+            document.getElementById('inquiry-count-badge').textContent = inquiries.length;
+            document.getElementById('order-count-badge').textContent = orders.length;
+            document.getElementById('message-count-badge').textContent = conversations.reduce((s,c)=>s+c.unread,0);
+        }
+
+        function animateNumber(id, target){
+            const el = document.getElementById(id);
+            const start = parseInt(el.textContent.replace(/,/g,'')) || 0;
+            const dur = 700;
+            const t0 = performance.now();
+            (function step(now){
+                const p = Math.min((now - t0) / dur, 1);
+                const e = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.round(start + (target - start) * e).toLocaleString();
+                if(p < 1) requestAnimationFrame(step);
+            })(t0);
+        }
+
+        function toggleSidebar(){
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebar-overlay');
+            if(window.innerWidth < 1024){
+                sb.classList.toggle('open');
+                ov.classList.toggle('show');
+            }else{
+                sb.classList.toggle('collapsed');
+                document.getElementById('main').classList.toggle('expanded');
+            }
+        }
+
+        function toggleNotifications(){
+            document.getElementById('notif-dropdown').classList.toggle('show');
+        }
+
+        document.addEventListener('click', e => {
+            if(!e.target.closest('.relative')) document.getElementById('notif-dropdown').classList.remove('show');
+        });
+
+        function openModal(html){
+            document.getElementById('modal-content').innerHTML = html;
+            document.getElementById('modal-content').className = 'modal-content';
+            document.getElementById('modal-overlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(e){
+            if(e && e.target !== document.getElementById('modal-overlay')) return;
+            document.getElementById('modal-overlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function showToast(msg, type = 'success'){
+            const c = document.getElementById('toast-container');
+            const icons = {success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};
+            const t = document.createElement('div');
+            t.className = `toast toast-${type}`;
+            t.innerHTML = `<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
+            c.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transform = 'translateX(30px)';
+                t.style.transition = 'all .3s';
+                setTimeout(() => t.remove(), 300);
+            }, 3500);
+        }
+
+        function logout(){
+            localStorage.removeItem('agro_token');
+            window.location.href = '/auth';
+        }
+    </script>
+<div id="rt-notif-container"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realtime.js"></script>
+<script>RT.connect();
+        // ── Real-time chat ──────────────────────────────────────────
+        let _currentRoom = null;
+        let _currentContact = null;
+        let _typingTimer = null;
+        let _allContacts = [];
+
+        async function loadContacts() {
+            try {
+                const prods = await API.getProducts({});
+                // Build unique farmer contacts from products
+                const seen = new Set();
+                _allContacts = [];
+                prods.forEach(p => {
+                    const key = (p.farmer || '').toLowerCase();
+                    if (key && !seen.has(key)) {
+                        seen.add(key);
+                        _allContacts.push({
+                            id: String(p.farmerId || p._id || p.id),
+                            name: p.farmer || 'Farmer',
+                            district: p.district || '',
+                            product: p.name || ''
+                        });
+                    }
+                });
+                renderContacts(_allContacts);
+            } catch(e) { console.error(e); }
+        }
+
+        function renderContacts(list) {
+            const el = document.getElementById('contacts-list');
+            if (!el) return;
+            if (!list.length) { el.innerHTML = '<p style="padding:16px;color:#9CA3AF;font-size:13px">No farmers found</p>'; return; }
+            el.innerHTML = list.map(c => {
+                const initials = c.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+                const isActive = _currentContact && _currentContact.id === c.id;
+                return `<div onclick="openChat('${c.id}','${c.name.replace(/'/g,"\\'")}','${c.district}')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid #F3F4F6;background:${isActive?'#F0FDF4':'#fff'};transition:background .2s" onmouseover="this.style.background='#F0FDF4'" onmouseout="this.style.background='${isActive?'#F0FDF4':'#fff'}'">
+                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;flex-shrink:0">${initials}</div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-weight:600;color:#111827;font-size:13px">${c.name}</div>
+                        <div style="font-size:11px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.product} • ${c.district}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function filterContacts() {
+            const q = document.getElementById('contact-search').value.toLowerCase();
+            renderContacts(_allContacts.filter(c => c.name.toLowerCase().includes(q) || c.district.toLowerCase().includes(q)));
+        }
+
+        function openChat(contactId, contactName, district) {
+            const user = API.getUser();
+            if (!user) { showToast('Please login to chat', 'error'); return; }
+
+            _currentContact = { id: contactId, name: contactName, district };
+            _currentRoom = RT.roomId(user.id, contactId);
+
+            // Update header
+            const initials = contactName.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+            document.getElementById('chat-avatar').textContent = initials;
+            document.getElementById('chat-name').textContent = contactName;
+            document.getElementById('chat-status').textContent = district + ' • Farmer';
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('chat-send-btn').disabled = false;
+            document.getElementById('chat-messages').innerHTML = '';
+
+            // Join socket room
+            RT.joinChat(_currentRoom);
+
+            // Listen for messages in this room
+            RT.onChat(_currentRoom, (msg) => {
+                appendChatMessage(msg.text, msg.from === user.id, msg.fromName, msg.time);
+            });
+
+            // Typing indicators
+            RT.onTyping(_currentRoom, (data) => {
+                document.getElementById('chat-typing-indicator').textContent = data.fromName + ' is typing...';
+            });
+            RT.onStopTyping(_currentRoom, () => {
+                document.getElementById('chat-typing-indicator').textContent = '';
+            });
+
+            // Re-render contacts to highlight active
+            renderContacts(_allContacts);
+        }
+
+        function sendDirectMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !_currentRoom) return;
+            const user = API.getUser();
+            RT.sendChatMessage(_currentRoom, text, _currentContact?.id);
+            // Optimistically show own message
+            appendChatMessage(text, true, user?.name || 'You', new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}));
+            input.value = '';
+            RT.stopTyping(_currentRoom);
+        }
+
+        function appendChatMessage(text, isMine, senderName, time) {
+            const area = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.style.cssText = `display:flex;flex-direction:column;align-items:${isMine?'flex-end':'flex-start'};max-width:70%;${isMine?'align-self:flex-end':'align-self:flex-start'}`;
+            div.innerHTML = `
+                ${!isMine ? `<span style="font-size:11px;color:#9CA3AF;margin-bottom:3px">${senderName}</span>` : ''}
+                <div style="background:${isMine?'linear-gradient(135deg,#10B981,#059669)':'#fff'};color:${isMine?'#fff':'#111827'};padding:10px 14px;border-radius:${isMine?'16px 16px 4px 16px':'16px 16px 16px 4px'};font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)">${text}</div>
+                <span style="font-size:10px;color:#9CA3AF;margin-top:3px">${time}</span>`;
+            area.appendChild(div);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function handleChatKey(e) {
+            if (e.key === 'Enter') { sendDirectMessage(); return; }
+            if (_currentRoom) {
+                RT.sendTyping(_currentRoom, _currentContact?.id);
+                clearTimeout(_typingTimer);
+                _typingTimer = setTimeout(() => RT.stopTyping(_currentRoom), 2000);
+            }
+        }
+
+        // Wire RT notifications to reload orders/inquiries
+        RT.onNotification(function(notif) {
+            if (notif.type === 'order_confirmed' || notif.type === 'order_rejected') {
+                loadOrders();
+            }
+            if (notif.type === 'payment_confirmed' || notif.type === 'payment_rejected') {
+                loadInquiries();
+            }
+        });
+
+        // Wire RT price updates to update stat
+        RT.onPriceUpdate(function(prices) {
+            // Could update a price widget if added to buyer dashboard
+        });
+
+        // Load contacts when messages page is opened
+        const _origNavigateTo = navigateTo;
+        function navigateTo(page) {
+            _origNavigateTo(page);
+            if (page === 'messages' && !_allContacts.length) loadContacts();
+        }
+
+</script>
+</body>
+</html>

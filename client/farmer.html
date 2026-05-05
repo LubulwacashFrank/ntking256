@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agitech Connect | Farmer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fraunces:ital,opsz,wght@0,9..144,100..900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        crop: {
+                            50:'#ECFDF5',100:'#D1FAE5',200:'#A7F3D0',300:'#6EE7B7',
+                            400:'#34D399',500:'#10B981',600:'#059669',700:'#047857',
+                            800:'#065F46',900:'#064E3B',950:'#022C22'
+                        },
+                        harvest: {
+                            50:'#FFFBEB',100:'#FEF3C7',200:'#FDE68A',300:'#FCD34D',
+                            400:'#FBBF24',500:'#F59E0B',600:'#D97706',700:'#B45309',
+                            800:'#92400E',900:'#78350F',950:'#451A03'
+                        },
+                        soil: {
+                            50:'#FEF7F0',100:'#FDEBD2',200:'#F9D5B0',300:'#F4B98A',
+                            400:'#ED935E',500:'#E07030',600:'#C2511A',700:'#9A3E14',
+                            800:'#6E2C0E',900:'#4A1D08',950:'#2A0F04'
+                        }
+                    },
+                    fontFamily: {
+                        display:['Fraunces','serif'],
+                        body:['DM Sans','sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'DM Sans',sans-serif;background:#F8FAF8;color:#022C22;overflow-x:hidden}
+        ::-webkit-scrollbar{width:5px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:#D1FAE5;border-radius:3px}
+        ::-webkit-scrollbar-thumb:hover{background:#059669}
+
+        /* Sidebar - bold gradient */
+        #sidebar{
+            position:fixed;left:0;top:0;bottom:0;width:260px;
+            background:linear-gradient(175deg,#064E3B 0%,#022C22 60%,#1A0F00 100%);
+            z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1);
+            display:flex;flex-direction:column;
+            box-shadow:6px 0 32px rgba(0,0,0,.2);
+            border-right:1px solid rgba(16,185,129,.15);
+        }
+        #sidebar.collapsed{transform:translateX(-260px)}
+        .nav-link{
+            display:flex;align-items:center;gap:12px;padding:11px 18px;margin:2px 10px;
+            border-radius:10px;color:rgba(167,243,208,.7);font-size:13.5px;font-weight:500;
+            cursor:pointer;transition:all .2s;text-decoration:none;position:relative;
+        }
+        .nav-link:hover{background:rgba(16,185,129,.12);color:#A7F3D0}
+        .nav-link.active{
+            background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(245,158,11,.1));
+            color:#6EE7B7;font-weight:700;
+        }
+        .nav-link.active::before{
+            content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);
+            width:3px;height:22px;background:linear-gradient(180deg,#10B981,#F59E0B);
+            border-radius:0 3px 3px 0;
+        }
+        .nav-link i{width:18px;text-align:center;font-size:14px}
+        .nav-badge{
+            margin-left:auto;background:linear-gradient(135deg,#F59E0B,#D97706);
+            color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:8px;
+        }
+
+        /* Main */
+        #main{margin-left:260px;min-height:100vh;transition:margin-left .3s cubic-bezier(.4,0,.2,1)}
+        #main.expanded{margin-left:0}
+
+        /* Pages */
+        .page{display:none;animation:fadeUp .3s ease}
+        .page.active{display:block}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+        /* Stat cards - each with bold color identity */
+        .stat-card{
+            border-radius:16px;padding:22px;position:relative;overflow:hidden;
+            border:1px solid transparent;transition:all .25s;cursor:default;
+        }
+        .stat-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.1)}
+        .stat-card.green{background:linear-gradient(135deg,#064E3B,#065F46);border-color:rgba(16,185,129,.2)}
+        .stat-card.gold{background:linear-gradient(135deg,#78350F,#92400E);border-color:rgba(245,158,11,.2)}
+        .stat-card.orange{background:linear-gradient(135deg,#7C2D12,#9A3412);border-color:rgba(251,146,60,.2)}
+        .stat-card.teal{background:linear-gradient(135deg,#134E4A,#115E59);border-color:rgba(20,184,166,.2)}
+
+        /* Product card */
+        .product-card{
+            background:#fff;border-radius:14px;overflow:hidden;
+            border:1px solid #E5E7EB;transition:all .25s;
+        }
+        .product-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(6,78,59,.08);border-color:#A7F3D0}
+
+        /* Buyer card */
+        .buyer-card{
+            background:#fff;border-radius:14px;padding:20px;
+            border:1px solid #E5E7EB;transition:all .25s;
+        }
+        .buyer-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(6,78,59,.08);border-color:#FDE68A}
+
+        /* Status badges */
+        .badge{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;letter-spacing:.3px}
+        .badge-active{background:#D1FAE5;color:#065F46}
+        .badge-pending{background:#FEF3C7;color:#92400E}
+        .badge-soldout{background:#F3F4F6;color:#6B7280}
+        .badge-draft{background:#E5E7EB;color:#4B5563}
+
+        /* Category colors - STRIKING */
+        .cat-grains{background:#FEF3C7;color:#92400E}
+        .cat-vegetables{background:#D1FAE5;color:#065F46}
+        .cat-fruits{background:#FFEDD5;color:#C2410C}
+        .cat-livestock{background:#F3E8FF;color:#7C3AED}
+        .cat-dairy{background:#DBEAFE;color:#1D4ED8}
+        .cat-poultry{background:#FFE4E6;color:#BE123C}
+        .cat-cashcrops{background:#ECFDF5;color:#047857}
+        .cat-organic{background:#F0FDF4;color:#15803D}
+
+        /* Modal */
+        #modal-overlay{
+            position:fixed;inset:0;background:rgba(2,44,34,.55);backdrop-filter:blur(6px);
+            z-index:200;display:none;align-items:center;justify-content:center;padding:20px;
+        }
+        #modal-overlay.show{display:flex}
+        .modal-content{
+            background:#fff;border-radius:20px;width:100%;max-width:580px;max-height:90vh;
+            overflow-y:auto;animation:modalIn .25s ease;
+        }
+        @keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+
+        /* Toast */
+        #toast-container{position:fixed;top:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
+        .toast{
+            padding:13px 18px;border-radius:12px;color:#fff;font-size:13px;font-weight:600;
+            display:flex;align-items:center;gap:10px;animation:toastIn .3s ease;
+            box-shadow:0 10px 30px rgba(0,0,0,.2);min-width:260px;
+        }
+        .toast-success{background:linear-gradient(135deg,#059669,#10B981)}
+        .toast-error{background:linear-gradient(135deg,#DC2626,#EF4444)}
+        .toast-info{background:linear-gradient(135deg,#064E3B,#065F46)}
+        @keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+
+        /* Chat */
+        .chat-bubble{max-width:75%;padding:10px 15px;border-radius:14px;font-size:13.5px;line-height:1.55}
+        .chat-bubble.sent{background:linear-gradient(135deg,#059669,#047857);color:#fff;border-bottom-right-radius:4px;margin-left:auto}
+        .chat-bubble.received{background:#F3F4F6;color:#1F2937;border-bottom-left-radius:4px}
+
+        /* Form */
+        .form-input{
+            width:100%;padding:10px 14px;border:2px solid #E5E7EB;border-radius:10px;
+            font-family:'DM Sans';font-size:13.5px;transition:all .2s;background:#fff;
+        }
+        .form-input:focus{outline:none;border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,.12)}
+        .form-input::placeholder{color:#9CA3AF}
+        select.form-input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+        /* Buttons */
+        .btn-primary{
+            background:linear-gradient(135deg,#059669,#047857);color:#fff;padding:10px 20px;
+            border-radius:10px;font-weight:700;font-size:13.5px;border:none;cursor:pointer;
+            transition:all .2s;display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans';
+            box-shadow:0 2px 8px rgba(5,150,105,.2);
+        }
+        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(5,150,105,.35)}
+        .btn-secondary{
+            background:transparent;color:#059669;padding:10px 20px;border-radius:10px;
+            font-weight:700;font-size:13.5px;border:2px solid #10B981;cursor:pointer;
+            transition:all .2s;display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans';
+        }
+        .btn-secondary:hover{background:#ECFDF5}
+        .btn-gold{
+            background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;padding:10px 20px;
+            border-radius:10px;font-weight:700;font-size:13.5px;border:none;cursor:pointer;
+            transition:all .2s;display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans';
+            box-shadow:0 2px 8px rgba(245,158,11,.25);
+        }
+        .btn-gold:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,158,11,.4)}
+        .btn-sm{padding:7px 14px;font-size:12.5px;border-radius:8px}
+        .btn-icon{
+            width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;
+            display:inline-flex;align-items:center;justify-content:center;transition:all .2s;
+            font-size:13px;background:#F3F4F6;color:#6B7280;
+        }
+        .btn-icon:hover{background:#E5E7EB}
+        .btn-icon.danger:hover{background:#FEE2E2;color:#DC2626}
+
+        .confirm-box{background:#fff;border-radius:16px;padding:28px;max-width:400px;width:100%;text-align:center;animation:modalIn .25s ease}
+
+        #sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;display:none}
+        #sidebar-overlay.show{display:block}
+
+        .notif-dropdown{
+            position:absolute;top:100%;right:0;margin-top:8px;width:320px;background:#fff;
+            border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.15);border:1px solid #E5E7EB;
+            display:none;z-index:50;overflow:hidden;
+        }
+        .notif-dropdown.show{display:block;animation:fadeUp .2s ease}
+
+        .upload-area{
+            border:2px dashed #D1D5DB;border-radius:12px;padding:28px;text-align:center;
+            cursor:pointer;transition:all .2s;background:#F9FAFB;
+        }
+        .upload-area:hover{border-color:#10B981;background:#ECFDF5}
+        .upload-area.has-image{padding:6px;border-style:solid;border-color:#10B981}
+
+        /* Ambient glow effects */
+        #main::before{
+            content:'';position:fixed;top:-100px;right:-100px;width:400px;height:400px;
+            background:radial-gradient(circle,rgba(16,185,129,.06) 0%,transparent 70%);
+            pointer-events:none;z-index:0;
+        }
+        #main::after{
+            content:'';position:fixed;bottom:-100px;left:200px;width:350px;height:350px;
+            background:radial-gradient(circle,rgba(245,158,11,.05) 0%,transparent 70%);
+            pointer-events:none;z-index:0;
+        }
+
+        @media(max-width:1024px){
+            #sidebar{transform:translateX(-260px)}
+            #sidebar.open{transform:translateX(0)}
+            #main{margin-left:0!important}
+        }
+
+        /* Shimmer on stat cards */
+        .stat-card::before{
+            content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+            background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,.04) 50%,transparent 60%);
+            animation:shimmer 6s infinite;
+        }
+        @keyframes shimmer{0%{transform:translateX(-100%) rotate(0deg)}100%{transform:translateX(100%) rotate(0deg)}}
+    </style>
+</head>
+<body>
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="p-5 pb-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-crop-500 to-harvest-500 flex items-center justify-center shadow-lg shadow-crop-500/20">
+                    <i class="fas fa-seedling text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-display text-[16px] font-bold text-white leading-tight tracking-tight">Agitech</h1>
+                    <span class="text-harvest-400 text-[10px] font-bold tracking-[.2em] uppercase">Connect</span>
+                </div>
+            </div>
+        </div>
+        <div class="px-5 mb-1 mt-2"><span class="text-crop-700 text-[9px] font-extrabold tracking-[.25em] uppercase">Menu</span></div>
+        <nav class="flex-1" id="sidebar-nav">
+            <a class="nav-link active" data-page="dashboard"><i class="fas fa-th-large"></i>Dashboard</a>
+            <a class="nav-link" data-page="products"><i class="fas fa-boxes-stacked"></i>My Products<span class="nav-badge" id="product-count-badge">0</span></a>
+            <a class="nav-link" data-page="add-product"><i class="fas fa-circle-plus"></i>Add Product</a>
+            <a class="nav-link" data-page="buyers"><i class="fas fa-truck-field"></i>Bulk Buyers</a>
+            <a class="nav-link" data-page="orders"><i class="fas fa-receipt"></i>Orders</a>
+            <a class="nav-link" data-page="earnings"><i class="fas fa-coins"></i>Earnings</a>
+            <a class="nav-link" data-page="messages"><i class="fas fa-comments"></i>Messages<span class="nav-badge" id="unread-badge" style="display:none">0</span></a>
+        </nav>
+        <div class="px-5 mb-1 mt-3"><span class="text-crop-700 text-[9px] font-extrabold tracking-[.25em] uppercase">Account</span></div>
+        <nav class="pb-3">
+            <a class="nav-link" data-page="settings"><i class="fas fa-gear"></i>Settings</a>
+        </nav>
+        <div class="p-4 border-t border-white/10">
+            <div class="flex items-center gap-3 px-1">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-harvest-400 to-harvest-600 flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-harvest-500/20" id="sidebarAvatar">?</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-white text-sm font-bold truncate" id="sidebarName">Loading...</p>
+                    <p class="text-crop-400 text-[11px] truncate" id="sidebarDistrict"></p>
+                </div>
+                <button onclick="logout()" class="text-crop-500 hover:text-harvest-400 transition" title="Logout"><i class="fas fa-right-from-bracket text-sm"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div id="main">
+        <!-- Top Bar -->
+        <header class="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-gray-200/60">
+            <div class="flex items-center justify-between px-4 lg:px-8 h-[60px]">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition">
+                        <i class="fas fa-bars text-sm"></i>
+                    </button>
+                    <h2 class="text-[17px] font-extrabold text-gray-900" id="page-title">Dashboard</h2>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <div class="hidden md:flex items-center bg-gray-100 rounded-xl px-3 py-2 gap-2 w-60">
+                        <i class="fas fa-search text-gray-400 text-xs"></i>
+                        <input type="text" placeholder="Search..." class="bg-transparent border-none outline-none text-sm text-gray-800 placeholder:text-gray-400 w-full font-body" id="global-search">
+                    </div>
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition relative">
+                            <i class="fas fa-bell text-sm"></i>
+                            <span id="notif-dot" class="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-red-500 to-red-600 rounded-full text-[9px] text-white font-extrabold flex items-center justify-center shadow" style="display:none">0</span>
+                        </button>
+                        <div class="notif-dropdown" id="notif-dropdown">
+                            <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                                <span class="font-bold text-sm text-gray-900">Notifications</span>
+                                <button class="text-xs text-crop-600 font-bold hover:underline" onclick="clearNotifications()">Clear all</button>
+                            </div>
+                            <div id="notif-list" class="max-h-72 overflow-y-auto"></div>
+                        </div>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-harvest-400 to-harvest-600 flex items-center justify-center text-white font-extrabold text-sm cursor-pointer shadow-md shadow-harvest-500/20" id="headerAvatar">?</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-4 lg:p-8 relative z-10">
+
+            <!-- ====== DASHBOARD ====== -->
+            <div id="page-dashboard" class="page active">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card green">
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center"><i class="fas fa-boxes-stacked text-crop-300 text-lg"></i></div>
+                            <span class="text-[10px] font-extrabold text-crop-300 bg-white/10 px-2 py-0.5 rounded-md tracking-wide">ACTIVE</span>
+                        </div>
+                        <p class="text-2xl font-extrabold text-white relative z-10" id="stat-products">0</p>
+                        <p class="text-xs text-crop-300 mt-1 relative z-10 font-medium">Total Products</p>
+                    </div>
+                    <div class="stat-card gold">
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center"><i class="fas fa-eye text-harvest-300 text-lg"></i></div>
+                            <span class="text-[10px] font-extrabold text-harvest-300 bg-white/10 px-2 py-0.5 rounded-md tracking-wide">+12%</span>
+                        </div>
+                        <p class="text-2xl font-extrabold text-white relative z-10" id="stat-views">0</p>
+                        <p class="text-xs text-harvest-300 mt-1 relative z-10 font-medium">Total Views</p>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center"><i class="fas fa-handshake text-orange-300 text-lg"></i></div>
+                            <span class="text-[10px] font-extrabold text-orange-300 bg-white/10 px-2 py-0.5 rounded-md tracking-wide">MONTH</span>
+                        </div>
+                        <p class="text-2xl font-extrabold text-white relative z-10" id="stat-inquiries">0</p>
+                        <p class="text-xs text-orange-300 mt-1 relative z-10 font-medium">Buyer Inquiries</p>
+                    </div>
+                    <div class="stat-card teal">
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center"><i class="fas fa-coins text-teal-300 text-lg"></i></div>
+                            <span class="text-[10px] font-extrabold text-teal-300 bg-white/10 px-2 py-0.5 rounded-md tracking-wide">+8%</span>
+                        </div>
+                        <p class="text-2xl font-extrabold text-white relative z-10" id="stat-revenue">0</p>
+                        <p class="text-xs text-teal-300 mt-1 relative z-10 font-medium">Revenue (UGX)</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                            <h3 class="font-extrabold text-gray-900">Recent Products</h3>
+                            <button class="text-xs text-crop-600 font-bold hover:underline" onclick="navigateTo('products')">View all <i class="fas fa-arrow-right text-[10px] ml-1"></i></button>
+                        </div>
+                        <div id="dashboard-products" class="divide-y divide-gray-100"></div>
+                    </div>
+                    <div class="space-y-5">
+                        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                            <h3 class="font-extrabold text-gray-900 mb-4">Quick Actions</h3>
+                            <div class="space-y-2.5">
+                                <button onclick="navigateTo('add-product')" class="w-full flex items-center gap-3 p-3 rounded-xl bg-crop-50 hover:bg-crop-100 transition text-left group border border-crop-200">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-crop-500 to-crop-700 flex items-center justify-center text-white shadow-md shadow-crop-500/20 group-hover:scale-105 transition"><i class="fas fa-plus text-sm"></i></div>
+                                    <div><p class="text-sm font-bold text-gray-900">Add New Product</p><p class="text-[11px] text-gray-500">List produce for sale</p></div>
+                                </button>
+                                <button onclick="navigateTo('buyers')" class="w-full flex items-center gap-3 p-3 rounded-xl bg-harvest-50 hover:bg-harvest-100 transition text-left group border border-harvest-200">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-harvest-500 to-harvest-700 flex items-center justify-center text-white shadow-md shadow-harvest-500/20 group-hover:scale-105 transition"><i class="fas fa-truck text-sm"></i></div>
+                                    <div><p class="text-sm font-bold text-gray-900">Browse Buyers</p><p class="text-[11px] text-gray-500">Find bulk buyers</p></div>
+                                </button>
+                                <button onclick="navigateTo('messages')" class="w-full flex items-center gap-3 p-3 rounded-xl bg-orange-50 hover:bg-orange-100 transition text-left group border border-orange-200">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-soil-500 to-soil-700 flex items-center justify-center text-white shadow-md shadow-soil-500/20 group-hover:scale-105 transition"><i class="fas fa-message text-sm"></i></div>
+                                    <div><p class="text-sm font-bold text-gray-900">Messages</p><p class="text-[11px] text-gray-500">Reply to inquiries</p></div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                            <h3 class="font-extrabold text-gray-900 mb-4">Recent Activity</h3>
+                            <div id="activity-feed" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== PRODUCTS ====== -->
+            <div id="page-products" class="page">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-gray-900">My Products</h3>
+                        <p class="text-sm text-gray-500 mt-0.5">Manage your product listings</p>
+                    </div>
+                    <button onclick="navigateTo('add-product')" class="btn-primary"><i class="fas fa-plus text-xs"></i>Add Product</button>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-200 p-4 mb-6">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="flex-1 flex items-center bg-gray-50 rounded-xl px-3 py-2 gap-2 border border-gray-200">
+                            <i class="fas fa-search text-gray-400 text-xs"></i>
+                            <input type="text" placeholder="Search products..." class="bg-transparent border-none outline-none text-sm text-gray-800 placeholder:text-gray-400 w-full font-body" id="product-search" oninput="renderProducts()">
+                        </div>
+                        <select class="form-input sm:w-48" id="filter-category" onchange="renderProducts()"><option value="">All Categories</option></select>
+                        <select class="form-input sm:w-40" id="filter-status" onchange="renderProducts()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="soldout">Sold Out</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                <div id="no-products" class="hidden text-center py-16">
+                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4"><i class="fas fa-box-open text-3xl text-gray-300"></i></div>
+                    <p class="text-gray-600 font-bold">No products found</p>
+                    <p class="text-sm text-gray-400 mt-1">Adjust your filters or add a new product</p>
+                </div>
+            </div>
+
+            <!-- ====== ADD PRODUCT ====== -->
+            <div id="page-add-product" class="page">
+                <div class="mb-6">
+                    <h3 class="text-xl font-extrabold text-gray-900" id="form-title">Add New Product</h3>
+                    <p class="text-sm text-gray-500 mt-0.5" id="form-subtitle">Fill in the details to list your product</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-200 p-6 lg:p-8 max-w-3xl">
+                    <form id="product-form" onsubmit="handleProductSubmit(event)">
+                        <input type="hidden" id="edit-product-id" value="">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Product Name</label>
+                                <input type="text" class="form-input" id="inp-name" placeholder="e.g. Premium Maize" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Category</label>
+                                <select class="form-input" id="inp-category" required><option value="">Select category</option></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Status</label>
+                                <select class="form-input" id="inp-status"><option value="active">Active</option><option value="pending">Pending</option><option value="draft">Draft</option></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Price (UGX)</label>
+                                <input type="number" class="form-input" id="inp-price" placeholder="2500" required min="1">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Quantity Available</label>
+                                <input type="number" class="form-input" id="inp-quantity" placeholder="500" required min="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Unit</label>
+                                <select class="form-input" id="inp-unit">
+                                    <option value="bags (50kg)">Bags (50kg)</option><option value="bags (90kg)">Bags (90kg)</option>
+                                    <option value="crates">Crates</option><option value="kg">Kilograms</option>
+                                    <option value="tons">Tons</option><option value="litres">Litres</option>
+                                    <option value="pieces">Pieces</option><option value="bundles">Bundles</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Location</label>
+                                <input type="text" class="form-input" id="inp-location" placeholder="e.g. Nakuru County" value="Nakuru County">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Description</label>
+                                <textarea class="form-input" id="inp-desc" rows="3" placeholder="Describe quality, variety, harvest season..."></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-gray-800 mb-1.5">Product Image</label>
+                                <div class="upload-area" id="upload-area" onclick="document.getElementById('inp-image').click()">
+                                    <input type="file" id="inp-image" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                                    <div id="upload-placeholder">
+                                        <i class="fas fa-cloud-arrow-up text-3xl text-gray-300 mb-2"></i>
+                                        <p class="text-sm text-gray-600 font-bold">Click to upload image</p>
+                                        <p class="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                                    </div>
+                                    <div id="upload-preview" class="hidden"><img id="preview-img" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-8 pt-5 border-t border-gray-100">
+                            <button type="submit" class="btn-primary" id="form-submit-btn"><i class="fas fa-check text-xs"></i>Add Product</button>
+                            <button type="button" class="btn-secondary" onclick="resetForm();navigateTo('products')">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ====== BUYERS ====== -->
+            <div id="page-buyers" class="page">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-gray-900">Bulk Buyers</h3>
+                        <p class="text-sm text-gray-500 mt-0.5">Connect directly with buyers</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-200 p-4 mb-6">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="flex-1 flex items-center bg-gray-50 rounded-xl px-3 py-2 gap-2 border border-gray-200">
+                            <i class="fas fa-search text-gray-400 text-xs"></i>
+                            <input type="text" placeholder="Search buyers..." class="bg-transparent border-none outline-none text-sm text-gray-800 placeholder:text-gray-400 w-full font-body" id="buyer-search" oninput="renderBuyers()">
+                        </div>
+                        <select class="form-input sm:w-48" id="buyer-filter-cat" onchange="renderBuyers()"><option value="">All Interests</option></select>
+                    </div>
+                </div>
+                <div id="buyers-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- ====== MESSAGES ====== -->
+            <div id="page-messages" class="page">
+                <div class="mb-6">
+                    <h3 class="text-xl font-extrabold text-gray-900">Messages</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Conversations with buyers</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden" style="height:calc(100vh - 210px);min-height:480px;">
+                    <div class="flex h-full">
+                        <div id="conv-list-panel" class="w-full sm:w-80 border-r border-gray-100 flex flex-col h-full">
+                            <div class="p-3 border-b border-gray-100">
+                                <div class="flex items-center bg-gray-50 rounded-xl px-3 py-2 gap-2 border border-gray-200">
+                                    <i class="fas fa-search text-gray-400 text-xs"></i>
+                                    <input type="text" placeholder="Search..." class="bg-transparent border-none outline-none text-sm text-gray-800 placeholder:text-gray-400 w-full font-body" id="conv-search" oninput="renderConversations()">
+                                </div>
+                            </div>
+                            <div id="conv-list" class="flex-1 overflow-y-auto"></div>
+                        </div>
+                        <div id="chat-panel" class="hidden sm:flex flex-col flex-1 h-full">
+                            <div id="chat-empty" class="flex-1 flex flex-col items-center justify-center text-gray-300">
+                                <i class="fas fa-comments text-5xl mb-3"></i>
+                                <p class="font-bold text-gray-400">Select a conversation</p>
+                                <p class="text-sm mt-1">Choose a conversation to start messaging</p>
+                            </div>
+                            <div id="chat-active" class="hidden flex-col flex-1 h-full">
+                                <div id="chat-header" class="px-5 py-3 border-b border-gray-100 flex items-center gap-3">
+                                    <button class="sm:hidden btn-icon" onclick="showConvList()"><i class="fas fa-arrow-left"></i></button>
+                                    <div id="chat-avatar" class="w-9 h-9 rounded-full flex items-center justify-center text-white font-extrabold text-xs"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <p id="chat-name" class="font-bold text-gray-900 text-sm truncate"></p>
+                                        <p id="chat-company" class="text-[11px] text-gray-500 truncate"></p>
+                                    </div>
+                                </div>
+                                <div id="chat-messages" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+                                <div class="px-5 py-3 border-t border-gray-100">
+                                    <div class="flex items-end gap-2.5">
+                                        <textarea id="chat-input" rows="1" placeholder="Type a message..." class="form-input flex-1 resize-none" onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+                                        <button onclick="sendMessage()" class="btn-primary btn-sm" style="height:40px"><i class="fas fa-paper-plane text-xs"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== ORDERS ====== -->
+            <div id="page-orders" class="page">
+                <div class="mb-6">
+                    <h3 class="text-xl font-extrabold text-gray-900">Orders Received</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Bulk inquiries from buyers for your products</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                    <div id="orders-list" class="divide-y divide-gray-100"></div>
+                    <div id="orders-empty" class="hidden p-12 text-center">
+                        <i class="fas fa-inbox text-4xl text-gray-200 mb-3"></i>
+                        <p class="font-bold text-gray-400">No orders yet</p>
+                        <p class="text-sm text-gray-400 mt-1">Buyers will send inquiries when interested in your products</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== EARNINGS ====== -->
+            <div id="page-earnings" class="page">
+                <div class="mb-6">
+                    <h3 class="text-xl font-extrabold text-gray-900">Earnings Overview</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Track your revenue from completed orders</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div class="stat-card green">
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center"><i class="fas fa-coins text-crop-300 text-lg"></i></div>
+                            <span class="text-[10px] font-extrabold text-crop-300 bg-white/10 px-2 py-0.5 rounded-md">TOTAL</span>
+                        </div>
+                        <p class="text-2xl font-extrabold text-white relative z-10" id="earn-total">UGX 0</p>
+                        <p class="text-xs text-crop-300 mt-1 relative z-10 font-medium">Total Earnings</p>
+                    </div>
+                    <div class="stat-card gold">
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center"><i class="fas fa-check-circle text-harvest-300 text-lg"></i></div>
+                            <span class="text-[10px] font-extrabold text-harvest-300 bg-white/10 px-2 py-0.5 rounded-md">DONE</span>
+                        </div>
+                        <p class="text-2xl font-extrabold text-white relative z-10" id="earn-completed">0</p>
+                        <p class="text-xs text-harvest-300 mt-1 relative z-10 font-medium">Completed Orders</p>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center"><i class="fas fa-clock text-orange-300 text-lg"></i></div>
+                            <span class="text-[10px] font-extrabold text-orange-300 bg-white/10 px-2 py-0.5 rounded-md">PENDING</span>
+                        </div>
+                        <p class="text-2xl font-extrabold text-white relative z-10" id="earn-pending">0</p>
+                        <p class="text-xs text-orange-300 mt-1 relative z-10 font-medium">Pending Orders</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-200 p-6">
+                    <h4 class="font-extrabold text-gray-900 mb-4">Recent Transactions</h4>
+                    <div id="earnings-list" class="space-y-3"></div>
+                    <div id="earnings-empty" class="hidden text-center py-8 text-gray-400">
+                        <i class="fas fa-chart-line text-3xl mb-2"></i>
+                        <p class="font-bold">No completed orders yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== SETTINGS ====== -->
+            <div id="page-settings" class="page">
+                <div class="mb-6">
+                    <h3 class="text-xl font-extrabold text-gray-900">Settings</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Manage your account</p>
+                </div>
+                <div class="max-w-3xl space-y-5">
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6 lg:p-8">
+                        <h4 class="font-extrabold text-gray-900 mb-5">Profile Information</h4>
+                        <div class="flex items-center gap-5 mb-6">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-harvest-400 to-harvest-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-harvest-500/20">JK</div>
+                            <div><button class="btn-secondary btn-sm"><i class="fas fa-camera text-xs"></i>Change Photo</button><p class="text-xs text-gray-400 mt-2">JPG, PNG. Max 2MB</p></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div><label class="block text-sm font-bold text-gray-800 mb-1.5">Full Name</label><input type="text" class="form-input" id="settings-name"></div>
+                            <div><label class="block text-sm font-bold text-gray-800 mb-1.5">Email</label><input type="email" class="form-input" id="settings-email" readonly style="background:#f9fafb"></div>
+                            <div><label class="block text-sm font-bold text-gray-800 mb-1.5">District</label><input type="text" class="form-input" id="settings-district"></div>
+                            <div><label class="block text-sm font-bold text-gray-800 mb-1.5">Role</label><input type="text" class="form-input" id="settings-role" readonly style="background:#f9fafb;text-transform:capitalize"></div>
+                        </div>
+                        <div class="mt-6 pt-5 border-t border-gray-100"><button class="btn-primary" onclick="saveProfile()"><i class="fas fa-check text-xs"></i>Save Changes</button></div>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6 lg:p-8">
+                        <h4 class="font-extrabold text-gray-900 mb-5">Notifications</h4>
+                        <div class="space-y-4">
+                            <label class="flex items-center justify-between cursor-pointer"><div><p class="text-sm font-bold text-gray-800">New inquiry alerts</p><p class="text-xs text-gray-500">When a buyer sends an inquiry</p></div><input type="checkbox" checked class="w-5 h-5 accent-emerald-600 rounded"></label>
+                            <label class="flex items-center justify-between cursor-pointer"><div><p class="text-sm font-bold text-gray-800">Message notifications</p><p class="text-xs text-gray-500">For new messages</p></div><input type="checkbox" checked class="w-5 h-5 accent-emerald-600 rounded"></label>
+                            <label class="flex items-center justify-between cursor-pointer"><div><p class="text-sm font-bold text-gray-800">Product view updates</p><p class="text-xs text-gray-500">Weekly summary</p></div><input type="checkbox" class="w-5 h-5 accent-emerald-600 rounded"></label>
+                            <label class="flex items-center justify-between cursor-pointer"><div><p class="text-sm font-bold text-gray-800">Marketing emails</p><p class="text-xs text-gray-500">Tips from Agitech Connect</p></div><input type="checkbox" class="w-5 h-5 accent-emerald-600 rounded"></label>
+                        </div>
+                        <div class="mt-6 pt-5 border-t border-gray-100"><button class="btn-primary" onclick="showToast('Preferences saved','success')"><i class="fas fa-check text-xs"></i>Save Preferences</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal & Toast -->
+    <div id="modal-overlay" onclick="closeModal(event)"><div id="modal-content" onclick="event.stopPropagation()"></div></div>
+    <div id="toast-container"></div>
+
+    <script src="/js/api.js"></script>
+    <script>
+    /* ============================================================
+       DATA
+       ============================================================ */
+    const CATEGORIES=['Grains & Cereals','Vegetables','Fruits','Livestock','Dairy','Poultry','Cash Crops','Organic Products'];
+    const CAT_CLASS={'Grains & Cereals':'cat-grains','Vegetables':'cat-vegetables','Fruits':'cat-fruits','Livestock':'cat-livestock','Dairy':'cat-dairy','Poultry':'cat-poultry','Cash Crops':'cat-cashcrops','Organic Products':'cat-organic'};
+    const CAT_ICON={'Grains & Cereals':'fa-wheat-awn','Vegetables':'fa-carrot','Fruits':'fa-apple-whole','Livestock':'fa-cow','Dairy':'fa-glass-water','Poultry':'fa-drumstick-bite','Cash Crops':'fa-leaf','Organic Products':'fa-spa'};
+
+    let products = [];
+    let siteProducts = [];
+
+    let buyers=[
+        {id:1,name:'GreenHarvest Co.',contact:'James Mwangi',location:'Nairobi',phone:'+254 722 111 222',interests:['Grains & Cereals','Vegetables'],rating:4.8,orders:12,avatar:'GH',color:'from-crop-500 to-crop-800'},
+        {id:2,name:'FreshMart Distributors',contact:'Sarah Wanjiku',location:'Mombasa',phone:'+254 733 222 333',interests:['Vegetables','Fruits'],rating:4.6,orders:8,avatar:'FM',color:'from-harvest-500 to-harvest-800'},
+        {id:3,name:'Uzalendo Mills',contact:'Peter Ochieng',location:'Kisumu',phone:'+254 744 333 444',interests:['Grains & Cereals','Cash Crops'],rating:4.9,orders:24,avatar:'UM',color:'from-soil-500 to-soil-800'},
+        {id:4,name:'Organic Fields Ltd',contact:'Mary Nyambura',location:'Nairobi',phone:'+254 755 444 555',interests:['Organic Products','Vegetables'],rating:4.7,orders:6,avatar:'OF',color:'from-emerald-500 to-emerald-800'},
+        {id:5,name:'Coastal Foods Int.',contact:'Ahmed Hassan',location:'Mombasa',phone:'+254 766 555 666',interests:['Fruits','Dairy','Poultry'],rating:4.5,orders:15,avatar:'CF',color:'from-orange-500 to-orange-800'},
+        {id:6,name:'Highland Breeders',contact:'Daniel Kiprop',location:'Eldoret',phone:'+254 777 666 777',interests:['Livestock','Dairy'],rating:4.4,orders:4,avatar:'HB',color:'from-amber-600 to-amber-900'},
+    ];
+
+    let conversations=[
+        {id:1,buyerId:1,messages:[
+            {sender:'buyer',text:'Hello John, I saw your maize listing. Can you supply 200 bags monthly?',time:'10:30 AM',date:'Jan 20'},
+            {sender:'farmer',text:'Hi James! Yes, I can comfortably supply 200 bags every month. When would you like the first delivery?',time:'11:15 AM',date:'Jan 20'},
+            {sender:'buyer',text:'We need the first batch by next week Wednesday. Can you arrange transport to Nairobi?',time:'11:45 AM',date:'Jan 20'},
+            {sender:'farmer',text:'Absolutely. I work with a reliable transporter. Delivery to your warehouse in Industrial Area?',time:'12:00 PM',date:'Jan 20'},
+            {sender:'buyer',text:'Yes, that works perfectly. Can we finalize pricing?',time:'2:30 PM',date:'Jan 21'},
+        ],unread:1,lastActive:'Jan 21'},
+        {id:2,buyerId:4,messages:[
+            {sender:'buyer',text:'Hi, we are looking for organic vegetable suppliers for our new store chain.',time:'9:00 AM',date:'Jan 22'},
+            {sender:'farmer',text:'Hello Mary! Great timing. I have organic kale and tomatoes available right now.',time:'10:20 AM',date:'Jan 22'},
+        ],unread:1,lastActive:'Jan 22'},
+        {id:3,buyerId:5,messages:[
+            {sender:'buyer',text:'Are your avocados export-grade? We have an order from Dubai.',time:'3:00 PM',date:'Jan 21'},
+            {sender:'farmer',text:'Yes, all Hass variety, properly sized 150-200g. I can provide phytosanitary certificates.',time:'3:30 PM',date:'Jan 21'},
+            {sender:'buyer',text:'Excellent. What is your minimum order quantity?',time:'3:45 PM',date:'Jan 21'},
+            {sender:'farmer',text:'Minimum 50 crates per order. I have 150 crates ready now.',time:'4:00 PM',date:'Jan 21'},
+            {sender:'buyer',text:'Perfect. Let me discuss with my team and get back to you tomorrow.',time:'4:15 PM',date:'Jan 21'},
+            {sender:'farmer',text:'Sounds good. Looking forward to it!',time:'4:20 PM',date:'Jan 21'},
+        ],unread:0,lastActive:'Jan 21'},
+    ];
+
+    let notifications=[
+        {id:1,text:'GreenHarvest Co. sent you a new message',time:'2 hours ago',icon:'fa-comment',read:false},
+        {id:2,text:'Your avocado listing got 15 new views today',time:'5 hours ago',icon:'fa-eye',read:false},
+        {id:3,text:'Organic Fields Ltd started following your products',time:'1 day ago',icon:'fa-user-plus',read:true},
+    ];
+
+    let nextProductId=7, nextConvId=4, activeConvId=null, uploadedImage='';
+
+    async function loadProducts() {
+        try {
+            if (!API.getToken()) { window.location.href = '/auth'; return; }
+            products = await API.getMyProducts();
+            renderProducts();
+            updateBadges();
+        } catch (error) {
+            console.error('Failed to load products:', error);
+            showToast('Failed to load products', 'error');
+        }
+    }
+
+    async function loadBuyers() {
+        // For now, keep local buyers data
+        // In future, this could come from API
+        renderBuyers();
+    }
+
+    async function loadConversations() {
+        // For now, keep local conversations data
+        // In future, this could come from API
+        renderMessages();
+    }
+
+    /* ============================================================
+       NAVIGATION
+       ============================================================ */
+    function navigateTo(page){
+        document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+        const link=document.querySelector(`.nav-link[data-page="${page}"]`);
+        if(link) link.classList.add('active');
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        const t=document.getElementById('page-'+page);
+        if(t) t.classList.add('active');
+        const titles={dashboard:'Dashboard',products:'My Products','add-product':'Add Product',buyers:'Bulk Buyers',messages:'Messages',orders:'Orders',earnings:'Earnings',settings:'Settings'};
+        document.getElementById('page-title').textContent=titles[page]||'Dashboard';
+        if(window.innerWidth<1024){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('show')}
+        if(page==='dashboard') { loadProducts().then(() => renderDashboard()); }
+        if(page==='products') loadProducts();
+        if(page==='buyers') loadBuyers();
+        if(page==='messages') loadConversations();
+        if(page==='orders' || page==='earnings') loadOrders();
+        if(page==='add-product'&&!document.getElementById('edit-product-id').value) resetForm();
+    }
+
+    function toggleSidebar(){
+        const sb=document.getElementById('sidebar'),ov=document.getElementById('sidebar-overlay');
+        if(window.innerWidth<1024){sb.classList.toggle('open');ov.classList.toggle('show')}
+        else{sb.classList.toggle('collapsed');document.getElementById('main').classList.toggle('expanded')}
+    }
+
+    document.getElementById('sidebar-nav').addEventListener('click',e=>{const l=e.target.closest('.nav-link');if(l)navigateTo(l.dataset.page)});
+
+    /* ============================================================
+       NOTIFICATIONS
+       ============================================================ */
+    function toggleNotifications(){document.getElementById('notif-dropdown').classList.toggle('show');renderNotifications()}
+    document.addEventListener('click',e=>{if(!e.target.closest('.relative'))document.getElementById('notif-dropdown').classList.remove('show')});
+
+    function renderNotifications(){
+        const list=document.getElementById('notif-list');
+        if(!notifications.length){list.innerHTML='<div class="p-6 text-center text-gray-400 text-sm">No notifications</div>';return}
+        list.innerHTML=notifications.map(n=>`
+            <div class="px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition cursor-pointer ${n.read?'opacity-50':''}">
+                <div class="w-8 h-8 rounded-lg ${n.read?'bg-gray-100':'bg-crop-100'} flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i class="fas ${n.icon} text-xs ${n.read?'text-gray-400':'text-crop-700'}"></i>
+                </div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-gray-800 leading-snug">${n.text}</p><p class="text-[11px] text-gray-400 mt-1">${n.time}</p></div>
+                ${!n.read?'<div class="w-2 h-2 rounded-full bg-crop-500 mt-2 flex-shrink-0"></div>':''}
+            </div>`).join('');
+    }
+
+    function clearNotifications(){notifications=[];renderNotifications();updateNotifDot();showToast('Notifications cleared','info')}
+    function updateNotifDot(){const u=notifications.filter(n=>!n.read).length,d=document.getElementById('notif-dot');if(u>0){d.style.display='flex';d.textContent=u}else d.style.display='none'}
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    function showToast(msg,type='success'){
+        const c=document.getElementById('toast-container'),icons={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};
+        const t=document.createElement('div');t.className=`toast toast-${type}`;
+        t.innerHTML=`<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
+        c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(30px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300)},3500);
+    }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    function openModal(html){document.getElementById('modal-content').innerHTML=html;document.getElementById('modal-content').className='modal-content';document.getElementById('modal-overlay').classList.add('show');document.body.style.overflow='hidden'}
+    function openConfirmModal(msg,onConfirm){
+        openModal(`<div class="confirm-box">
+            <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4"><i class="fas fa-triangle-exclamation text-2xl text-red-500"></i></div>
+            <p class="text-gray-900 font-bold mb-2">${msg}</p><p class="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
+            <div class="flex items-center justify-center gap-3">
+                <button class="btn-secondary btn-sm" onclick="closeModal()">Cancel</button>
+                <button class="btn-sm" style="background:linear-gradient(135deg,#DC2626,#EF4444);color:#fff;padding:7px 14px;border-radius:8px;font-weight:700;border:none;cursor:pointer;font-family:DM Sans;box-shadow:0 2px 8px rgba(220,38,38,.2)" id="confirm-yes-btn">Delete</button>
+            </div></div>`);
+        document.getElementById('confirm-yes-btn').onclick=()=>{closeModal();onConfirm()};
+    }
+    function closeModal(e){if(e&&e.target!==document.getElementById('modal-overlay'))return;document.getElementById('modal-overlay').classList.remove('show');document.body.style.overflow=''}
+
+    /* ============================================================
+       DASHBOARD
+       ============================================================ */
+    function renderDashboard(){
+        animateNumber('stat-products', products.length);
+        animateNumber('stat-views', products.reduce((s,p)=>s+(p.views || 0),0));
+        animateNumber('stat-inquiries', products.reduce((s,p)=>s+(p.inquiries || 0),0));
+        animateNumber('stat-revenue', Math.round(products.reduce((s,p)=>s+(p.price * (p.inquiries || 0) * 0.3),0)));
+
+        // Group products by category
+        const categoryGroups = {};
+        products.forEach(p => {
+            if (!categoryGroups[p.category]) {
+                categoryGroups[p.category] = [];
+            }
+            categoryGroups[p.category].push(p);
+        });
+
+        const dp = document.getElementById('dashboard-products');
+        const categories = Object.keys(categoryGroups).filter(cat => categoryGroups[cat].length > 0);
+        if (categories.length === 0) {
+            dp.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">No products yet.</div>';
+        } else {
+            dp.innerHTML = categories.map(cat => {
+                const catProducts = categoryGroups[cat].slice(0, 3); // Show up to 3 products per category
+                return `
+                    <div class="px-5 py-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg ${CAT_CLASS[cat] || 'bg-gray-100'} flex items-center justify-center">
+                                <i class="fas ${CAT_ICON[cat] || 'fa-box'} text-xs text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-900">${cat}</h4>
+                                <p class="text-xs text-gray-500">${categoryGroups[cat].length} product${categoryGroups[cat].length > 1 ? 's' : ''}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            ${catProducts.map(p => `
+                                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" onclick="navigateTo('products')">
+                                    <img src="${p.image || ''}" alt="${p.name}" class="w-8 h-8 rounded object-cover flex-shrink-0" style="${p.image?'':'display:none'}">
+                                    <div class="w-8 h-8 rounded flex items-center justify-center text-lg flex-shrink-0" style="${p.image?'display:none':'background:#f3f4f6'}">${p.category==='grains'?'🌾':p.category==='fruits'?'🍌':p.category==='vegetables'?'🥬':'📦'}</div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold text-gray-900 truncate">${p.name}</p>
+                                        <p class="text-xs text-gray-500">${p.stock || 'Available'} • UGX ${p.price.toLocaleString()}</p>
+                                    </div>
+                                    <span class="badge badge-${p.status} text-xs">${statusLabel(p.status)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('<div class="border-t border-gray-100"></div>');
+        }
+
+        document.getElementById('activity-feed').innerHTML=[
+            {icon:'fa-eye',bg:'bg-harvest-100',ic:'text-harvest-600',text:'Avocado listing received 15 views',time:'2h ago'},
+            {icon:'fa-comment',bg:'bg-crop-100',ic:'text-crop-700',text:'New message from GreenHarvest Co.',time:'5h ago'},
+            {icon:'fa-plus',bg:'bg-crop-100',ic:'text-crop-700',text:'Added Fresh Milk to listings',time:'1d ago'},
+            {icon:'fa-handshake',bg:'bg-orange-100',ic:'text-orange-600',text:'Coastal Foods viewed your profile',time:'2d ago'},
+            {icon:'fa-star',bg:'bg-harvest-100',ic:'text-harvest-600',text:'Uzalendo Mills left a 5-star rating',time:'3d ago'},
+        ].map(a=>`<div class="flex items-start gap-3"><div class="w-8 h-8 rounded-lg ${a.bg} flex items-center justify-center flex-shrink-0"><i class="fas ${a.icon} text-xs ${a.ic}"></i></div><div class="flex-1 min-w-0"><p class="text-sm text-gray-700 leading-snug">${a.text}</p><p class="text-[11px] text-gray-400 mt-0.5">${a.time}</p></div></div>`).join('');
+
+        document.getElementById('product-count-badge').textContent=products.length;
+        updateUnreadBadge();
+    }
+
+    function animateNumber(id,target){
+        const el=document.getElementById(id),start=parseInt(el.textContent.replace(/,/g,''))||0,dur=700,t0=performance.now();
+        (function step(now){const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.round(start+(target-start)*e).toLocaleString();if(p<1)requestAnimationFrame(step)})(t0);
+    }
+    function statusLabel(s){return{active:'Active',pending:'Pending',soldout:'Sold Out',draft:'Draft'}[s]||s}
+
+    function formatCurrencyUGX(value){
+        return `UGX ${Number(value||0).toLocaleString()}`;
+    }
+
+    function getProductCardImage(product){
+        if(product.image && typeof product.image === 'string' && product.image.startsWith('http')){
+            return `<img src="${product.image}" alt="${product.name}" class="w-full h-24 object-cover rounded-lg" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(product.name)}/400/300'">`;
+        }
+        return `<div class="w-full h-24 rounded-lg" style="background:${product.image || '#E5E7EB'}"></div>`;
+    }
+
+    /* ============================================================
+       PRODUCTS
+       ============================================================ */
+    function renderProducts(){
+        const s=(document.getElementById('product-search')?.value||'').toLowerCase(),
+              cf=document.getElementById('filter-category')?.value||'',
+              sf=document.getElementById('filter-status')?.value||'';
+        let f=products.filter(p=>(p.name.toLowerCase().includes(s)||p.category.toLowerCase().includes(s))&&(!cf||p.category===cf)&&(!sf||p.status===sf));
+        const g=document.getElementById('products-grid'),e=document.getElementById('no-products');
+        if(!f.length){g.innerHTML='';e.classList.remove('hidden')}
+        else{e.classList.add('hidden');g.innerHTML=f.map(p=>`
+            <div class="product-card">
+                <div class="relative">
+                    ${p.image
+                        ? `<img src="${p.image}" alt="${p.name}" class="w-full h-44 object-cover" onerror="this.style.display='none'">`
+                        : `<div class="w-full h-44 flex items-center justify-center text-5xl" style="background:#f3f4f6">${p.category==='grains'?'🌾':p.category==='fruits'?'🍌':p.category==='vegetables'?'🥬':p.category==='tubers'?'🥔':p.category==='legumes'?'🫘':'📦'}</div>`
+                    }
+                    <span class="absolute top-3 left-3 badge badge-${p.status}">${statusLabel(p.status)}</span>
+                    <span class="absolute top-3 right-3 badge ${CAT_CLASS[p.category] || 'bg-gray-100'}"><i class="fas ${CAT_ICON[p.category] || 'fa-box'} mr-1 text-[9px]"></i>${(p.category || 'Other').split(' ')[0]}</span>
+                    <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/30 to-transparent"></div>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-gray-900 mb-1">${p.name}</h4>
+                    <p class="text-xs text-gray-500 mb-3 line-clamp-2">${p.description || 'No description'}</p>
+                    <p class="text-lg font-extrabold text-crop-800">UGX ${p.price.toLocaleString()}<span class="text-xs font-normal text-gray-400">/${p.unit}</span></p>
+                    <p class="text-xs text-gray-500 mb-3">${p.stock || 'Available'}</p>
+                    <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-3">
+                        <span><i class="fas fa-map-marker-alt mr-1"></i>${p.district}</span>
+                    </div>
+                    <div class="flex items-center gap-2 pt-3 border-t border-gray-100">
+                        <button class="btn-secondary btn-sm flex-1" onclick="editProduct('${p._id}')"><i class="fas fa-pen text-[10px]"></i>Edit</button>
+                        <button class="btn-icon" title="Duplicate" onclick="duplicateProduct('${p._id}')"><i class="fas fa-copy"></i></button>
+                        <button class="btn-icon danger" title="Delete" onclick="deleteProduct('${p._id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>`).join('')}
+    }
+
+    function editProduct(id){
+        const p = products.find(x => String(x._id) === String(id));
+        if(!p) return;
+        document.getElementById('edit-product-id').value = p._id;
+        document.getElementById('inp-name').value=p.name;
+        document.getElementById('inp-category').value=p.category;
+        document.getElementById('inp-status').value=p.status;
+        document.getElementById('inp-price').value=p.price;
+        const quantityMatch = (p.stock || '').match(/(\d+)/);
+        document.getElementById('inp-quantity').value=quantityMatch ? quantityMatch[1] : '';
+        document.getElementById('inp-unit').value=p.unit;
+        document.getElementById('inp-location').value=p.district;
+        document.getElementById('inp-desc').value=p.description || '';
+        uploadedImage=p.image || '';
+        if (uploadedImage) {
+            document.getElementById('upload-placeholder').classList.add('hidden');
+            document.getElementById('upload-preview').classList.remove('hidden');
+            document.getElementById('preview-img').src=uploadedImage;
+            document.getElementById('upload-area').classList.add('has-image');
+        }
+        document.getElementById('form-title').textContent='Edit Product';
+        document.getElementById('form-subtitle').textContent='Update your product listing';
+        document.getElementById('form-submit-btn').innerHTML='<i class="fas fa-check text-xs"></i>Update Product';
+        navigateTo('add-product');
+    }
+
+    async function duplicateProduct(id){
+        const p = products.find(x => String(x._id) === String(id));
+        if (!p) return;
+
+        const data = {
+            name: p.name + ' (Copy)',
+            category: p.category,
+            status: 'draft',
+            price: p.price,
+            stock: p.stock,
+            unit: p.unit,
+            district: p.district,
+            description: p.description
+        };
+
+        try {
+            await API.createProduct(data);
+            showToast('Product duplicated as draft', 'success');
+            await loadProducts();
+        } catch (error) {
+            showToast('Failed to duplicate product: ' + error.message, 'error');
+        }
+    }
+
+    async function deleteProduct(id) {
+        openConfirmModal('Delete this product?', async () => {
+            try {
+                await API.deleteProduct(id);
+                showToast('Product deleted', 'success');
+                await loadProducts();
+            } catch (error) {
+                showToast('Failed to delete: ' + error.message, 'error');
+            }
+        });
+    }
+
+    async function handleProductSubmit(e){
+        e.preventDefault();
+        const eid = document.getElementById('edit-product-id').value;
+        const data = {
+            name: document.getElementById('inp-name').value.trim(),
+            category: document.getElementById('inp-category').value,
+            status: document.getElementById('inp-status').value,
+            price: parseInt(document.getElementById('inp-price').value),
+            stock: document.getElementById('inp-quantity').value + ' ' + document.getElementById('inp-unit').value,
+            unit: document.getElementById('inp-unit').value,
+            district: document.getElementById('inp-location').value.trim(),
+            description: document.getElementById('inp-desc').value.trim(),
+            image: uploadedImage || null,
+        };
+
+        try {
+            if (eid) {
+                await API.updateProduct(eid, data);
+                showToast('Product updated', 'success');
+            } else {
+                await API.createProduct(data);
+                showToast('Product added successfully', 'success');
+            }
+            resetForm();
+            await loadProducts();
+            navigateTo('products');
+        } catch (error) {
+            showToast('Failed to save product: ' + error.message, 'error');
+        }
+    }
+
+    function resetForm(){
+        document.getElementById('product-form').reset();document.getElementById('edit-product-id').value='';
+        document.getElementById('inp-location').value='Nakuru County';
+        document.getElementById('form-title').textContent='Add New Product';
+        document.getElementById('form-subtitle').textContent='Fill in the details to list your product';
+        document.getElementById('form-submit-btn').innerHTML='<i class="fas fa-check text-xs"></i>Add Product';
+        uploadedImage='';document.getElementById('upload-placeholder').classList.remove('hidden');
+        document.getElementById('upload-preview').classList.add('hidden');document.getElementById('upload-area').classList.remove('has-image');
+    }
+
+    function handleImageUpload(e){
+        const f=e.target.files[0];if(!f)return;
+        if(f.size>5*1024*1024){showToast('Image must be under 5MB','error');return}
+        const r=new FileReader();r.onload=ev=>{uploadedImage=ev.target.result;document.getElementById('upload-placeholder').classList.add('hidden');document.getElementById('upload-preview').classList.remove('hidden');document.getElementById('preview-img').src=uploadedImage;document.getElementById('upload-area').classList.add('has-image')};r.readAsDataURL(f);
+    }
+
+    function updateBadges(){document.getElementById('product-count-badge').textContent=products.length;updateUnreadBadge()}
+    function updateUnreadBadge(){const t=conversations.reduce((s,c)=>s+c.unread,0),b=document.getElementById('unread-badge');if(t>0){b.style.display='inline';b.textContent=t}else b.style.display='none'}
+
+    /* ============================================================
+       BUYERS
+       ============================================================ */
+    function renderBuyers(){
+        const s=(document.getElementById('buyer-search')?.value||'').toLowerCase(),cf=document.getElementById('buyer-filter-cat')?.value||'';
+        let f=buyers.filter(b=>(b.name.toLowerCase().includes(s)||b.contact.toLowerCase().includes(s)||b.location.toLowerCase().includes(s))&&(!cf||b.interests.includes(cf)));
+        document.getElementById('buyers-grid').innerHTML=f.map(b=>{
+            const hasConv=conversations.some(c=>c.buyerId===b.id);
+            return `<div class="buyer-card">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br ${b.color} flex items-center justify-center text-white font-extrabold text-xs shadow-lg">${b.avatar}</div>
+                    <div class="flex-1 min-w-0"><h4 class="font-bold text-gray-900 truncate text-sm">${b.name}</h4><p class="text-[11px] text-gray-500">${b.contact}</p></div>
+                    <div class="flex items-center gap-1 bg-harvest-50 px-2 py-0.5 rounded-md border border-harvest-200"><i class="fas fa-star text-harvest-500 text-[10px]"></i><span class="text-xs font-extrabold text-harvest-700">${b.rating}</span></div>
+                </div>
+                <div class="flex items-center gap-4 text-[11px] text-gray-500 mb-3"><span><i class="fas fa-map-marker-alt mr-1"></i>${b.location}</span><span><i class="fas fa-box mr-1"></i>${b.orders} orders</span></div>
+                <div class="flex flex-wrap gap-1.5 mb-4">${b.interests.map(i=>`<span class="badge ${CAT_CLASS[i]} text-[10px]"><i class="fas ${CAT_ICON[i]} mr-1 text-[8px]"></i>${i.split(' ')[0]}</span>`).join('')}</div>
+                <div class="flex items-center gap-2 pt-3 border-t border-gray-100">
+                    <button class="${hasConv?'btn-secondary':'btn-gold'} btn-sm flex-1" onclick="startConversation(${b.id})"><i class="fas ${hasConv?'fa-comment':'fa-paper-plane'} text-[10px]"></i>${hasConv?'Continue Chat':'Start Conversation'}</button>
+                    <button class="btn-icon"><i class="fas fa-phone text-xs"></i></button>
+                </div>
+            </div>`}).join('');
+    }
+
+    function startConversation(buyerId){
+        let conv=conversations.find(c=>c.buyerId===buyerId);
+        if(!conv){conv={id:nextConvId++,buyerId,messages:[],unread:0,lastActive:'Now'};conversations.unshift(conv)}
+        activeConvId=conv.id;navigateTo('messages');setTimeout(()=>openChat(conv.id),100);
+    }
+
+    /* ============================================================
+       MESSAGES
+       ============================================================ */
+    function renderMessages(){renderConversations();if(activeConvId)openChat(activeConvId)}
+
+    function renderConversations(){
+        const s=(document.getElementById('conv-search')?.value||'').toLowerCase();
+        let convs=conversations.map(c=>({...c,buyer:buyers.find(b=>b.id===c.buyerId)})).filter(c=>c.buyer&&(c.buyer.name.toLowerCase().includes(s)||c.buyer.contact.toLowerCase().includes(s)));
+        document.getElementById('conv-list').innerHTML=convs.length?convs.map(c=>`
+            <div class="flex items-center gap-3 px-4 py-3 cursor-pointer transition ${activeConvId===c.id?'bg-crop-50 border-r-2 border-crop-600':'hover:bg-gray-50'}" onclick="openChat(${c.id})">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br ${c.buyer.color} flex items-center justify-center text-white font-extrabold text-[11px] flex-shrink-0">${c.buyer.avatar}</div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between"><p class="text-sm font-bold text-gray-900 truncate">${c.buyer.name}</p><span class="text-[10px] text-gray-400 flex-shrink-0 ml-2">${c.lastActive}</span></div>
+                    <p class="text-[11px] text-gray-500 truncate mt-0.5">${c.messages.length?c.messages[c.messages.length-1].text:'No messages yet'}</p>
+                </div>
+                ${c.unread>0?`<span class="w-5 h-5 rounded-full bg-gradient-to-br from-crop-500 to-crop-700 text-white text-[9px] font-extrabold flex items-center justify-center flex-shrink-0 shadow">${c.unread}</span>`:''}
+            </div>`).join(''):'<div class="p-6 text-center text-gray-400 text-sm">No conversations yet</div>';
+    }
+
+    function openChat(convId){
+        activeConvId=convId;const conv=conversations.find(c=>c.id===convId);if(!conv)return;
+        const buyer=buyers.find(b=>b.id===conv.buyerId);if(!buyer)return;
+        conv.unread=0;updateUnreadBadge();
+        document.getElementById('chat-empty').classList.add('hidden');
+        document.getElementById('chat-active').classList.remove('hidden');document.getElementById('chat-active').classList.add('flex');
+        document.getElementById('chat-panel').classList.remove('hidden');document.getElementById('chat-panel').classList.add('flex');
+        if(window.innerWidth<640){document.getElementById('conv-list-panel').classList.add('hidden')}
+        document.getElementById('chat-avatar').textContent=buyer.avatar;
+        document.getElementById('chat-avatar').className=`w-9 h-9 rounded-full bg-gradient-to-br ${buyer.color} flex items-center justify-center text-white font-extrabold text-xs`;
+        document.getElementById('chat-name').textContent=buyer.name;
+        document.getElementById('chat-company').textContent=buyer.location+' · '+buyer.contact;
+        renderChatMessages(conv);renderConversations();
+    }
+
+    function renderChatMessages(conv){
+        const c=document.getElementById('chat-messages');
+        if(!conv.messages.length){c.innerHTML='<div class="text-center text-gray-400 text-sm py-8">No messages yet. Start the conversation!</div>';return}
+        let html='',ld='';
+        conv.messages.forEach(m=>{
+            if(m.date!==ld){html+=`<div class="text-center"><span class="text-[10px] text-gray-400 bg-gray-100 px-3 py-1 rounded-full font-semibold">${m.date}</span></div>`;ld=m.date}
+            html+=`<div class="flex ${m.sender==='farmer'?'justify-end':'justify-start'}"><div class="chat-bubble ${m.sender==='farmer'?'sent':'received'}"><p>${m.text}</p><p class="text-[9px] ${m.sender==='farmer'?'text-crop-200':'text-gray-400'} mt-1 text-right">${m.time}</p></div></div>`;
+        });
+        c.innerHTML=html;c.scrollTop=c.scrollHeight;
+    }
+
+    function showConvList(){document.getElementById('conv-list-panel').classList.remove('hidden');document.getElementById('chat-panel').classList.add('hidden');document.getElementById('chat-panel').classList.remove('flex')}
+
+    function sendMessage(){
+        const input=document.getElementById('chat-input'),text=input.value.trim();
+        if(!text||!activeConvId)return;
+        const conv=conversations.find(c=>c.id===activeConvId);if(!conv)return;
+        const now=new Date(),time=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}),date=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        conv.messages.push({sender:'farmer',text,time,date});conv.lastActive='Now';
+        input.value='';input.style.height='auto';renderChatMessages(conv);renderConversations();
+        setTimeout(()=>{
+            const replies=['Thank you for the update. Let me get back to you.','That sounds great! I will discuss with my team.','Can you share more details about the pricing?','We are interested. What is the earliest delivery date?','Perfect, let us proceed with the order.','I appreciate the quick response!'];
+            const rt=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+            conv.messages.push({sender:'buyer',text:replies[Math.floor(Math.random()*replies.length)],time:rt,date});conv.lastActive='Now';
+            if(activeConvId===conv.id)renderChatMessages(conv);renderConversations();
+            const buyer=buyers.find(b=>b.id===conv.buyerId);
+            if(buyer){notifications.unshift({id:Date.now(),text:`${buyer.name} replied to your message`,time:'Just now',icon:'fa-comment',read:false});updateNotifDot()}
+        },1500+Math.random()*2000);
+    }
+
+    function handleChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
+    function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'}
+
+    /* ============================================================
+       DROPDOWNS
+       ============================================================ */
+    function populateCategoryDropdowns(){
+        ['filter-category','buyer-filter-cat','inp-category'].forEach(id=>{
+            const el=document.getElementById(id);if(!el)return;const cv=el.value;
+            el.innerHTML='<option value="">'+(id.includes('filter')?(id.includes('buyer')?'All Interests':'All Categories'):'Select category')+'</option>';
+            CATEGORIES.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;el.appendChild(o)});el.value=cv;
+        });
+    }
+
+    /* ============================================================
+       GLOBAL SEARCH
+       ============================================================ */
+    document.getElementById('global-search').addEventListener('input',function(){
+        const q=this.value.toLowerCase().trim();if(!q)return;
+        if(products.some(p=>p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q))){navigateTo('products');document.getElementById('product-search').value=q;renderProducts();return}
+        if(buyers.some(b=>b.name.toLowerCase().includes(q)||b.contact.toLowerCase().includes(q))){navigateTo('buyers');document.getElementById('buyer-search').value=q;renderBuyers()}
+    });
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    populateCategoryDropdowns();
+    updateNotifDot();
+    if (!API.getToken()) { window.location.href = '/auth'; }
+    else {
+        // Load real user from JWT
+        const user = API.getUser();
+        if (user) {
+            const initials = (user.name || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('sidebarAvatar').textContent = initials;
+            document.getElementById('sidebarName').textContent = user.name || 'Farmer';
+            document.getElementById('sidebarDistrict').textContent = user.district || '';
+            document.getElementById('headerAvatar').textContent = initials;
+            // Pre-fill settings
+            document.getElementById('settings-name').value = user.name || '';
+            document.getElementById('settings-email').value = user.email || '';
+            document.getElementById('settings-district').value = user.district || '';
+            document.getElementById('settings-role').value = user.role || 'farmer';
+            // Default location for new products
+            document.getElementById('inp-location').value = user.district || '';
+        }
+        loadProducts().then(() => renderDashboard());
+    }
+
+    function logout() {
+        API.clearToken();
+        window.location.href = '/auth';
+    }
+
+    function saveProfile() {
+        showToast('Profile saved (read-only in demo)', 'info');
+    }
+
+    async function loadOrders() {
+        try {
+            const inquiries = await fetch('/api/bulk-inquiries', {
+                headers: { Authorization: `Bearer ${API.getToken()}` }
+            }).then(r => r.ok ? r.json() : []);
+            renderOrders(inquiries);
+        } catch (e) {
+            renderOrders([]);
+        }
+    }
+
+    function renderOrders(orders) {
+        const list = document.getElementById('orders-list');
+        const empty = document.getElementById('orders-empty');
+        if (!orders.length) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden');
+        const statusColor = { pending: 'bg-yellow-100 text-yellow-800', processing: 'bg-blue-100 text-blue-800', completed: 'bg-green-100 text-green-800', cancelled: 'bg-red-100 text-red-800' };
+        list.innerHTML = orders.map(o => `
+            <div class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition">
+                <div class="w-10 h-10 rounded-xl bg-crop-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-box text-crop-700 text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-bold text-gray-900">${o.product || 'Product'}</p>
+                    <p class="text-xs text-gray-500">${o.quantity || 0}kg • UGX ${Number(o.targetPrice || 0).toLocaleString()} target • ${o.location || ''}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : ''}</p>
+                </div>
+                <span class="text-xs font-bold px-3 py-1 rounded-full ${statusColor[o.status] || 'bg-gray-100 text-gray-600'}">${o.status || 'pending'}</span>
+            </div>
+        `).join('');
+
+        // Update earnings page too
+        const completed = orders.filter(o => o.status === 'completed');
+        const pending = orders.filter(o => o.status === 'pending' || o.status === 'processing');
+        const totalEarned = completed.reduce((s, o) => s + (Number(o.targetPrice || 0) * Number(o.quantity || 0) * 0.95), 0);
+        document.getElementById('earn-total').textContent = 'UGX ' + Math.round(totalEarned).toLocaleString();
+        document.getElementById('earn-completed').textContent = completed.length;
+        document.getElementById('earn-pending').textContent = pending.length;
+
+        const earnList = document.getElementById('earnings-list');
+        const earnEmpty = document.getElementById('earnings-empty');
+        if (!completed.length) { earnList.innerHTML = ''; earnEmpty.classList.remove('hidden'); }
+        else {
+            earnEmpty.classList.add('hidden');
+            earnList.innerHTML = completed.map(o => `
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-crop-50 border border-crop-100">
+                    <div class="w-8 h-8 rounded-lg bg-crop-500 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-check text-white text-xs"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-gray-900">${o.product} — ${o.quantity}kg</p>
+                        <p class="text-xs text-gray-500">${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : ''}</p>
+                    </div>
+                    <p class="font-extrabold text-crop-700">UGX ${Math.round(Number(o.targetPrice||0)*Number(o.quantity||0)*0.95).toLocaleString()}</p>
+                </div>
+            `).join('');
+        }
+    }
+    </script>
+</body>
+</html>

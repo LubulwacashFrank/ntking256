@@ -1,0 +1,7 @@
+.env
+node_modules/
+*.log
+*.docx
+*.ps1
+tmp_*.js
+seed_prices.js

@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Tech Connect | Uganda's #1 Farm-to-Market Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --neon-green: #00FF41;
+            --electric-green: #39FF14;
+            --lime-bright: #BFFF00;
+            --sunset-orange: #FF6B35;
+            --hot-pink: #FF1493;
+            --cyber-yellow: #FFFF00;
+            --ocean-blue: #00D4FF;
+            --purple-vivid: #BF00FF;
+            --white: #FFFFFF;
+            --dark-bg: #0A0E27;
+            --text-dark: #1a1a1a;
+            --text-medium: #555555;
+            --bg-light: #f8fff8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fff0 0%, #ffffff 50%, #fff9e6 100%);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        img { max-width: 100%; display: block; }
+        a { text-decoration: none; color: inherit; transition: all 0.3s ease; }
+        ul { list-style: none; }
+        
+        /* ═══ NAVIGATION ═══ */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, var(--dark-bg), #1a1f3d);
+            backdrop-filter: blur(20px);
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, var(--neon-green), var(--electric-green)) 1;
+            padding: 12px 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 65px;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo i { font-size: 2rem; filter: drop-shadow(0 0 15px var(--neon-green)); }
+
+        .nav-links { display: flex; gap: 24px; list-style: none; align-items: center; }
+
+        .nav-link {
+            color: rgba(255,255,255,0.85);
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--cyber-yellow);
+            background: rgba(255,255,0,0.15);
+            box-shadow: 0 0 25px rgba(255,255,0,0.3);
+        }
+
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
+
+        .btn {
+            padding: 11px 24px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            box-shadow: 0 5px 25px rgba(0,255,65,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 35px rgba(0,255,65,0.6);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--hot-pink));
+            color: white;
+            box-shadow: 0 5px 25px rgba(255,107,53,0.4);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 35px rgba(255,107,53,0.6);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .btn-outline:hover {
+            background: var(--neon-green);
+            color: var(--dark-bg);
+            box-shadow: 0 0 30px rgba(0,255,65,0.5);
+        }
+
+        /* ═══ BREAKING TICKER ═══ */
+        .ticker-bar {
+            background: linear-gradient(90deg, var(--hot-pink), var(--purple-vivid), var(--ocean-blue));
+            padding: 10px 0;
+            overflow: hidden;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .ticker-content {
+            display: flex;
+            animation: scroll 25s linear infinite;
+            width: max-content;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            padding: 0 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.88rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ticker-badge {
+            background: var(--cyber-yellow);
+            color: black;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        /* ═══ HERO ═══ */
+        .hero {
+            min-height: 90vh;
+            padding-top: 89px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(0,255,65,0.05) 0%, rgba(255,255,255,0.95) 50%, rgba(255,215,0,0.08) 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%; right: -15%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0,255,65,0.15), transparent);
+            animation: heroGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroGlow {
+            from { transform: translate(0, 0); }
+            to { transform: translate(50px, 50px); }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 22px;
+            background: linear-gradient(135deg, var(--purple-vivid), var(--hot-pink));
+            color: white;
+            border-radius: 25px;
+            font-weight: 800;
+            font-size: 0.82rem;
+            margin-bottom: 18px;
+            animation: badgeFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes badgeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--dark-bg), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-medium);
+            margin-bottom: 28px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            max-width: 650px;
+            width: 100%;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 14px;
+        }
+
+        .search-input-wrapper i { color: var(--neon-green); }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+
+        .location-select {
+            padding: 12px 18px;
+            border: none;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* ═══ SECTIONS ═══ */
+        .section {
+            padding: 80px 24px;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--dark-bg), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 1.08rem;
+            color: var(--text-medium);
+        }
+
+        /* ═══ PAGE CONTAINER (for SPA) ═══ */
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .page-container.active {
+            display: block;
+        }
+
+        /* ═══ FARMERS DIRECTORY ═══ */
+        .farmers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .farmer-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border: 2px solid transparent;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .farmer-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-green);
+            box-shadow: 0 15px 50px rgba(0,255,65,0.2);
+        }
+
+        .farmer-header {
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .farmer-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--neon-green);
+        }
+
+        .farmer-info h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .farmer-info .role {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .farmer-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 18px 20px;
+            background: #f8fafc;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--neon-green);
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-medium);
+        }
+
+        .farmer-products {
+            padding: 18px 20px;
+        }
+
+        .product-mini-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .product-mini-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f0fdf4;
+            border-radius: 8px;
+            font-size: 0.88rem;
+        }
+
+        .farmer-actions {
+            padding: 16px 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        /* ═══ ACCOUNT MODAL ═══ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-window {
+            background: white;
+            border-radius: 24px;
+            width: 95%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 28px 32px;
+            border-bottom: 3px solid var(--neon-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+        }
+
+        .close-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--sunset-orange), var(--hot-pink));
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .modal-body {
+            padding: 28px 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-bottom: 8px;
+            color: var(--dark-bg);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0,255,65,0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .switch-auth {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .switch-option {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #e5e7eb;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .switch-option.active {
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            border-color: var(--neon-green);
+        }
+
+        /* ═══ COMMUNITY SECTION ═══ */
+        .community-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .discussion-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--neon-green);
+            transition: all 0.3s ease;
+        }
+
+        .discussion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.12);
+        }
+
+        .discussion-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .user-avatar-sm {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .discussion-meta {
+            font-size: 0.82rem;
+            color: var(--text-medium);
+        }
+
+        .discussion-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--dark-bg);
+            margin-bottom: 8px;
+        }
+
+        .discussion-excerpt {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .discussion-footer {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding-top: 14px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .like-btn, .comment-btn {
+            background: none;
+            border: 2px solid #e5e7eb;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            transition: all 0.3s ease;
+        }
+
+        .like-btn:hover {
+            border-color: var(--hot-pink);
+            color: var(--hot-pink);
+            background: rgba(255,20,147,0.1);
+        }
+
+        .comment-btn:hover {
+            border-color: var(--ocean-blue);
+            color: var(--ocean-blue);
+            background: rgba(0,212,255,0.1);
+        }
+
+        .likes-count {
+            font-weight: 700;
+            color: var(--hot-pink);
+        }
+
+        /* ═══ ANALYTICS SECTION ═══ */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border-top: 4px solid;
+        }
+
+        .analytics-card.price-card { border-color: var(--neon-green); }
+        .analytics-card.trend-card { border-color: var(--ocean-blue); }
+        .analytics-card.region-card { border-color: var(--sunset-orange); }
+        .analytics-card.crop-card { border-color: var(--purple-vivid); }
+
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin: 16px 0;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar-label {
+            width: 120px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .bar-container {
+            flex: 1;
+            height: 28px;
+            background: #e5e7eb;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: white;
+            animation: barGrow 1s ease forwards;
+        }
+
+        @keyframes barGrow {
+            from { width: 0; }
+            to { width: var(--bar-width); }
+        }
+
+        .price-list-analytics {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid var(--neon-green);
+        }
+
+        /* ═══ TOAST ═══ */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(0,255,65,0.5);
+            z-index: 99998;
+            display: none;
+            animation: toastIn 0.4s ease;
+        }
+
+        @keyframes toastIn {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        /* ═══ WHATSAPP FLOAT ═══ */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 998;
+        }
+
+        .whatsapp-btn {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(37,211,102,0.5);
+            animation: whatsappPulse 2s infinite;
+        }
+
+        @keyframes whatsappPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 65px;
+                left: 0;
+                right: 0;
+                background: var(--dark-bg);
+                flex-direction: column;
+                padding: 20px;
+                z-index: 999;
+            }
+
+            .nav-links.mobile-active {
+                display: flex;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.8rem;
+                cursor: pointer;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══ BREAKING TICKER ═══ -->
+<div class="ticker-bar">
+    <div class="ticker-content">
+        <div class="ticker-item"><span class="ticker-badge">🔥 HOT</span><span class="live-dot"></span>CASSAVA PRICES UP 15%! Farmers in Jinja reporting high demand</div>
+        <div class="ticker-item"><span class="ticker-badge">✅ NEW</span><span class="live-dot"></span>500kg MAIZE JUST LISTED by verified farmer in Mukono</div>
+        <div class="ticker-item"><span class="ticker-badge">⚡ DEAL</span><span class="live-dot"></span>BULK DISCOUNT: 2 tons Matooke available at UGX 1,200/bunch</div>
+        <div class="ticker-item"><span class="ticker-badge">🌧️ WEATHER</span><span class="live-dot"></span>RAIN EXPECTED in Eastern Region tomorrow - Harvest NOW!</div>
+        <div class="ticker-item"><span class="ticker-badge">💬 CHAT</span><span class="live-dot"></span>23 farmers ONLINE now - Start negotiating instantly</div>
+        <!-- Duplicate for loop -->
+        <div class="ticker-item"><span class="ticker-badge">🔥 HOT</span><span class="live-dot"></span>CASSAVA PRICES UP 15%! Farmers in Jinja reporting high demand</div>
+        <div class="ticker-item"><span class="ticker-badge">✅ NEW</span><span class="live-dot"></span>500kg MAIZE JUST LISTED by verified farmer in Mukono</div>
+        <div class="ticket-item"><span class="ticker-badge">⚡ DEAL</span><span class="live-dot"></span>BULK DISCOUNT: 2 tons Matooke available at UGX 1,200/bunch</div>
+        <div class="ticker-item"><span class="ticker-badge">🌧️ WEATHER</span><span class="live-dot"></span>RAIN EXPECTED in Eastern Region tomorrow - Harvest NOW!</div>
+        <div class="ticker-item"><span class="ticker-badge">💬 CHAT</span><span class="live-dot"></span>23 farmers ONLINE now - Start negotiating instantly</div>
+    </div>
+</div>
+
+<!-- ═══ NAVIGATION ═══ -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="#" class="logo" onclick="showPage('home')">
+            <i class="fas fa-leaf"></i>
+            Agro Tech<br>Connect
+        </a>
+        
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#" class="nav-link active" onclick="showPage('home')">Home</a></li>
+            <li><a href="#" class="nav-link" onclick="showPage('marketplace')">Marketplace</a></li>
+            <li><a href="#" class="nav-link" onclick="showPage('farmers')">Farmers</a></li>
+            <li><a href="#" class="nav-link" onclick="showPage('sell')">Sell/Advertise</a></li>
+            <li><a href="#" class="nav-link" onclick="showPage('prices')">Prices & Analytics</a></li>
+            <li><a href="#" class="nav-link" onclick="showPage('community')">Community</a></li>
+        </ul>
+        
+        <div class="nav-actions">
+            <select class="location-select" id="locationSelect" onchange="changeLocation(this.value)">
+                <option>Kampala, UG</option>
+                <option>Jinja</option>
+                <option>Mbarara</option>
+                <option>Gulu</option>
+                <option>Mbale</option>
+                <option>Arua</option>
+            </select>
+            <button class="btn btn-primary" onclick="showModal('account')">Account</button>
+            <button class="mobile-menu-toggle" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ HOME PAGE ═══ -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fas fa-bolt"></i>
+            Uganda's #1 Agri-Marketplace
+        </div>
+        
+        <h1>Connect <span>Farmers</span> & <span>Buyers</span> Directly</h1>
+        <p class="hero-subtitle">Real-time prices • Direct chat • Weather insights • No middlemen</p>
+        
+        <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="showPage('marketplace')">
+                <i class="fas fa-shopping-basket"></i>
+                Browse Products
+            </button>
+            <button class="btn btn-accent" onclick="showPage('sell')">
+                <i class="fas fa-plus-circle"></i>
+                Sell My Harvest
+            </button>
+        </div>
+        
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input" placeholder="Search crops, farmers or location...">
+            </div>
+            <select class="location-select">
+                <option>Kampala</option>
+                <option>Jinja</option>
+                <option>Mukono</option>
+                <option>Mbale</option>
+            </select>
+            <button class="btn btn-primary search-btn" onclick="performSearch()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ MARKETPLACE PAGE ═══ -->
+<section class="section" id="marketplace-page">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-store"></i> Live Marketplace
+            </h2>
+            <p class="section-subtitle">Fresh products from verified Ugandan farmers</p>
+        </div>
+        
+        <div style="display:flex; justify-content:center; gap:16px; margin-bottom:36px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="filterProducts('all')">All Products</button>
+            <button class="btn btn-outline" onclick="filterProducts('grains')">🌾 Grains</button>
+            <button class="btn btn-outline" onclick="filterProducts('vegetables')">🥬 Vegetables</button>
+            <button class="btn btn-outline" onclick="filterProducts('tubers')">🥔 Tubers</button>
+            <button class="btn btn-outline" onclick="filterProducts('fruits')">🍎 Fruits</button>
+            <button class="btn btn-outline" onclick="filterProducts('legumes')">🫘 Legumes</button>
+        </div>
+        
+        <div class="farmers-grid" id="productsGrid">
+            <!-- Products will be loaded by JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- ═══ FARMERS PAGE ═══ -->
+<section class="section" id="farmers-page">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-users"></i> Farmers Directory
+            </h2>
+            <p class="section-subtitle">Meet our verified farmers across Uganda</p>
+        </div>
+        
+        <div class="farmers-grid" id="farmersGrid">
+            <!-- Farmers will be loaded by JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- ═══ ACCOUNT MODALS ═══ -->
+
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal-window">
+        <div class="modal-header">
+            <h3 class="modal-title">Welcome Back!</h3>
+            <button class="close-btn" onclick="closeModal('loginModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="switch-auth">
+                <div class="switch-option active" id="loginTab" onclick="switchAuthMode('login')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </div>
+                <div class="switch-option" id="registerTab" onclick="switchAuthMode('register')">
+                    <i class="fas fa-user-plus"></i> Register
+                </div>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>Email or Phone</label>
+                    <input type="email" class="form-input" placeholder="Enter your email or phone number" id="loginEmail">
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-input" placeholder="Enter your password" id="loginPassword">
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                        <input type="checkbox" id="rememberMe" checked>
+                        Remember me
+                    </label>
+                    <a href="#" style="color:var(--neon-green);font-weight:600;font-size:0.88rem;">Forgot Password?</a>
+                </div>
+                
+                <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="handleLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                
+                <p style="text-align:center;margin-top:16px;color:var(--text-medium);">
+                    Don't have an account? 
+                    <a href="#" onclick="switchAuthMode('register')" style="color:var(--electric-green);font-weight:700;">Register here</a>
+                </p>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerForm" style="display:none;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name *</label>
+                        <input type="text" class="form-input" placeholder="John" id="regFirstName">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name *</label>
+                        <input type="text" class="form-input" placeholder="Doe" id="regLastName">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" class="form-input" placeholder="john@example.com" id="regEmail">
+                </div>
+                
+                <div class="form-group">
+                   >Phone Number *</label>
+                    <input type="tel" class="form-input" placeholder="+256 7XX XXX XXXX" id="regPhone">
+                </div>
+                
+                <div class="form-group">
+                    >Password *</label>
+                    <input type="password" class="form-input" placeholder="Min 8 characters" id="regPassword">
+                </div>
+                
+                <div class="form-group">
+                    >Confirm Password *</label>
+                    <input type="password" class="form-input" placeholder="Re-enter password" id="regConfirmPassword">
+                </div>
+                
+                <div class="form-group">
+                    <label>I am a *</label>
+                    <select class="form-input" id="userType">
+                        <option value="">Select user type...</option>
+                        <option value="buyer">Buyer / Restaurant Owner</option>
+                        <option value="farmer">Farmer</option>
+                        <option value="transporter">Transporter / Logistics</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="agreeTerms" required>
+                        I agree to the Terms of Service and Privacy Policy
+                    </label>
+                </div>
+                
+                <button class="btn btn-accent" style="width:100%;padding:14px;" onclick="handleRegister()">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <p style="text-align:center;margin-top:16px;color:var(--text-medium);">
+                    Already have an account? 
+                    <a href="#" onclick="switchAuthMode('login')" style="color:var(--neon-green);font-weight:700;">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ COMMUNITY PAGE ═══ -->
+<section class="section" id="community-page">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-comments"></i> Community Hub
+            </h2>
+            <p class="section-subtitle">Join discussions, share tips, connect with fellow farmers and buyers</p>
+        </div>
+        
+        <div style="display:flex;justify-content:center;gap:16px;margin-bottom:36px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="createDiscussion()">
+                <i class="fas fa-plus-circle"></i> New Discussion
+            </button>
+            <button class="btn btn-outline" onclick="filterDiscussions('all')">
+                <i class="fas fa-th-large"></i> All Topics
+            </button>
+            <button class="btn btn-outline" onclick="filterDiscussions('tips')">
+                <i class="fas fa-lightbulb"></i> Tips & Advice
+            </button>
+            <button class="btn btn-outline" onclick="filterDiscussions('success')">
+                <i class="fas fa-trophy"></i> Success Stories
+            </button>
+        </div>
+        
+        <div class="community-grid" id="communityGrid">
+            <!-- Discussions will be loaded by JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- ═══ PRICES & ANALYTICS PAGE ═══ -->
+<section class="section" id="prices-page">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-chart-line"></i> Prices & Analytics
+            </h2>
+            <p class="section-subtitle">Real-time market data, price trends, and insights</p>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:24px;">
+            <!-- Current Prices Card -->
+            <div class="analytics-card price-card">
+                <h3 style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-tags" style="color:var(--neon-green);font-size:1.3rem;"></i>
+                    Current Market Prices
+                </h3>
+                <div class="price-list-analytics" id="currentPricesList">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+            
+            <!-- Price Trends Chart -->
+            <div class="analytics-card trend-card">
+                <h3 style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-chart-line" style="color:var(--ocean-blue);font-size:1.3rem;"></i>
+                    Price Trends (Last 7 Days)
+                </h3>
+                <div class="chart-placeholder" id="trendChart">
+                    <i class="fas fa-chart-area" style="font-size:3rem;"></i>
+                    <p>Price Trend Chart</p>
+                </div>
+            </div>
+            
+            <!-- Top Crops by Region -->
+            <div class="analytics-card region-card">
+                <h3 style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-map-marked-alt" style="color:var(--sunset-orange);font-size:1.3rem;"></i>
+                    Top Crops by Region
+                </h3>
+                <div class="chart-placeholder" id="regionChart">
+                    <i class="fas fa-map" style="font-size:3rem;"></i>
+                    <p>Regional Distribution</p>
+                </div>
+            </div>
+            
+            <!-- Popular Crops -->
+            <div class="analytics-card crop-card">
+                <h3 style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-seedling" style="color:var(--purple-vivid);font-size:1.3rem;"></i>
+                    Most Popular Crops
+                </h3>
+                <div class="bar-chart" id="popularCropsChart">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+            
+            <!-- Demand Forecast -->
+            <div class="analytics-card trend-card">
+                <h3 style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-chart-bar" style="color:var(--neon-green);font-size:1.3rem;"></i>
+                    Demand Forecast
+                </h3>
+                <div class="bar-chart" id="demandChart">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ WHATSAPP FLOAT ═══ -->
+<div class="whatsapp-float">
+    <a href="https://wa.me/256700123456?text=Hello!%20I'm%20interested%20in%20buying/selling%20on%20Agro%20Tech%20Connect!" target="_blank" class="whatsapp-btn">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</div>
+
+<!-- ═══ TOAST NOTIFICATION ═══ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══ JAVASCRIPT ═══ -->
+<script>
+// ==================== DATA STORES ====================
+const products = [
+    { id: 1, name: "Cassava - Fresh", category: "tubers", district: "Jinja", price: 1200, unit: "kg", quantity: "500kg", farmer: "Sarah Ema", image: "linear-gradient(135deg, #FFE0B2, #FFCC80)", badges: ["verified","fresh"] },
+    { id: 2, name: "Maize - Dried", category: "grains", district: "Mukono", price: 1500, unit: "kg", quantity: "2 tons", farmer: "John Okello", image: "linear-gradient(135deg, #FFF9C4, #FFF176)", badges: ["verified","featured"] },
+    { id: 3, name: "Matooke - Kisansa", category: "fruits", district: "Mukono", price: 1500, unit: "bunch", quantity: "15 bunches", farmer: "Mary Nakamya", image: "linear-gradient(135deg, #FFCCBC, #FFAB91)", badges: ["verified","featured","fresh"] },
+    { id: 4, name: "Tomatoes - Fresh", category: "vegetables", district: "Wakiso", price: 2000, unit: "kg", quantity: "200kg", farmer: "David Mugisha", image: "linear-gradient(135deg, #C8E6C9, #A5D6A7)", badges: ["verified","fresh"] },
+    { id: 5, name: "Beans - Kanyebwa", category: "legumes", district: "Mbale", price: 2800, unit: "kg", quantity: "800kg", farmer: "Grace Robert", image: "linear-gradient(135deg, #DCEDC8, #C5E1A5)", badges: ["verified"] },
+    { id: 6, name: "Cabbage - Fresh", category: "vegetables", district: "Kabale", price: 800, unit: "head", quantity: "150 heads", farmer: "Peter Tumusiime", image: "linear-gradient(135deg, #E8F5E9, #C8E6C9)", badges: ["verified","fresh"] },
+    { id: 7, name: "Sweet Potatoes", category: "tubers", district: "Soroti", price: 1800, unit: "kg", quantity: "1 ton", farmer: "Samuel Ongom", image: "linear-gradient(135deg, #D7CCC8, #BCAAA4)", badges: ["verified"] },
+    { id: 8, name: "Coffee - Robusta", category: "coffee", district: "Bugisu", price: 8500, unit: "kg", quantity: "500kg", farmer: "Joseph Mwanga", image: "linear-gradient(135g, #EFEBE9, #D7CCC8)", badges: ["verified","featured"] }
+];
+
+const farmers = [
+    {
+        id: 1,
+        name: "Sarah Ema",
+        role: "Cassava Specialist",
+        district: "Jinja District",
+        avatar: "SE",
+        avatarColor: "linear-gradient(135deg, #00FF41, #39FF14)",
+        products: ["Cassava - Fresh", "Sweet Potatoes"],
+        rating: 4.8,
+        dealsCompleted: 156,
+        responseTime: "< 2 hours",
+        joinedDate: "March 2024"
+    },
+    {
+        id: 2,
+        name: "John Okello",
+        role: "Maize Farmer",
+        district: "Mukono District",
+        avatar: "JO",
+        avatarColor: "linear-gradient(135deg, #FF6B35, #FF1493)",
+        products: ["Maize - Dried"],
+        rating: 4.9,
+        dealsCompleted: 234,
+        responseTime: "< 1 hour",
+        joinedDate: "January 2023"
+    },
+    {
+        id: 3,
+        name: "Mary Nakamya",
+        role: "Matooke Specialist",
+        district: "Mukono District",
+        avatar: "MN",
+        avatarColor: "linear-gradient(135deg, #00D4FF, #0099ff)",
+        products: ["Matooke - Kisansa"],
+        rating: 4.7,
+        dealsCompleted: 189,
+        responseTime: "< 3 hours",
+        joinedDate: "May 2024"
+    },
+    },
+    {
+        id: 4,
+        name: "David Mugisha",
+        role: "Vegetable Farmer",
+        district: "Wakiso District",
+        avatar: "DM",
+        avatarColor: "linear-gradient(135deg, #9C27B0, #7B1FA2)",
+        products: ["Tomatoes - Fresh", "Cabbage - Fresh"],
+        rating: 4.6,
+        dealsCompleted: 145,
+        responseTime: "< 4 hours",
+        joinedDate: "August 2024"
+    },
+    {
+        id: 5,
+        name: "Grace Robert",
+        role: "Coffee Farmer",
+        district: "Mbale District",
+        avatar: "GR",
+        avatarColor: "linear-gradient(135deg, #4CAF50, #2D7A3E)",
+        products: ["Coffee - Robusta", "Beans - Kanyebwa"],
+        rating: 4.9,
+        dealsCompleted: 267,
+        responseTime: "< 1 hour",
+        joinedDate: "February 2024"
+    },
+    {
+        id: 6,
+        name: "Peter Tumusiime",
+        role: "Tuber & Root Farmer",
+        district: "Kabale District",
+        avatar: "PT",
+        avatarColor: "linear-gradient(135deg, #FF8C00, #FF5722)",
+        products: ["Cabbage - Fresh", "Irish Potatoes"],
+        rating: 4.5,
+        dealsCompleted: 98,
+        responseTime: "< 5 hours",
+        joinedDate: "November 2024"
+    },
+    {
+        id: 7,
+        name: "Samuel Ongom",
+        role: "Sorghum & Millet Farmer",
+        district: "Soroti District",
+        avatar: "SO",
+        avatarColor: "linear-gradient(135deg, #BF00FF, #9C27B0)",
+        products: ["Sweet Potatoes", "Sorghum"],
+        rating: 4.4,
+        dealsCompleted: 76,
+        responseTime: "< 6 hours",
+        joinedDate: "December 2024"
+    },
+    {
+        id: 8,
+        name: "Joseph Mwanga",
+        role: "Coffee Exporter",
+        district: "Bugisu Region",
+        avatar: "JM",
+        avatarColor: "linear-gradient(135deg, #8B4513, #F57C00)",
+        products: ["Coffee - Robusta"],
+        rating: 5.0,
+        dealsCompleted: 423,
+        responseTime: "< 30 minutes",
+        joinedDate: "June 2023"
+    }
+];
+
+const discussions = [
+    {
+        id: 1,
+        author: "Sarah Ema",
+        avatar: "SE",
+        avatarColor: "linear-gradient(135deg, #00FF41, #39FF14)",
+        title: "Best time to harvest cassava?",
+        excerpt: "Hi everyone! I've been farming cassava for 5 years now. The best time I've found for harvesting is when the leaves start turning yellow, usually around 10-12 months after planting. What has been your experience?",
+        category: "tips",
+        likes: 34,
+        comments: 12,
+        time: "2 hours ago"
+    },
+    {
+        id: 2,
+        author: "John Okello",
+        avatar: "JO",
+        avatarColor: "linear-gradient(135deg, #FF6B35, #FF1493)",
+        title: "New maize variety available!",
+        excerpt: "Just wanted to share - I'm now growing Longe 5 maize variety and the yields are incredible! Getting about 4 tons per acre. Anyone else tried this variety?",
+        category: "success",
+        likes: 56,
+        comments: 23,
+        time: "5 hours ago"
+    },
+    {
+        id: 3,
+        author: "Mary Nakamya",
+        avatar: "MN",
+        avatarColor: "linear-gradient(135deg, #00D4FF, #0099ff)",
+        title: "Matooke storage tips needed urgently!",
+        excerpt: "My matooke is ripening faster than usual this season due to the heat. Does anyone have tips on how to extend shelf life? I'm losing stock quickly!",
+        category: "tips",
+        likes: 29,
+        comments: 19,
+        time: "1 day ago"
+    },
+    {
+        id: 4,
+        author: "David Mugisha",
+        avatar: "DM",
+        avatarColor: "linear-gradient(135deg, #9C27B0, #7B1FA2)",
+        title: "Tomato prices dropping - Good or bad?",
+        excerpt: "I've noticed tomato prices have dropped by 15% this week. Is this good for us farmers or should we hold stock? Need advice from experienced sellers.",
+        category: "tips",
+        likes: 42,
+        comments: 31,
+        time: "3 hours ago"
+    },
+    {
+        id: 5,
+        author: "Grace Robert",
+        avatar: "GR",
+        avatarColor: "linear-gradient(135deg, #4CAF50, #2D7A3E)",
+        title: "Coffee quality standards discussion",
+        excerpt: "Let's discuss coffee quality parameters. What moisture level are buyers looking for? I'm getting consistent feedback about my Robusta beans.",
+        category: "success",
+        likes: 67,
+        comments: 24,
+        time: "6 hours ago"
+    },
+    {
+        id: 6,
+        author: "Admin",
+        avatar: "AD",
+        avatarColor: "linear-gradient(135deg, var(--neon-green), var(--electric-green))",
+        title: "NEW: Bulk negotiation feature launched! 🎉",
+        excerpt: "We're excited to announce our new bulk negotiation feature! Now you can post bulk requirements and get competitive quotes from multiple farmers instantly.",
+        category: "tips",
+        likes: 89,
+        comments: 45,
+        time: "Just now"
+    }
+];
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', function() {
+    renderProducts();
+    renderFarmers();
+    renderDiscussions();
+    initAnalytics();
+    
+    // Auto-update prices every 30 seconds
+    setInterval(updatePricesDisplay, 30000);
+});
+
+// ==================== PAGE NAVIGATION ====================
+function showPage(pageId) {
+    // Hide all pages first
+    document.querySelectorAll('.page-container').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Show selected page
+    const targetPage = document.getElementById(pageId + '-page');
+    if (targetPage) {
+        targetPage.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Update nav links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('onclick').includes(pageId)) {
+            link.classList.add('active');
+        }
+    });
+}
+
+// ==================== PRODUCTS ====================
+function renderProducts() {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = products.map(product => `
+        <article class="product-card" data-category="${product.category}">
+            <div class="product-image" style="background:${product.image}">
+                <div style="position:absolute;top:12px;left:12px;z-index:2;display:flex;gap:6px;">
+                    ${product.badges.includes('verified') ? '<span style="background:linear-gradient(135deg,#00FF41,#39FF14);color:#000;padding:4px 12px;border-radius:12px;font-size:0.72rem;font-weight:800;">✓ Verified</span>' : ''}
+                    ${product.badges.includes('featured') ? '<span style="background:linear-gradient(135deg,#FF6B35,#FF1493);color:#000;padding:4px 12px;border-radius:12px;font-size:0.72rem;font-weight:800;">🔥 HOT</span>' : ''}
+                    ${product.badges.includes('fresh') ? '<span style="background:linear-gradient(135deg,#00D4FF,#0099ff);color:#000;padding:4px 12px;border-radius:12px;font-size:0.72rem;font-weight:800;">🆕 FRESH</span>' : ''}
+                </div>
+                <div class="product-wishlist" onclick="toggleWishlist(${product.id},this)">
+                    <i class="far fa-heart"></i>
+                </div>
+            </div>
+            <div style="padding:18px;">
+                <h3 style="font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:700;color:var(--dark-bg);margin-bottom:8px;">${product.name}</h3>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:0.85rem;color:var(--text-medium);">
+                    <span><i class="fas fa-map-marker-alt"></i> ${product.district} District</span>
+                    <span><i class="fas fa-box"></i> ${product.quantity}</span>
+                </div>
+                <div style="font-family:'Poppins',sans-serif;font-size:1.75rem;font-weight:900;background:linear-gradient(135deg,var(--neon-green),var(--electric-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:12px 0;">
+                    UGX ${product.price.toLocaleString()}<span style="font-size:0.9rem;font-weight:500;-webkit-text-fill-color:var(--text-medium);">/${product.unit}</span>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:14px;">
+                    <button class="btn btn-primary" onclick="openChatWith('${product.farmer}')">
+                        <i class="fab fa-whatsapp"></i> Chat
+                    </button>
+                    <button class="btn btn-outline wishlist-btn" onclick="toggleWishlist(${product.id},this)">
+                        Save
+                    </button>
+                </div>
+            </div>
+        `
+    `).join('');
+}
+
+function filterProducts(category) {
+    showToast(`Showing ${category} products`);
+    showPage('marketplace');
+}
+
+function performSearch() {
+    const searchValue = document.querySelector('.search-input').value;
+    if(searchValue.trim()) {
+        showToast(`Searching for "${searchValue}"...`);
+        showPage('marketplace');
+    } else {
+        showToast('Please enter a search term');
+    }
+}
+
+function toggleWishlist(productId, buttonElement) {
+    const icon = buttonElement.querySelector('i');
+    if(icon.classList.contains('far')) {
+        icon.classList.remove('far');
+        icon.classList.add('fas');
+        icon.style.color = '#FF1493';
+        showToast('Added to wishlist! ❤️');
+    } else {
+        icon.classList.remove('fas');
+        icon.classList.add('far');
+        icon.style.color = '';
+        showToast('Removed from wishlist');
+    }
+}
+
+// ==================== FARMERS ====================
+function renderFarmers() {
+    const grid = document.getElementById('farmersGrid');
+    grid.innerHTML = farmers.map(farmer => `
+        <div class="farmer-card">
+            <div class="farmer-header">
+                <div class="farmer-avatar" style="background:${farmer.avatarColor}">${farmer.avatar}</div>
+                <div class="farmer-info">
+                    <h3>${farmer.name}</h3>
+                    <div class="role">${farmer.role}</div>
+                </div>
+            </div>
+            <div class="farmer-stats">
+                <div class="stat-item">
+                    <div class="stat-value">${farmer.rating}</div>
+                    <div class="stat-label">Rating</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${farmer.dealsCompleted}</div>
+                    <div class="stat-label">Deals Done</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${farmer.responseTime}</div>
+                    <div class="stat-label">Response Time</div>
+                </div>
+            </div>
+            <div class="farmer-products">
+                <strong style="margin-bottom:10px;display:block;">Current Products:</strong>
+                <div class="product-mini-list">
+                    ${farmer.products.map(p => `<div class="product-mini-item"><span>${p}</span><span style="color:var(--neon-green);font-weight:700;">UGX ${products.find(pr => p.name === p).price?.toLocaleString()}</span></div>`).join('')}
+                </div>
+            </div>
+            <div class="farmer-actions">
+                <button class="btn btn-primary" onclick="openChatWith('${farmer.name}')">
+                    <i class="fab fa-whatsapp"></i> Chat Now
+                </button>
+                <button class="btn btn-accent" onclick="viewFarmerProfile(${farmer.id})">
+                    <i class="fas fa-eye"></i> View Profile
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function viewFarmerProfile(farmerId) {
+    const farmer = farmers.find(f => f.id === farmerId);
+    if(farmer) {
+        showToast(`Viewing ${farmer.name}'s profile`);
+        // In real app, would open detailed modal
+    }
+}
+
+function openChatWith(personName) {
+    showToast(`Opening chat with ${personName}...`);
+    // In real app, would open chat modal with pre-filled recipient
+}
+
+// ==================== ACCOUNT FUNCTIONS ====================
+function showModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function switchAuthMode(mode) {
+    document.getElementById('loginTab').classList.toggle('active');
+    document.getElementById('registerTab').classList.toggle('active');
+    document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = mode === 'register' ? 'block' : 'none';
+}
+
+function handleLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if(!email || !password) {
+        showToast('Please fill in all fields!');
+        return;
+    }
+    
+    // Simulate login
+    showToast(`Logging in as ${email}...`);
+    setTimeout(() => {
+        closeModal('loginModal');
+        showToast('✅ Login successful! Welcome back!');
+        updateNavForLoggedInUser(email);
+    }, 1500);
+}
+
+function handleRegister() {
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('regEmail').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const userType = document.getElementById('userType').value;
+    const agreeTerms = document.getElementById('agreeTerms').checked;
+    
+    if(!firstName || !lastName || !email || !phone || !password) {
+        showToast('Please fill in all required fields!');
+        return;
+    }
+    
+    if(password !== confirmPassword) {
+        showToast('Passwords do not match!');
+        return;
+    }
+    
+    if(!agreeTerms) {
+        showToast('Please accept terms and conditions');
+        return;
+    }
+    
+    // Simulate registration
+    showToast(`Creating account for ${firstName}...`);
+    setTimeout(() => {
+        closeModal('account');
+        showToast(`✅ Account created successfully! Welcome, ${firstName}!`);
+        updateNavForLoggedInUser(firstName);
+    }, 2000);
+}
+
+function updateNavForLoggedInUser(userOrEmail) {
+    const accountBtn = document.querySelector('.btn[onclick*="showModal('account)"]');
+    if(accountBtn) {
+        accountBtn.innerHTML = `<i class="fas fa-user-check"></i> ${userOrEmail}`;
+    }
+}
+
+// ==================== COMMUNITY FUNCTIONS ====================
+function renderDiscussions() {
+    const grid = document.getElementById('communityGrid');
+    grid.innerHTML = discussions.map(discussion => `
+        <div class="discussion-card">
+            <div class="discussion-header">
+                <div class="user-avatar-sm" style="background:${discussion.avatarColor}">
+                    ${discussion.avatar}
+                </div>
+                <div>
+                    <div class="discussion-name">${discussion.author}</div>
+                    <div class="discussion-meta">${discussion.time}</div>
+                </div>
+            </div>
+            <h3 class="discussion-title">${discussion.title}</h3>
+            <p class="discussion-excerpt">${discussion.excerpt}</p>
+            <div class="discussion-footer">
+                <button class="like-btn" onclick="likeDiscussion(${discussion.id}, this)">
+                    <i class="far fa-heart"></i> Like
+                </button>
+                <span class="likes-count" id="likes-${discussion.id}">${discussion.likes}</span>
+                <button class="comment-btn" onclick="openComments(${discussion.id})">
+                    <i class="far fa-comment-dots"></i> Comment
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function createDiscussion() {
+    showToast('Creating new discussion...');
+    // In real app, would open form modal
+}
+
+function filterDiscussions(category) {
+    showToast(`Showing ${category} discussions`);
+    // Would filter discussions array
+}
+
+function likeDiscussion(discId, buttonElement) {
+    const disc = discussions.find(d => d.id === discId);
+    if(disc) {
+        disc.likes++;
+        document.getElementById(`likes-${discId}`).textContent = disc.likes;
+        
+        const icon = buttonElement.querySelector('i');
+        if(icon.classList.contains('far')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            icon.style.color = '#FF1493';
+        }
+        showToast('❤️ Liked!');
+    }
+}
+
+function openComments(discId) {
+    showToast(`Opening comments for discussion #${discId}`);
+    // In real app, would expand to show comments section
+}
+
+// ==================== ANALYTICS ====================
+function initAnalytics() {
+    // Current Prices
+    const currentPrices = [
+        { crop: "🌽 Maize", price: 1500, change: 5 },
+        { crop: "🍌 Matooke", price: 0, change: -2 },
+        { crop: "🥔 Cassava", price: 1200, change: 3 },
+        { crop: "🍅 Tomatoes", price: 2000, change: -8 },
+        { crop: "🫘 Beans", price: 2800, change: 4 },
+        { crop: "☕ Coffee", price: 8500, change: 2 }
+    ];
+    
+    const currentPricesList = document.getElementById('currentPricesList');
+    currentPricesList.innerHTML = currentPrices.map(p => `
+        <div class="price-row">
+            <span>${p.crop}</span>
+            <strong>UGX ${p.price.toLocaleString()}</strong>
+            <span class="${p.change >= 0 ? 'trend-up' : 'trend-down'}">
+                ${p.change >= 0 ? '↑' : '↓'} ${Math.abs(p.change)}%
+            </span>
+        </div>
+    `).join('');
+    
+    // Popular Crops Bar Chart
+    const popularCrops = [
+        { name: "Beans", percentage: 78, color: "#00FF41" },
+        { name: "Maize", percentage: 92, color: "#39FF14" },
+        { name: "Tomatoes", percentage: 65, color: "#FF1493" },
+        { name: "Cassava", percentage: 71, color: "#FF8C00" },
+        { name: "Matooke", percentage: 84, color: "#FFD700" },
+        { name: "Coffee", price: 45, color: "#BF00FF" }
+    ];
+    
+    const popularCropsChart = document.getElementById('popularCropsChart');
+    popularCropsChart.innerHTML = popularCrops.map(crop => `
+        <div class="bar-item">
+            <span class="bar-label">${crop.name}</span>
+            <div class="bar-container">
+                <div class="bar-fill" style="--bar-width:${crop.percentage}%;background:linear-gradient(135deg,${crop.color}, ${crop.color});">
+                    ${crop.percentage}%
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Demand Forecast
+    const demandData = [
+        { month: "Jan", demand: 70 },
+        { month: "Feb", demand: 65 },
+        { month: "Mar", demand: 85 },
+        { month: "Apr", demand: 92 },
+        { month: "May", demand: 100 },
+        { month: "Jun", demand: 95 },
+        { month: "Jul", demand: 88 }
+    ];
+    
+    const demandChart = document.getElementById('demandChart');
+    demandChart.innerHTML = demandData.map((d, i) => `
+        <div class="bar-item">
+            <span class="bar-label">${d.month}</span>
+            <div class="bar-container">
+                <div class="bar-fill" style="--bar-width:${d.demand}%;background:linear-gradient(135deg, var(--neon-green), var(--electric-green));">
+                    ${d.demand}% Demand
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updatePricesDisplay() {
+    // Update prices randomly
+    currentPrices.forEach(p => {
+        const change = Math.floor(Math.random() * 15) - 7;
+        p.price = Math.max(500, Math.min(10000, p.price + change));
+        p.change = change;
+    });
+    
+    // Re-render
+    initAnalytics();
+}
+</script>
+
+</body>
+</html>

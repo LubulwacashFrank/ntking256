@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Tech Connect | Uganda's #1 Farm-to-Market Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --neon-green: #00FF41;
+            --electric-green: #39FF14;
+            --lime-bright: #BFFF00;
+            --sunset-orange: #FF6B35;
+            --hot-pink: #FF1493;
+            --cyber-yellow: #FFFF00;
+            --ocean-blue: #00D4FF;
+            --purple-vivid: #BF00FF;
+            --white: #FFFFFF;
+            --dark-bg: #0A0E27;
+            --card-bg: rgba(255,255,255,0.95);
+            --text-medium: #555;
+            --text-light: #888;
+            --text-dark: #1a1a1a;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fff0 0%, #ffffff 50%, #fff9e6 100%);
+            color: #1a1a1a;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .breaking-ticker {
+            background: linear-gradient(90deg, var(--hot-pink), var(--purple-vivid), var(--ocean-blue));
+            color: white;
+            padding: 12px 0;
+            position: relative;
+            overflow: hidden;
+            z-index: 1001;
+        }
+
+        .ticker-content {
+            display: flex;
+            animation: scroll 30s linear infinite;
+            width: max-content;
+        }
+
+        .ticker-content:hover { animation-play-state: paused; }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            padding: 0 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ticker-badge {
+            background: var(--cyber-yellow);
+            color: black;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 900;
+        }
+
+        .ticker-live-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            animation: livePulse 1s infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        /* Announcements */
+        .announcements-container {
+            background: linear-gradient(135deg, var(--hot-pink), var(--sunset-orange));
+            color: white;
+            padding: 12px 0;
+            position: relative;
+            z-index: 999;
+        }
+
+        .announcements-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .announcement-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .announcement-item i {
+            font-size: 1.2rem;
+            color: var(--cyber-yellow);
+        }
+
+        .announcement-close {
+            margin-left: auto;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .announcement-close:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1f3d 100%);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--neon-green);
+            filter: drop-shadow(0 0 15px var(--neon-green));
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 10px 18px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--neon-green);
+            background: rgba(0,255,65,0.1);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 26px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--hot-pink));
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 3px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .btn-outline:hover {
+            background: var(--neon-green);
+            color: var(--dark-bg);
+        }
+
+        .hero {
+            min-height: 85vh;
+            background: linear-gradient(135deg, rgba(0,255,65,0.05) 0%, rgba(255,255,255,0.9) 30%, rgba(255,215,0,0.08) 70%, rgba(255,107,53,0.05) 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 100px 24px 60px;
+        }
+
+        .hero-content {
+            max-width: 750px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--purple-vivid), var(--hot-pink));
+            color: white;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--dark-bg), var(--neon-green), var(--electric-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-medium);
+            margin-bottom: 36px;
+            font-weight: 500;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--neon-green);
+            transform: scale(1.02);
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #f0fdf4, #ecfccb);
+            padding: 14px 20px;
+            border-radius: 14px;
+        }
+
+        .search-input-wrapper i { color: var(--neon-green); }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            outline: none;
+            width: 100%;
+            font-weight: 500;
+        }
+
+        .location-select {
+            padding: 14px 20px;
+            border: none;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            min-width: 150px;
+            outline: none;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            font-weight: 900;
+            padding: 14px 32px;
+        }
+
+        .activity-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 48px;
+            flex-wrap: wrap;
+        }
+
+        .activity-item {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .activity-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 10px;
+        }
+
+        .icon-farmers { background: linear-gradient(135deg, var(--neon-green), var(--electric-green)); color: white; }
+        .icon-buyers { background: linear-gradient(135deg, var(--ocean-blue), #0099ff); color: white; }
+        .icon-deals { background: linear-gradient(135deg, var(--sunset-orange), var(--hot-pink)); color: white; }
+        .icon-online { background: linear-gradient(135deg, var(--purple-vivid), #bf40bf); color: white; }
+
+        .activity-number {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--dark-bg);
+        }
+
+        .activity-label {
+            font-size: 0.88rem;
+            color: var(--text-medium);
+            font-weight: 600;
+        }
+
+        .categories-section, .marketplace-section, .weather-section {
+            padding: 80px 24px;
+        }
+
+        .categories-section { background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%); }
+        .weather-section { background: linear-gradient(180deg, #E3F2FD, #BBDEFB); }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--dark-bg), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-medium);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 3px solid transparent;
+        }
+
+        .category-card:hover {
+            transform: translateY(-12px);
+            border-color: var(--neon-green);
+            box-shadow: 0 20px 50px rgba(0,255,65,0.25);
+        }
+
+        .category-icon { font-size: 4rem; margin-bottom: 16px; }
+
+        .category-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--dark-bg);
+            margin-bottom: 8px;
+        }
+
+        .category-count {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .category-count strong { color: var(--neon-green); }
+
+        .marketplace-container { max-width: 1400px; margin: 0 auto; }
+
+        .marketplace-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        .filters-sidebar {
+            background: linear-gradient(180deg, #f0fdf4, white);
+            border-radius: 20px;
+            padding: 24px;
+            border: 2px solid var(--neon-green);
+            position: sticky;
+            top: 100px;
+        }
+
+        .filter-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group {
+            margin-bottom: 22px;
+            padding-bottom: 22px;
+            border-bottom: 2px solid rgba(0,255,65,0.15);
+        }
+
+        .filter-label {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--dark-bg);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: var(--text-medium);
+        }
+
+        .filter-option:hover {
+            background: linear-gradient(135deg, rgba(0,255,65,0.1), rgba(57,255,20,0.1));
+            color: var(--neon-green);
+        }
+
+        .filter-option input[type="checkbox"] {
+            accent-color: var(--neon-green);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .products-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 15px;
+            border-left: 5px solid var(--sunset-orange);
+        }
+
+        .products-count { font-weight: 700; font-size: 1rem; }
+        .products-count strong { color: var(--sunset-orange); font-size: 1.2rem; }
+
+        .sort-select {
+            padding: 12px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 22px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+        }
+
+        .product-card:hover {
+            transform: translateY(-12px);
+            border-color: var(--neon-green);
+            box-shadow: 0 25px 60px rgba(0,255,65,0.25);
+        }
+
+        .product-image {
+            height: 200px;
+            background: linear-gradient(135deg, #FFE0B2, #FFCC80);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-badges {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .badge-verified {
+            background: linear-gradient(135deg, #00FF41, #39FF14);
+            color: var(--dark-bg);
+        }
+
+        .badge-hot {
+            background: linear-gradient(135deg, #FF6B35, #FF1493);
+            color: white;
+        }
+
+        .badge-new {
+            background: linear-gradient(135deg, #00D4FF, #0099ff);
+            color: white;
+        }
+
+        .product-wishlist {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .product-wishlist:hover {
+            background: linear-gradient(135deg, var(--hot-pink), #FF1493);
+            color: white;
+        }
+
+        .product-info { padding: 20px; }
+
+        .product-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--dark-bg);
+            margin-bottom: 8px;
+        }
+
+        .product-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .product-meta i { color: var(--neon-green); }
+
+        .product-price {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .product-price span {
+            font-size: 0.9rem;
+            font-weight: 600;
+            -webkit-text-fill-color: var(--text-light);
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .product-actions .btn {
+            flex: 1;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            justify-content: center;
+        }
+
+        /* Category-based product display */
+        .category-section {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+            margin-bottom: 4px;
+        }
+
+        .category-count {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .category-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .product-icon-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .product-icon-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: var(--neon-green);
+        }
+
+        .product-icon-card.view-more {
+            border-style: dashed;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        }
+
+        .product-icon-card.view-more:hover {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+        }
+
+        /* Rich product card */
+        .mp-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            cursor: pointer;
+        }
+        .mp-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--neon-green);
+            box-shadow: 0 16px 40px rgba(0,255,65,0.18);
+        }
+        .mp-card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            background: linear-gradient(135deg,#e5e7eb,#f3f4f6);
+        }
+        .mp-card-img-placeholder {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+        }
+        .mp-card-body { padding: 14px 16px 16px; }
+        .mp-card-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mp-card-price {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2px;
+        }
+        .mp-card-stock { font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px; }
+        .mp-farmer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 10px;
+        }
+        .mp-farmer-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.75rem; color: var(--dark-bg);
+            flex-shrink: 0;
+        }
+        .mp-farmer-name { font-weight: 700; font-size: 0.85rem; color: var(--dark-bg); }
+        .mp-farmer-loc { font-size: 0.75rem; color: var(--text-light); }
+        .mp-card-actions { display: flex; gap: 8px; }
+        .mp-btn-chat {
+            flex: 1;
+            padding: 9px 0;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mp-btn-chat:hover { transform: scale(1.03); }
+        .mp-btn-view {
+            padding: 9px 14px;
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mp-btn-view:hover { background: var(--neon-green); color: var(--dark-bg); }
+
+        /* Product detail modal */
+        .pd-modal {
+            background: white;
+            border-radius: 24px;
+            width: 95%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+        .pd-img {
+            width: 100%; height: 240px;
+            object-fit: cover;
+            border-radius: 24px 24px 0 0;
+            display: block;
+        }
+        .pd-img-placeholder {
+            width: 100%; height: 240px;
+            border-radius: 24px 24px 0 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 5rem;
+        }
+        .pd-body { padding: 24px; }
+        .pd-price {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .pd-farmer-card {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 16px 0;
+            border: 1px solid rgba(0,255,65,0.2);
+        }
+        .pd-farmer-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1rem; color: var(--dark-bg);
+            flex-shrink: 0;
+        }
+
+        .product-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .product-icon-info { flex: 1; min-width: 0; }
+        .product-icon-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem; font-weight: 700; color: var(--dark-bg);
+            margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .product-icon-price {
+            font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 2px;
+        }
+        .product-icon-meta { font-size: 0.8rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-card:hover { border-color: var(--neon-green); }
+
+        .sidebar-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin-bottom: 16px;
+        }
+
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            animation: liveDot 1s infinite;
+        }
+
+        @keyframes liveDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        .price-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 12px;
+            border-left: 4px solid var(--neon-green);
+        }
+
+        .price-crop { font-weight: 700; font-size: 0.95rem; }
+
+        .price-value {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--neon-green);
+        }
+
+        .price-change {
+            font-size: 0.82rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+
+        .trend-up { color: #00C853; background: #E8F5E9; }
+        .trend-down { color: #F44336; background: #FFEBEE; }
+
+        .negotiation-hub {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+            border: 3px solid var(--sunset-orange);
+        }
+
+        .negotiation-content { text-align: center; padding: 20px; }
+
+        .negotiation-icon {
+            font-size: 4rem;
+            color: var(--sunset-orange);
+            margin-bottom: 16px;
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .weather-card {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border-top: 5px solid;
+            transition: all 0.4s ease;
+        }
+
+        .weather-card:hover { transform: translateY(-10px); }
+        .weather-card:nth-child(1) { border-color: var(--neon-green); }
+        .weather-card:nth-child(2) { border-color: var(--ocean-blue); }
+        .weather-card:nth-child(3) { border-color: var(--sunset-orange); }
+        .weather-card:nth-child(4) { border-color: var(--purple-vivid); }
+
+        .weather-location { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+        .weather-district {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+        }
+
+        .weather-main { display: flex; align-items: center; gap: 24px; margin-bottom: 20px; }
+
+        .weather-icon-large { font-size: 5rem; }
+
+        .weather-temp {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--dark-bg);
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .weather-detail-value { font-weight: 800; font-size: 1.1rem; color: var(--dark-bg); }
+
+        .weather-advisory {
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #FFF9C4, #FFF59D);
+            border-left: 5px solid #FBC02D;
+            border-radius: 10px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+        }
+
+        .modal-overlay.active { display: flex; align-items: center; justify-content: center; }
+
+        .chat-modal {
+            width: 95%;
+            max-width: 1100px;
+            height: 85vh;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            display: flex;
+        }
+
+        .chat-sidebar {
+            width: 340px;
+            background: linear-gradient(180deg, #0A0E27, #1a1f3d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            border-right: 3px solid var(--neon-green);
+        }
+
+        .chat-sidebar-header {
+            padding: 24px;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+        }
+
+        .chat-sidebar-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .chat-search { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        .chat-search input {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            outline: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .chat-search input::placeholder { color: rgba(255,255,255,0.5); }
+
+        .contacts-list { flex: 1; overflow-y: auto; }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .contact-item:hover, .contact-item.active {
+            background: rgba(0,255,65,0.15);
+            border-left: 4px solid var(--neon-green);
+        }
+
+        .contact-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .online-status {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            border: 3px solid #0A0E27;
+        }
+
+        .contact-info { flex: 1; }
+
+        .contact-name { font-weight: 700; font-size: 1rem; }
+
+        .contact-role { font-size: 0.82rem; opacity: 0.7; }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+        }
+
+        .chat-header-bar {
+            padding: 18px 24px;
+            background: white;
+            border-bottom: 2px solid var(--neon-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-modal-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #FF6B35, #FF1493);
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal-btn:hover { transform: rotate(90deg) scale(1.1); }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 14px 18px;
+            border-radius: 18px;
+        }
+
+        .message-received {
+            background: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .message-sent {
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0,255,65,0.3);
+        }
+
+        .message-sender {
+            font-weight: 700;
+            font-size: 0.82rem;
+            margin-bottom: 6px;
+            color: var(--neon-green);
+        }
+
+        .message-time {
+            font-size: 0.72rem;
+            opacity: 0.7;
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .message-input-area {
+            padding: 20px 24px;
+            background: white;
+            border-top: 2px solid var(--neon-green);
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-input-field {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .message-input-field:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 25px rgba(0,255,65,0.2);
+        }
+
+        .send-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .send-btn:hover { transform: scale(1.1); }
+
+        .toast-notification {
+            position: fixed;
+            top: 100px;
+            right: 28px;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-green));
+            color: var(--dark-bg);
+            padding: 16px 28px;
+            border-radius: 15px;
+            font-weight: 700;
+            z-index: 9998;
+            display: none;
+        }
+
+        .toast-notification.show { display: block; }
+
+        .whatsapp-float {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 998;
+        }
+
+        .whatsapp-button {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(37,211,102,0.5);
+        }
+
+        @media (max-width: 1200px) {
+            .marketplace-layout { grid-template-columns: 250px 1fr; }
+            .right-sidebar { display: none; }
+        }
+
+        @media (max-width: 992px) {
+            .nav-links { display: none; }
+            .marketplace-layout { grid-template-columns: 1fr; }
+            .filters-sidebar { position: static; }
+            .chat-modal { flex-direction: column; height: 90vh; }
+            .chat-sidebar { width: 100%; max-height: 250px; border-right: none; border-bottom: 3px solid var(--neon-green); }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .products-grid { grid-template-columns: 1fr; }
+            .categories-grid { grid-template-columns: repeat(2, 1fr); }
+            .weather-grid { grid-template-columns: 1fr; }
+            .activity-stats { gap: 24px; }
+        }
+
+        @media (max-width: 480px) {
+            .categories-grid { grid-template-columns: 1fr; }
+            .hero-buttons { flex-direction: column; }
+            .activity-stats { flex-direction: column; gap: 20px; }
+        }
+
+        .mobile-menu-toggle { display: none; }
+
+        @media (max-width: 992px) {
+            .mobile-menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.8rem;
+                cursor: pointer;
+            }
+        }
+    </style>
+<style id="rt-notif-style">
+#rt-notif-container{position:fixed;bottom:24px;left:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:340px}
+.rt-notif{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.18);border-left:4px solid #10B981;display:flex;align-items:flex-start;gap:12px;animation:rtSlideIn .3s ease}
+.rt-notif-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.rt-notif-body{flex:1;min-width:0}
+.rt-notif-title{font-weight:700;font-size:13px;color:#111827;margin-bottom:2px}
+.rt-notif-text{font-size:12px;color:#6B7280;line-height:1.4}
+.rt-notif-close{background:none;border:none;color:#9CA3AF;font-size:18px;cursor:pointer;padding:0;line-height:1;flex-shrink:0}
+@keyframes rtSlideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+</style></head>
+<body>
+
+<div class="breaking-ticker">
+    <div class="ticker-content">
+        <div class="ticker-item">
+            <span class="ticker-badge">HOT</span>
+            <span class="ticker-live-dot"></span>
+            CASSAVA PRICES UP 15%! Farmers in Jinja reporting high demand
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-badge">NEW</span>
+            <span class="ticker-live-dot"></span>
+            500kg MAIZE JUST LISTED by verified farmer in Mukono
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-badge">DEAL</span>
+            <span class="ticker-live-dot"></span>
+            BULK DISCOUNT: 2 tons Matooke available at UGX 1,200/bunch
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-badge">WEATHER</span>
+            <span class="ticker-live-dot"></span>
+            RAIN EXPECTED in Eastern Region tomorrow - Harvest your crops NOW!
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-badge">CHAT</span>
+            <span class="ticker-live-dot"></span>
+            23 farmers ONLINE now - Start negotiating instantly
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-badge">HOT</span>
+            <span class="ticker-live-dot"></span>
+            CASSAVA PRICES UP 15%! Farmers in Jinja reporting high demand
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-badge">NEW</span>
+            <span class="ticker-live-dot"></span>
+            500kg MAIZE JUST LISTED by verified farmer in Mukono
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-badge">DEAL</span>
+            <span class="ticker-live-dot"></span>
+            BULK DISCOUNT: 2 tons Matooke available at UGX 1,200/bunch
+        </div>
+    </div>
+</div>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <i class="fas fa-leaf"></i>
+            Agro Tech<br>Connect
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="#home" class="nav-link active">Home</a></li>
+            <li><a href="#marketplace" class="nav-link">Marketplace</a></li>
+            <li><a href="#marketplace" class="nav-link">Products</a></li>
+            <li><a href="#" class="nav-link" onclick="showToast('Sell feature coming soon!'); return false;">Sell/Advertise</a></li>
+            <li><a href="#prices" class="nav-link">Prices & Insights</a></li>
+            <li><a href="#" class="nav-link" onclick="showToast('Community coming soon!'); return false;">Community</a></li>
+        </ul>
+        
+        <div class="nav-actions">
+            <a href="/auth" class="btn btn-primary">Account</a>
+            <a href="/admin" class="btn btn-outline">Admin</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Announcements Section -->
+<div id="announcements" class="announcements-container" style="display: none;">
+    <div class="announcements-content">
+        <div class="announcement-item">
+            <i class="fas fa-bullhorn"></i>
+            <span id="announcement-text"></span>
+            <button class="announcement-close" onclick="hideAnnouncement()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<section class="hero" id="home">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fas fa-bolt"></i>
+            Uganda's #1 Agri-Marketplace
+        </div>
+        
+        <h1>Browse <span>Products</span> & <span>Buyers</span> Directly</h1>
+        
+        <p class="hero-subtitle">Real-time prices • Agricultural products by category • Weather insights • No middlemen • Fair trade</p>
+        
+        <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})">
+                <i class="fas fa-shopping-basket"></i> Browse Products
+            </button>
+            <button class="btn btn-accent" onclick="showToast('Sell form coming soon!')">
+                <i class="fas fa-plus-circle"></i> Sell My Harvest
+            </button>
+        </div>
+        
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input" placeholder="Search crops, products or location..." id="searchInput">
+            </div>
+            <select class="location-select" id="locationSelect">
+                <option value="">All Districts</option>
+                <option value="kampala">Kampala</option>
+                <option value="jinja">Jinja</option>
+                <option value="mukono">Mukono</option>
+                <option value="mbale">Mbale</option>
+                <option value="mbarara">Mbarara</option>
+            </select>
+            <button class="btn search-btn" onclick="performSearch()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        
+        <div class="activity-stats">
+            <div class="activity-item" onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})">
+                <div class="activity-icon icon-farmers"><i class="fas fa-box"></i></div>
+                <div class="activity-number" id="productsCount">0</div>
+                <div class="activity-label">Available Products</div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon icon-buyers"><i class="fas fa-shopping-cart"></i></div>
+                <div class="activity-number" id="buyersCount">3,891</div>
+                <div class="activity-label">Online Buyers</div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon icon-deals"><i class="fas fa-handshake"></i></div>
+                <div class="activity-number" id="dealsCount">567</div>
+                <div class="activity-label">Deals Today</div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon icon-online"><i class="fas fa-comments"></i></div>
+                <div class="activity-number" id="chatsCount">89</div>
+                <div class="activity-label">Live Chats</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="categories-section">
+    <div style="max-width: 1400px; margin: 0 auto;">
+        <div class="section-header">
+            <h2 class="section-title">Browse by Category</h2>
+            <p class="section-subtitle">Browse agricultural products available in the system by category</p>
+        </div>
+        
+        <div class="categories-grid">
+            <div class="category-card" onclick="filterByCategory('grains')">
+                <div class="category-icon">🌾</div>
+                <div class="category-name">Grains & Cereals</div>
+                <div class="category-count"><strong id="grainCount">0</strong> listings</div>
+            </div>
+            
+            <div class="category-card" onclick="filterByCategory('fruits')">
+                <div class="category-icon">🍌</div>
+                <div class="category-name">Fruits</div>
+                <div class="category-count"><strong id="fruitCount">0</strong> listings</div>
+            </div>
+            
+            <div class="category-card" onclick="filterByCategory('vegetables')">
+                <div class="category-icon">🥬</div>
+                <div class="category-name">Vegetables</div>
+                <div class="category-count"><strong id="vegCount">0</strong> listings</div>
+            </div>
+            
+            <div class="category-card" onclick="filterByCategory('tubers')">
+                <div class="category-icon">🥔</div>
+                <div class="category-name">Tubers & Roots</div>
+                <div class="category-count"><strong id="tuberCount">0</strong> listings</div>
+            </div>
+            
+            <div class="category-card" onclick="filterByCategory('legumes')">
+                <div class="category-icon">🫘</div>
+                <div class="category-name">Legumes & Pulses</div>
+                <div class="category-count"><strong id="legumeCount">0</strong> listings</div>
+            </div>
+            
+            <div class="category-card" onclick="filterByCategory('coffee')">
+                <div class="category-icon">☕</div>
+                <div class="category-name">Coffee & Others</div>
+                <div class="category-count"><strong id="coffeeCount">0</strong> listings</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="marketplace-section" id="marketplace">
+    <div class="marketplace-container">
+        <div class="section-header">
+            <h2 class="section-title" id="prices"><i class="fas fa-store"></i> Live Marketplace</h2>
+            <p class="section-subtitle">Fresh agricultural products from across Uganda</p>
+        </div>
+        
+        <div class="marketplace-layout">
+            <aside class="filters-sidebar">
+                <h3 class="filter-title"><i class="fas fa-filter"></i> Filters</h3>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Price Range</label>
+                    <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> Under UGX 500</label>
+                    <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> UGX 500 - 1,000</label>
+                    <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> UGX 1,000 - 2,000</label>
+                    <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> Above UGX 2,000</label>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">District</label>
+                    <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Kampala</label>
+                    <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> Jinja</label>
+                    <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> Mukono</label>
+                    <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> Mbale</label>
+                </div>
+                
+                <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="resetFilters()">
+                    <i class="fas fa-redo"></i> Reset Filters
+                </button>
+            </aside>
+            
+            <main class="products-main">
+                <div class="products-toolbar">
+                    <div class="products-count">Showing <strong id="productsShowing">0</strong> products</div>
+                    <select class="sort-select" id="sortSelect" onchange="sortProducts()">
+                        <option value="relevance">Sort by: Relevance</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+                </div>
+                
+                <div class="products-grid" id="productsGrid"></div>
+            </main>
+            
+            <aside class="right-sidebar">
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title"><i class="fas fa-chart-line" style="color:var(--neon-green)"></i> Live Market Prices</h3>
+                    <div class="live-indicator"><div class="live-dot"></div> LIVE - Updates every 30 seconds</div>
+                    <div class="price-list" id="livePricesList"></div>
+                </div>
+                
+                <div class="sidebar-card negotiation-hub">
+                    <h3 class="sidebar-title"><i class="fas fa-handshake" style="color:var(--sunset-orange)"></i> Negotiation Hub</h3>
+                    <div class="negotiation-content">
+                        <div class="negotiation-icon"><i class="fas fa-comments-dollar"></i></div>
+                        <p style="font-weight:600; color:var(--text-dark); margin-bottom:12px;">
+                            Bulk buyers can negotiate directly with farmers for better prices!
+                        </p>
+                        <button class="btn btn-accent" onclick="openNegotiation()" style="width:100%;">
+                            <i class="fas fa-bolt"></i> Start Negotiation
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title"><i class="fas fa-bolt" style="color:var(--hot-pink)"></i> Quick Actions</h3>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <button class="btn btn-primary" onclick="openChat()" style="width:100%;"><i class="fab fa-whatsapp"></i> Chat Now</button>
+                    </div>
+                </div>
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title"><i class="fas fa-comment-alt" style="color:var(--ocean-blue)"></i> Feedback</h3>
+                    <p style="font-size:0.92rem; color:var(--text-medium); margin-bottom:12px;">Share your feedback and help us improve the marketplace.</p>
+                    <input id="feedbackName" type="text" placeholder="Your name" style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem; margin-bottom:10px;">
+                    <input id="feedbackEmail" type="email" placeholder="Email (optional)" style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem; margin-bottom:10px;">
+                    <select id="feedbackCategory" style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem; margin-bottom:10px;">
+                        <option value="General">General</option>
+                        <option value="Chat">Chat</option>
+                        <option value="Product">Product</option>
+                        <option value="Pricing">Pricing</option>
+                        <option value="Support">Support</option>
+                    </select>
+                    <textarea id="feedbackMessage" placeholder="Your feedback..." style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem; resize:none; height:100px; margin-bottom:10px;"></textarea>
+                    <button class="btn btn-accent" onclick="submitFeedbackForm()" style="width:100%; padding:14px; font-size:0.95rem;">Send Feedback</button>
+                    <div id="feedbackReply" style="display:none;margin-top:12px;padding:14px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:10px;border-left:4px solid #10B981;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-robot" style="color:#fff;font-size:12px;"></i></div><span style="font-weight:700;font-size:13px;color:#065F46;">Support Bot</span></div><p id="feedbackReplyText" style="font-size:13px;color:#374151;line-height:1.6;margin:0;"></p></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<section class="weather-section" id="weather">
+    <div style="max-width: 1400px; margin: 0 auto;">
+        <div class="section-header">
+            <h2 class="section-title"><i class="fas fa-cloud-sun" style="color:#03A9F4"></i> Weather Advisory</h2>
+            <p class="section-subtitle">Plan your farming activities with accurate weather forecasts</p>
+        </div>
+        
+        <div class="weather-grid" id="weatherGrid"></div>
+    </div>
+</section>
+
+<div class="modal-overlay" id="chatModal">
+    <div class="chat-modal">
+        <div class="chat-sidebar">
+            <div class="chat-sidebar-header">
+                <div class="chat-sidebar-title">Messages</div>
+                <div style="font-size:0.85rem; opacity:0.9;">Connect buyers & sellers</div>
+            </div>
+            <div class="chat-search">
+                <input type="text" placeholder="Search conversations...">
+            </div>
+            <div class="contacts-list" id="contactsList">
+                <div class="contact-item active">
+                    <div class="contact-avatar" style="background:linear-gradient(135deg, var(--neon-green), var(--electric-green));">SE</div>
+                    <div class="contact-info">
+                        <div class="contact-name">Sarah Ema</div>
+                        <div class="contact-role">Farmer • Jinja District</div>
+                    </div>
+                    <div class="online-status"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-main">
+            <div class="chat-header-bar">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="contact-avatar" style="background:linear-gradient(135deg, var(--neon-green), var(--electric-green)); width:45px;height:45px;font-size:1rem;">SE</div>
+                    <div>
+                        <div class="contact-name" id="chatUserName">Sarah Ema</div>
+                        <div class="contact-role" id="chatUserRole">Farmer • Jinja District</div>
+                    </div>
+                </div>
+                <button class="close-modal-btn" onclick="closeChat()">×</button>
+            </div>
+            
+            <div class="messages-area" id="messagesArea">
+                <!-- Messages will be loaded dynamically -->
+            </div>
+            
+            <div class="message-input-area">
+                <textarea class="message-input-field" id="messageInput" placeholder="Type your message here..." rows="1" onkeypress="handleMessageKey(event)"></textarea>
+                <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="negotiationModal">
+    <div class="chat-modal" style="max-width:700px;">
+        <div class="chat-main" style="width:100%;">
+            <div class="chat-header-bar" style="background:linear-gradient(135deg, var(--sunset-orange), var(--hot-pink));">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="background:rgba(255,255,255,0.2); width:50px;height:50px;border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:1.4rem; color:white;">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div style="color:white;">
+                        <div class="contact-name" style="color:white;">Bulk Negotiation Hub</div>
+                        <div class="contact-role" style="color:rgba(255,255,255,0.8);">For orders over 500kg</div>
+                    </div>
+                </div>
+                <button class="close-modal-btn" onclick="closeNegotiation()" style="background:rgba(255,255,255,0.2);">×</button>
+            </div>
+            
+            <div class="messages-area" style="background:#FFF9F0;">
+                <div style="padding:24px; background:white; border-radius:16px; margin-bottom:16px; border-left:5px solid var(--sunset-orange);">
+                    <h4 style="color:var(--sunset-orange); margin-bottom:10px; font-family:'Poppins',sans-serif;">
+                        <i class="fas fa-info-circle"></i> How Bulk Negotiation Works
+                    </h4>
+                    <ul style="font-size:0.92rem; color:var(--text-medium); padding-left:20px; line-height:1.8;">
+                        <li><strong>Post your bulk requirement</strong> (minimum 500kg)</li>
+                        <li><strong>Farmers compete</strong> to give you best offers</li>
+                        <li><strong>Negotiate price,</strong> delivery terms, payment</li>
+                        <li><strong>Finalize deal</strong> and arrange logistics</li>
+                    </ul>
+                </div>
+                
+                <div style="background:white; padding:24px; border-radius:16px;">
+                    <h4 style="margin-bottom:16px; font-family:'Poppins',sans-serif; color:var(--dark-bg);">
+                        <i class="fas fa-edit"></i> Create Bulk Inquiry
+                    </h4>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.88rem; margin-bottom:6px; display:block; color:var(--dark-bg);">Product Needed *</label>
+                            <input type="text" id="bulkProduct" placeholder="e.g., Cassava, Maize" style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem;">
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.88rem; margin-bottom:6px; display:block; color:var(--dark-bg);">Quantity (kg) *</label>
+                            <input type="number" id="bulkQuantity" placeholder="Min 500kg" style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem;">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom:14px;">
+                        <label style="font-weight:700; font-size:0.88rem; margin-bottom:6px; display:block; color:var(--dark-bg);">Target Price (UGX/kg)</label>
+                        <input type="number" id="bulkTargetPrice" placeholder="Your budget per kg" style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem;">
+                    </div>
+                    
+                    <div style="margin-bottom:14px;">
+                        <label style="font-weight:700; font-size:0.88rem; margin-bottom:6px; display:block; color:var(--dark-bg);">Delivery Location</label>
+                        <input type="text" id="bulkLocation" placeholder="e.g., Kampala City Center" style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem;">
+                    </div>
+                    
+                    <div style="margin-bottom:16px;">
+                        <label style="font-weight:700; font-size:0.88rem; margin-bottom:6px; display:block; color:var(--dark-bg);">Additional Notes</label>
+                        <textarea id="bulkNotes" placeholder="Any specific requirements..." style="width:100%; padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:0.92rem; resize:none; height:80px;"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-accent" onclick="submitBulkInquiry()" style="width:100%; padding:16px; font-size:1rem;">
+                        <i class="fas fa-paper-plane"></i> Submit Bulk Inquiry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-notification" id="toastNotification">
+    <span id="toastMessage"></span>
+</div>
+
+<div class="whatsapp-float">
+    <a href="https://wa.me/256700123456?text=Hello!%20I'm%20interested%20in%20buying/selling%20on%20Agro%20Tech%20Connect!" target="_blank" class="whatsapp-button" title="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</div>
+
+<script src="/js/api.js"></script>
+<script>
+let productsData = [];
+let pricesData = [];
+let weatherData = [];
+let selectedCategory = '';
+let selectedContact = { name: 'Sarah Ema', role: 'Farmer • Jinja District' };
+
+const categoryLabels = {
+    grains: 'Grains & Cereals',
+    fruits: 'Fruits',
+    vegetables: 'Vegetables',
+    tubers: 'Tubers & Roots',
+    legumes: 'Legumes & Pulses',
+    coffee: 'Coffee & Others'
+};
+
+const categoryIcons = {
+    grains: 'fa-wheat-awn',
+    fruits: 'fa-apple-whole',
+    vegetables: 'fa-carrot',
+    tubers: 'fa-circle',
+    legumes: 'fa-seedling',
+    coffee: 'fa-mug-hot',
+    other: 'fa-box'
+};
+
+const categoryColors = {
+    grains: '#F59E0B',
+    fruits: '#EF4444',
+    vegetables: '#10B981',
+    tubers: '#8B5CF6',
+    legumes: '#84CC16',
+    coffee: '#92400E',
+    other: '#6B7280'
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    bootstrap().then(() => {
+        renderProducts();
+        renderLivePrices();
+        renderWeather();
+        updateCategoryCounts();
+        startActivityCounters();
+        setInterval(refreshPrices, 30000);
+    // Real-time price updates via socket
+    RT.onPriceUpdate(function(prices){ pricesData = prices; renderLivePrices(); });
+    });
+});
+
+async function bootstrap() {
+    try {
+        const response = await fetch('/api/bootstrap');
+        if (!response.ok) throw new Error('Failed to load bootstrap data');
+        const data = await response.json();
+        productsData = data.products || [];
+        pricesData = data.livePrices || [];
+        weatherData = data.weatherData || [];
+    } catch (e) {
+        console.error('Bootstrap failed:', e);
+        productsData = [];
+    }
+}
+
+function renderProducts() {
+    const grid = document.getElementById('productsGrid');
+    let filteredProducts = selectedCategory
+        ? productsData.filter(p => (p.category || '').toLowerCase() === selectedCategory)
+        : productsData;
+
+    document.getElementById('productsShowing').textContent = filteredProducts.length;
+    const cnt = document.getElementById('productsCount');
+    if (cnt) cnt.textContent = productsData.length.toLocaleString();
+
+    if (!filteredProducts.length) {
+        grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">No products listed yet. Check back soon!</p>';
+        return;
+    }
+
+    // Group by category
+    const groups = {};
+    filteredProducts.forEach(p => {
+        const cat = p.category || 'other';
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push(p);
+    });
+
+    grid.innerHTML = Object.keys(groups).map(cat => {
+        const catKey = cat.toLowerCase();
+        const color = categoryColors[catKey] || '#6B7280';
+        const icon = categoryIcons[catKey] || 'fa-box';
+        const label = categoryLabels[catKey] || cat;
+        const items = groups[cat];
+        const visible = selectedCategory ? items : items.slice(0, 6);
+
+        return `
+        <div class="category-section" style="grid-column:1/-1">
+            <div class="category-header">
+                <div class="category-icon" style="background:linear-gradient(135deg,${color},${color}cc)">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="category-info">
+                    <h3 class="category-title">${label}</h3>
+                    <span class="category-count">${items.length} product${items.length > 1 ? 's' : ''}</span>
+                </div>
+                ${!selectedCategory && items.length > 6 ? `<button onclick="filterByCategory('${catKey}')" style="margin-left:auto;background:none;border:2px solid var(--neon-green);color:var(--neon-green);padding:6px 14px;border-radius:20px;cursor:pointer;font-weight:700;font-size:0.82rem;">View all ${items.length}</button>` : ''}
+                ${selectedCategory ? `<button onclick="clearCategoryFilter()" style="margin-left:auto;background:none;border:1px solid #d1d5db;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:0.82rem;">Show All</button>` : ''}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;">
+                ${visible.map(p => productCard(p, color, icon)).join('')}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function productCard(p, color, icon) {
+    const initials = (p.farmer || 'F').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const imgHtml = p.image
+        ? `<img class="mp-card-img" src="${p.image}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+           <div class="mp-card-img-placeholder" style="display:none;background:linear-gradient(135deg,${color}22,${color}11)">${getCatEmoji(p.category)}</div>`
+        : `<div class="mp-card-img-placeholder" style="background:linear-gradient(135deg,${color}22,${color}11)">${getCatEmoji(p.category)}</div>`;
+
+    return `
+    <div class="mp-card" onclick="openProductDetail(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+        <div style="position:relative">
+            ${imgHtml}
+            <span style="position:absolute;top:10px;left:10px;background:linear-gradient(135deg,${color},${color}cc);color:white;padding:3px 10px;border-radius:12px;font-size:0.72rem;font-weight:800;text-transform:capitalize">${p.category || 'Other'}</span>
+        </div>
+        <div class="mp-card-body">
+            <div class="mp-card-name">${p.name}</div>
+            <div class="mp-card-price">UGX ${Number(p.price).toLocaleString()}<span style="font-size:0.8rem;font-weight:600;-webkit-text-fill-color:var(--text-light)">/${p.unit}</span></div>
+            <div class="mp-card-stock"><i class="fas fa-box" style="color:${color};margin-right:4px"></i>${p.stock || 'Available'}</div>
+            <div class="mp-farmer-row">
+                <div class="mp-farmer-avatar">${initials}</div>
+                <div>
+                    <div class="mp-farmer-name">${p.farmer || 'Farmer'}</div>
+                    <div class="mp-farmer-loc"><i class="fas fa-map-marker-alt" style="color:var(--neon-green);margin-right:3px"></i>${p.district || ''}</div>
+                </div>
+            </div>
+            <div class="mp-card-actions" style="flex-wrap:wrap;gap:6px">
+                <button class="mp-btn-chat" onclick="event.stopPropagation();openDirectChat('${(p.farmer||'Farmer').replace(/'/g,'\\&apos;')}','${p.district||''}')">
+                    <i class="fas fa-comment-dots"></i> Chat Farmer
+                </button>
+                <button class="mp-btn-view" onclick="event.stopPropagation();openProductDetail(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="mp-btn-chat" onclick="event.stopPropagation();openGuestCheckout(p)" style="background:linear-gradient(135deg,#F59E0B,#D97706);width:100%;margin-top:4px">
+                    <i class="fas fa-shopping-cart"></i> Buy Now
+                </button>
+            </div>
+        </div>
+    </div>`;
+}
+
+function getCatEmoji(cat) {
+    const map = { grains:'🌾', fruits:'🍌', vegetables:'🥬', tubers:'🥔', legumes:'🫘', coffee:'☕' };
+    return map[(cat||'').toLowerCase()] || '📦';
+}
+
+function openProductDetail(p) {
+    if (typeof p === 'string') p = JSON.parse(p);
+    const initials = (p.farmer || 'F').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const catKey = (p.category || '').toLowerCase();
+    const color = categoryColors[catKey] || '#6B7280';
+
+    const imgHtml = p.image
+        ? `<img class="pd-img" src="${p.image}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+           <div class="pd-img-placeholder" style="display:none;background:linear-gradient(135deg,${color}22,${color}11)">${getCatEmoji(p.category)}</div>`
+        : `<div class="pd-img-placeholder" style="background:linear-gradient(135deg,${color}22,${color}11)">${getCatEmoji(p.category)}</div>`;
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.innerHTML = `
+    <div class="pd-modal">
+        ${imgHtml}
+        <div class="pd-body">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="background:linear-gradient(135deg,${color},${color}cc);color:white;padding:4px 12px;border-radius:12px;font-size:0.78rem;font-weight:800;text-transform:capitalize">${p.category || 'Other'}</span>
+                ${p.verified ? '<span style="background:linear-gradient(135deg,#00FF41,#39FF14);color:#0A0E27;padding:4px 12px;border-radius:12px;font-size:0.78rem;font-weight:800">✓ Verified</span>' : ''}
+            </div>
+            <h2 style="font-family:Poppins,sans-serif;font-size:1.5rem;font-weight:900;color:var(--dark-bg);margin-bottom:6px">${p.name}</h2>
+            <div class="pd-price">UGX ${Number(p.price).toLocaleString()} <span style="font-size:1rem;font-weight:600;-webkit-text-fill-color:var(--text-light)">/ ${p.unit}</span></div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0">
+                <div style="background:#f8fafc;border-radius:10px;padding:12px">
+                    <div style="font-size:0.75rem;color:var(--text-light);margin-bottom:4px">Available Stock</div>
+                    <div style="font-weight:800;color:var(--dark-bg)">${p.stock || 'Available'}</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:10px;padding:12px">
+                    <div style="font-size:0.75rem;color:var(--text-light);margin-bottom:4px">Location</div>
+                    <div style="font-weight:800;color:var(--dark-bg)">${p.district || 'Uganda'}</div>
+                </div>
+            </div>
+
+            ${p.description ? `<p style="font-size:0.9rem;color:var(--text-medium);line-height:1.6;margin-bottom:14px">${p.description}</p>` : ''}
+
+            <div class="pd-farmer-card">
+                <div class="pd-farmer-avatar">${initials}</div>
+                <div style="flex:1">
+                    <div style="font-weight:800;font-size:0.95rem;color:var(--dark-bg)">${p.farmer || 'Farmer'}</div>
+                    <div style="font-size:0.8rem;color:var(--text-light)"><i class="fas fa-map-marker-alt" style="color:var(--neon-green);margin-right:4px"></i>${p.district || 'Uganda'} • Farmer</div>
+                </div>
+                <span style="background:linear-gradient(135deg,var(--neon-green),var(--electric-green));color:var(--dark-bg);padding:4px 10px;border-radius:10px;font-size:0.75rem;font-weight:800">SELLER</span>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:4px">
+                <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="openDirectChat('${(p.farmer||'Farmer').replace(/'/g,'\\&apos;')}','${p.district||''}');closeModal()">
+                    <i class="fas fa-comment-dots"></i> Chat Farmer
+                </button>
+                <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>`;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+function openDirectChat(farmerName, district) {
+    document.getElementById('chatUserName').textContent = farmerName || 'Farmer';
+    document.getElementById('chatUserRole').textContent = 'Farmer • ' + (district || 'Uganda');
+    selectedContact = { name: farmerName || 'Farmer', role: 'Farmer • ' + (district || 'Uganda') };
+    // Update sidebar contact
+    const contactsList = document.getElementById('contactsList');
+    const initials = (farmerName || 'F').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    contactsList.innerHTML = `
+        <div class="contact-item active">
+            <div class="contact-avatar" style="background:linear-gradient(135deg,var(--neon-green),var(--electric-green));color:var(--dark-bg)">${initials}</div>
+            <div class="contact-info">
+                <div class="contact-name">${farmerName || 'Farmer'}</div>
+                <div class="contact-role">Farmer • ${district || 'Uganda'}</div>
+            </div>
+            <div class="online-status"></div>
+        </div>`;
+    document.getElementById('messagesArea').innerHTML = '';
+    document.getElementById('chatModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function renderLivePrices() {
+    const list = document.getElementById('livePricesList');
+    list.innerHTML = pricesData.map(price => `
+        <div class="price-item">
+            <div class="price-crop">${price.crop}</div>
+            <div>
+                <div class="price-value">UGX ${price.price ? price.price.toLocaleString() : '0'}</div>
+                <div class="price-change ${price.trend === 'up' ? 'trend-up' : 'trend-down'}">
+                    ${price.trend === 'up' ? '↑' : '↓'} ${price.change || 0}%
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function refreshPrices() {
+    try {
+        pricesData = await API.getLivePrices();
+        renderLivePrices();
+    } catch (e) {
+        console.error('Failed to refresh prices:', e);
+    }
+}
+
+function renderWeather() {
+    const grid = document.getElementById('weatherGrid');
+    const colors = ['var(--neon-green)', 'var(--ocean-blue)', 'var(--sunset-orange)', 'var(--purple-vivid)'];
+    const icons = ['⛅', '🌧️', '☀️', '🌤️'];
+    
+    grid.innerHTML = weatherData.map((w, i) => `
+        <div class="weather-card" style="border-color:${colors[i % colors.length]}">
+            <div class="weather-location">
+                <div class="weather-district">${w.region}</div>
+                <div>${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+            </div>
+            <div class="weather-main">
+                <div class="weather-icon-large">${icons[i % icons.length]}</div>
+                <div>
+                    <div class="weather-temp">${w.temp}°C</div>
+                    <div style="font-weight:600;font-size:1.05rem;color:#555;">${w.condition}</div>
+                </div>
+            </div>
+            <div class="weather-details">
+                <div><div style="font-size:0.78rem;color:#888;margin-bottom:4px;">Humidity</div><div class="weather-detail-value">${w.humidity}%</div></div>
+                <div><div style="font-size:0.78rem;color:#888;margin-bottom:4px;">Rain</div><div class="weather-detail-value">${w.rain}%</div></div>
+                <div><div style="font-size:0.78rem;color:#888;margin-bottom:4px;">Wind</div><div class="weather-detail-value">${w.wind} km/h</div></div>
+            </div>
+            <div class="weather-advisory">
+                <div style="font-weight:700;color:#F57F17;margin-bottom:4px;"><i class="fas fa-exclamation-triangle"></i> Advisory</div>
+                <div style="font-size:0.88rem;color:#555;line-height:1.5;">${w.advisory}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateCategoryCounts() {
+    const counts = { grains: 0, fruits: 0, vegetables: 0, tubers: 0, legumes: 0, coffee: 0 };
+    productsData.forEach(p => {
+        const cat = (p.category || '').toLowerCase();
+        if (cat.includes('grains') || cat.includes('cereals')) counts.grains++;
+        else if (cat.includes('fruits')) counts.fruits++;
+        else if (cat.includes('vegetables')) counts.vegetables++;
+        else if (cat.includes('tubers') || cat.includes('roots')) counts.tubers++;
+        else if (cat.includes('legumes') || cat.includes('pulses')) counts.legumes++;
+        else if (cat.includes('coffee')) counts.coffee++;
+    });
+    document.getElementById('grainCount').textContent = counts.grains;
+    document.getElementById('fruitCount').textContent = counts.fruits;
+    document.getElementById('vegCount').textContent = counts.vegetables;
+    document.getElementById('tuberCount').textContent = counts.tubers;
+    document.getElementById('legumeCount').textContent = counts.legumes;
+    document.getElementById('coffeeCount').textContent = counts.coffee;
+}
+
+function filterByCategory(category) {
+    selectedCategory = category;
+    renderProducts();
+    document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
+    showToast(`Showing ${categoryLabels[category] || category} products`);
+}
+
+function clearCategoryFilter() {
+    selectedCategory = null;
+    renderProducts();
+    showToast('Showing all products');
+}
+
+function applyFilters() { showToast('Filters applied!'); }
+function resetFilters() { showToast('Filters reset!'); }
+function sortProducts() { showToast('Sorting applied!'); }
+
+function performSearch() {
+    const q = document.getElementById('searchInput').value;
+    const district = document.getElementById('locationSelect').value;
+    showToast(`Searching for "${q}" in ${district || 'all districts'}...`);
+    document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleWishlist(btn) {
+    const icon = btn.querySelector('i');
+    if (icon.classList.contains('far')) {
+        icon.classList.remove('far');
+        icon.classList.add('fas');
+        showToast('Added to wishlist!');
+    } else {
+        icon.classList.remove('fas');
+        icon.classList.add('far');
+        showToast('Removed from wishlist');
+    }
+}
+
+function openChat() {
+    openDirectChat(selectedContact.name, '');
+}
+
+function closeChat() {
+    document.getElementById('chatModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function openNegotiation() {
+    if (!API.getToken()) {
+        showToast('Please login to create bulk inquiry. Redirecting to auth...');
+        window.location.href = '/auth';
+        return;
+    }
+    document.getElementById('negotiationModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeNegotiation() {
+    document.getElementById('negotiationModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+async function sendMessage() {
+    if (!API.getToken()) {
+        showToast('Please login to send messages');
+        window.location.href = '/auth';
+        return;
+    }
+    
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    
+    if (!text) return;
+    
+    try {
+        const result = await API.sendMessage({ text });
+        addMessage(text, true);
+        input.value = '';
+        
+        setTimeout(() => {
+            addMessage(result.replyMessage?.text || 'Thank you for your message!', false);
+        }, 1000);
+    } catch (e) {
+        showToast('Failed to send. Login may have expired.');
+        console.error(e);
+    }
+}
+
+function addMessage(text, isSent) {
+    const area = document.getElementById('messagesArea');
+    const time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    area.innerHTML += `
+        <div class="message ${isSent ? 'message-sent' : 'message-received'}">
+            ${!isSent ? `<div class="message-sender">${selectedContact.name}</div>` : ''}
+            <div class="message-text">${text}</div>
+            <div class="message-time">${time}</div>
+        </div>
+    `;
+    area.scrollTop = area.scrollHeight;
+}
+
+function handleMessageKey(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+async function submitBulkInquiry() {
+    if (!API.getToken()) {
+        showToast('Please login to submit inquiry');
+        return;
+    }
+    
+    const payload = {
+        product: document.getElementById('bulkProduct').value,
+        quantity: Number(document.getElementById('bulkQuantity').value),
+        targetPrice: Number(document.getElementById('bulkTargetPrice').value),
+        location: document.getElementById('bulkLocation').value,
+        notes: document.getElementById('bulkNotes').value
+    };
+    
+    if (!payload.product || !payload.quantity || !payload.targetPrice || !payload.location) {
+        showToast('Please fill in all required fields!');
+        return;
+    }
+    
+    try {
+        await API.submitInquiry(payload);
+        showToast('Bulk inquiry submitted successfully!');
+        closeNegotiation();
+        
+        document.getElementById('bulkProduct').value = '';
+        document.getElementById('bulkQuantity').value = '';
+        document.getElementById('bulkTargetPrice').value = '';
+        document.getElementById('bulkLocation').value = '';
+        document.getElementById('bulkNotes').value = '';
+    } catch (e) {
+        showToast('Failed to submit inquiry: ' + e.message);
+    }
+}
+
+function closeModal() {
+    const modal = document.querySelector('.modal-overlay.active');
+    if (modal) {
+        modal.remove();
+        document.body.style.overflow = '';
+    }
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toastNotification');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+
+function startActivityCounters() {
+    setInterval(() => {
+        const products = document.getElementById('productsCount');
+        const buyers = document.getElementById('buyersCount');
+        const deals = document.getElementById('dealsCount');
+        const chats = document.getElementById('chatsCount');
+        
+        if (products) {
+            let n = parseInt(products.textContent.replace(',', ''));
+            n += Math.floor(Math.random() * 3) - 1;
+            products.textContent = Math.max(0, n).toLocaleString();
+        }
+        if (buyers) {
+            let n = parseInt(buyers.textContent.replace(',', ''));
+            n += Math.floor(Math.random() * 10) - 4;
+            buyers.textContent = n.toLocaleString();
+        }
+        if (deals) {
+            let n = parseInt(deals.textContent);
+            n += Math.floor(Math.random() * 3);
+            deals.textContent = n;
+        }
+        if (chats) {
+            let n = parseInt(chats.textContent);
+            n += Math.floor(Math.random() * 2);
+            chats.textContent = n;
+        }
+    }, 5000);
+}
+
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeChat();
+        closeNegotiation();
+    }
+});
+function openGuestCheckout(p){
+    if(typeof p === "string") p = JSON.parse(p);
+    const id = String(p._id||p.id);
+    const price = Number(p.price||0);
+    const unit = p.unit||"kg";
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay active";
+    modal.id = "guestCheckoutModal";
+    const html = `<div class="pd-modal"><div style="padding:24px"><h3 style="font-family:Poppins,sans-serif;font-size:1.4rem;font-weight:900;color:var(--dark-bg);margin-bottom:6px"><i class="fas fa-shopping-cart" style="color:var(--sunset-orange)"></i> Quick Checkout</h3><p style="color:var(--text-medium);font-size:0.9rem;margin-bottom:16px">No account needed &mdash; just fill in your details</p><div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:12px;padding:14px;margin-bottom:16px;border-left:4px solid var(--sunset-orange)"><div style="font-weight:700;font-size:1rem;color:var(--dark-bg)">${p.name}</div><div style="font-size:0.85rem;color:var(--text-medium)">UGX ${price.toLocaleString()} / ${unit}</div></div><div style="display:flex;flex-direction:column;gap:12px"><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Your Name *</label><input type="text" id="guest-name" style="width:100%;padding:10px 14px;border:1px solid #D1D5DB;border-radius:8px;font-size:14px;outline:none" placeholder="Full name"></div><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Phone Number *</label><input type="text" id="guest-phone" style="width:100%;padding:10px 14px;border:1px solid #D1D5DB;border-radius:8px;font-size:14px;outline:none" placeholder="e.g. 0772123456"></div><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Email (optional)</label><input type="email" id="guest-email" style="width:100%;padding:10px 14px;border:1px solid #D1D5DB;border-radius:8px;font-size:14px;outline:none" placeholder="your@email.com"></div><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Quantity (${unit}) *</label><input type="number" id="guest-qty" min="1" style="width:100%;padding:10px 14px;border:1px solid #D1D5DB;border-radius:8px;font-size:14px;outline:none" placeholder="e.g. 50"></div><div id="guest-total" style="background:#F0FDF4;border-radius:10px;padding:12px;text-align:center;display:none"><p style="font-size:12px;color:#6B7280;margin-bottom:2px">Total Amount</p><p id="guest-total-val" style="font-size:22px;font-weight:900;color:#059669"></p></div><div><label style="font-size:13px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Payment Method</label><select id="guest-method" style="width:100%;padding:10px 14px;border:1px solid #D1D5DB;border-radius:8px;font-size:14px;outline:none"><option value="mobile_money">&#128241; Mobile Money (MTN/Airtel)</option><option value="bank">&#127970; Bank Transfer</option></select></div></div><div style="display:flex;gap:8px;margin-top:20px"><button onclick="submitGuestOrder()" class="btn btn-primary" style="flex:1;justify-content:center"><i class="fas fa-check-circle"></i> Place Order</button><button onclick="this.closest(.modal-overlay).remove();document.body.style.overflow=\x27\x27" class="btn btn-outline" style="flex:1;justify-content:center">Cancel</button></div></div></div>`;
+    modal.innerHTML = html;
+    window._guestProduct = {id, productName: p.name, pricePerUnit: price};
+    document.body.appendChild(modal);
+    document.body.style.overflow = "hidden";
+    setTimeout(()=>{
+        const qtyEl = document.getElementById("guest-qty");
+        if(qtyEl) qtyEl.addEventListener("input", function(){
+            const qty = Number(this.value);
+            const total = document.getElementById("guest-total");
+            const totalVal = document.getElementById("guest-total-val");
+            if(qty>0){total.style.display="block";totalVal.textContent="UGX "+(qty*price).toLocaleString();}
+            else total.style.display="none";
+        });
+    }, 100);
+}
+
+async function submitGuestOrder(){
+    const guestName = (document.getElementById("guest-name")||{}).value||"";
+    const phone = (document.getElementById("guest-phone")||{}).value||"";
+    const guestEmail = (document.getElementById("guest-email")||{}).value||"";
+    const qty = Number((document.getElementById("guest-qty")||{}).value||0);
+    const method = (document.getElementById("guest-method")||{}).value||"mobile_money";
+    const {id: productId, productName, pricePerUnit} = window._guestProduct||{};
+    if(!guestName.trim()){ showToast("Please enter your name"); return; }
+    if(!phone.trim()){ showToast("Please enter your phone number"); return; }
+    if(!qty||qty<1){ showToast("Please enter a valid quantity"); return; }
+    try{
+        await API.placeOrder({productId, productName, quantity:qty, pricePerUnit, method, phone:phone.trim(), guestName:guestName.trim(), guestEmail:guestEmail.trim()});
+        const m = document.getElementById("guestCheckoutModal");
+        if(m) m.remove();
+        document.body.style.overflow = "";
+        showToast("Order placed! We will contact you at "+phone.trim()+" shortly.");
+    }catch(e){ showToast("Failed: "+e.message); }
+}
+</script>
+
+<div id="rt-notif-container"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realtime.js"></script>
+<script>RT.connect();</script>
+</body>
+</html>
