@@ -26,7 +26,7 @@ function adminRouter(state) {
     if (isVerified !== undefined) updates.isVerified = Boolean(isVerified);
     if (!Object.keys(updates).length) return res.status(400).json({ error: 'No fields to update' });
     try {
-      const user = await User.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true, runValidators: true }).select('-passwordHash');
+      const user = await User.findByIdAndUpdate(req.params.id, { $set: updates }, { returnDocument: 'after', runValidators: true }).select('-passwordHash');
       if (!user) return res.status(404).json({ error: 'User not found' });
       return res.json(user);
     } catch (e) {
@@ -77,7 +77,7 @@ function adminRouter(state) {
       }
     }
     try {
-      const product = await Product.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });
+      const product = await Product.findByIdAndUpdate(req.params.id, { $set: updates }, { returnDocument: 'after' });
       if (!product) return res.status(404).json({ error: 'Product not found' });
       return res.json(product);
     } catch (e) {
@@ -108,7 +108,7 @@ function adminRouter(state) {
     if (!status || !['pending','processing','completed','cancelled'].includes(status))
       return res.status(400).json({ error: 'Valid status required: pending, processing, completed, cancelled' });
 
-    const inquiry = await BulkInquiry.findByIdAndUpdate(req.params.id, { $set: { status } }, { new: true });
+    const inquiry = await BulkInquiry.findByIdAndUpdate(req.params.id, { $set: { status } }, { returnDocument: 'after' });
     if (!inquiry) return res.status(404).json({ error: 'Inquiry not found' });
 
     if (status === 'completed') {
@@ -141,7 +141,7 @@ function adminRouter(state) {
       trend: Number(price) > existing.price ? 'up' : 'down',
       change: Math.abs(((Number(price) - existing.price) / existing.price) * 100).toFixed(1),
       lastUpdated: new Date()
-    }, { new: true });
+    }, { returnDocument: 'after' });
 
     if (state.io) state.io.emit('prices:update', await LivePrice.find().lean());
     return res.json(updated);
@@ -186,7 +186,7 @@ function adminRouter(state) {
     if (category) updates.category = String(category).trim();
     if (notes !== undefined) updates.notes = String(notes).trim();
     if (status) updates.status = String(status).trim();
-    const t = await Transaction.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });
+    const t = await Transaction.findByIdAndUpdate(req.params.id, { $set: updates }, { returnDocument: 'after' });
     if (!t) return res.status(404).json({ error: 'Transaction not found' });
     return res.json(t);
   });

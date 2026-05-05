@@ -15,7 +15,7 @@ function paymentsRouter(state) {
       const inquiry = await BulkInquiry.findByIdAndUpdate(
         inquiryId,
         { $set: { status: "processing", notes: `Payment: ${method} | Phone: ${phone} | Amount: UGX ${amount}` } },
-        { new: true }
+        { returnDocument: 'after' }
       );
       if (!inquiry) return res.status(404).json({ error: "Inquiry not found" });
       return res.json({ message: "Payment initiated", inquiry });

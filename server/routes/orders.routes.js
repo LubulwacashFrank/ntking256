@@ -55,7 +55,7 @@ function ordersRouter(state) {
 
   // POST /api/orders/:id/confirm — admin confirms
   router.post('/:id/confirm', requireAuth, requireRole('admin'), async (req, res) => {
-    const order = await Order.findByIdAndUpdate(req.params.id, { status: 'confirmed' }, { new: true });
+    const order = await Order.findByIdAndUpdate(req.params.id, { status: 'confirmed' }, { returnDocument: 'after' });
     if (!order) return res.status(404).json({ error: 'Order not found' });
     if (order.buyerId) {
       notify(state, {
@@ -71,7 +71,7 @@ function ordersRouter(state) {
 
   // POST /api/orders/:id/reject — admin rejects
   router.post('/:id/reject', requireAuth, requireRole('admin'), async (req, res) => {
-    const order = await Order.findByIdAndUpdate(req.params.id, { status: 'rejected' }, { new: true });
+    const order = await Order.findByIdAndUpdate(req.params.id, { status: 'rejected' }, { returnDocument: 'after' });
     if (!order) return res.status(404).json({ error: 'Order not found' });
     if (order.buyerId) {
       notify(state, {
