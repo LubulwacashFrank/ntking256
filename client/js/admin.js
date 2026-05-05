@@ -13,38 +13,42 @@ const API = {
     try { return JSON.parse(atob(token.split(".")[1])); } catch(e) { return null; }
   },
 
+  authHeaders() {
+    return { "Content-Type": "application/json", Authorization: "Bearer " + this.getToken() };
+  },
+
   async getUsers() {
-    const response = await fetch(`${API_BASE}/admin/users`);
+    const response = await fetch(`${API_BASE}/admin/users`, { headers: this.authHeaders() });
     if (!response.ok) throw new Error("Failed to fetch users");
     return response.json();
   },
 
   async getProducts() {
-    const response = await fetch(`${API_BASE}/admin/products`);
+    const response = await fetch(`${API_BASE}/admin/products`, { headers: this.authHeaders() });
     if (!response.ok) throw new Error("Failed to fetch products");
     return response.json();
   },
 
   async getInquiries() {
-    const response = await fetch(`${API_BASE}/admin/inquiries`);
+    const response = await fetch(`${API_BASE}/admin/inquiries`, { headers: this.authHeaders() });
     if (!response.ok) throw new Error("Failed to fetch inquiries");
     return response.json();
   },
 
   async getPrices() {
-    const response = await fetch(`${API_BASE}/admin/prices`);
+    const response = await fetch(`${API_BASE}/admin/prices`, { headers: this.authHeaders() });
     if (!response.ok) throw new Error("Failed to fetch prices");
     return response.json();
   },
 
   async getStats() {
-    const response = await fetch(`${API_BASE}/admin/stats`);
+    const response = await fetch(`${API_BASE}/admin/stats`, { headers: this.authHeaders() });
     if (!response.ok) throw new Error("Failed to fetch stats");
     return response.json();
   },
 
   async getTransactions() {
-    const response = await fetch(`${API_BASE}/admin/transactions`);
+    const response = await fetch(`${API_BASE}/admin/transactions`, { headers: this.authHeaders() });
     if (!response.ok) throw new Error("Failed to fetch transactions");
     return response.json();
   },
@@ -52,9 +56,7 @@ const API = {
   async createTransaction(payload) {
     const response = await fetch(`${API_BASE}/admin/transactions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.authHeaders(),
       body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error("Failed to create transaction");
@@ -64,9 +66,7 @@ const API = {
   async updateTransaction(id, updates) {
     const response = await fetch(`${API_BASE}/admin/transactions/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.authHeaders(),
       body: JSON.stringify(updates)
     });
     if (!response.ok) throw new Error("Failed to update transaction");
@@ -76,9 +76,7 @@ const API = {
   async createProduct(product) {
     const response = await fetch(`${API_BASE}/admin/products`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.authHeaders(),
       body: JSON.stringify(product)
     });
     if (!response.ok) throw new Error("Failed to create product");
@@ -88,9 +86,7 @@ const API = {
   async updateProduct(id, updates) {
     const response = await fetch(`${API_BASE}/admin/products/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.authHeaders(),
       body: JSON.stringify(updates)
     });
     if (!response.ok) throw new Error("Failed to update product");
@@ -99,7 +95,8 @@ const API = {
 
   async deleteProduct(id) {
     const response = await fetch(`${API_BASE}/admin/products/${id}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: this.authHeaders()
     });
     if (!response.ok) throw new Error("Failed to delete product");
     return response.json();
@@ -108,9 +105,7 @@ const API = {
   async updateUser(id, updates) {
     const response = await fetch(`${API_BASE}/admin/users/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.authHeaders(),
       body: JSON.stringify(updates)
     });
     if (!response.ok) throw new Error("Failed to update user");
@@ -119,7 +114,8 @@ const API = {
 
   async deleteUser(id) {
     const response = await fetch(`${API_BASE}/admin/users/${id}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: this.authHeaders()
     });
     if (!response.ok) throw new Error("Failed to delete user");
     return response.json();
@@ -128,9 +124,7 @@ const API = {
   async updateInquiry(id, status) {
     const response = await fetch(`${API_BASE}/admin/inquiries/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.authHeaders(),
       body: JSON.stringify({ status })
     });
     if (!response.ok) throw new Error("Failed to update inquiry");
@@ -140,9 +134,7 @@ const API = {
   async updatePrice(crop, price) {
     const response = await fetch(`${API_BASE}/admin/prices/${encodeURIComponent(crop)}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.authHeaders(),
       body: JSON.stringify({ price })
     });
     if (!response.ok) throw new Error("Failed to update price");
@@ -167,9 +159,7 @@ const API = {
   async createBroadcast(message, type = "info") {
     const response = await fetch(`${API_BASE}/admin/broadcast`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.authHeaders(),
       body: JSON.stringify({ message, type })
     });
     if (!response.ok) throw new Error("Failed to create broadcast");
@@ -177,14 +167,15 @@ const API = {
   },
 
   async getBroadcasts() {
-    const response = await fetch(`${API_BASE}/admin/broadcast`);
+    const response = await fetch(`${API_BASE}/admin/broadcast`, { headers: this.authHeaders() });
     if (!response.ok) throw new Error("Failed to fetch broadcasts");
     return response.json();
   },
 
   async deleteBroadcast(id) {
     const response = await fetch(`${API_BASE}/admin/broadcast/${id}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: this.authHeaders()
     });
     if (!response.ok) throw new Error("Failed to delete broadcast");
     return response.json();
@@ -221,6 +212,11 @@ let transactionsData = [];
 
 // ==================== INITIALIZATION ====================
 document.addEventListener("DOMContentLoaded", async function () {
+  // Redirect to auth if no token
+  if (!API.getToken()) {
+    window.location.href = "/auth";
+    return;
+  }
   try {
     await loadAllData();
   } catch (e) {
@@ -796,9 +792,31 @@ async function updateOrderStatus(orderId, newStatus) {
   } catch (err) { showToast(err.message, "error"); }
 }
 
-  document.getElementById("totalOutgoing").textContent = `UGX ${financeData.totalOutgoing.toLocaleString()}`;
-  document.getElementById("netFlow").textContent = `UGX ${financeData.netFlow.toLocaleString()}`;
-  document.getElementById("transactionCount").textContent = transactionsData.length;
+// ==================== TRANSACTIONS ====================
+function renderTransactionsTable() {
+  const el = id => document.getElementById(id);
+  if (el("totalIncome")) el("totalIncome").textContent = `UGX ${(financeData.totalIncome || 0).toLocaleString()}`;
+  if (el("totalOutgoing")) el("totalOutgoing").textContent = `UGX ${(financeData.totalOutgoing || 0).toLocaleString()}`;
+  if (el("netFlow")) el("netFlow").textContent = `UGX ${(financeData.netFlow || 0).toLocaleString()}`;
+  if (el("transactionCount")) el("transactionCount").textContent = transactionsData.length;
+
+  const tbody = document.getElementById("transactionsTableBody");
+  if (!tbody) return;
+  if (!transactionsData.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#9CA3AF">No transactions yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = transactionsData.map(t => `
+    <tr>
+      <td><span class="status-badge ${t.type === 'income' ? 'status-active' : 'status-inactive'}">${t.type}</span></td>
+      <td><strong>UGX ${Number(t.amount).toLocaleString()}</strong></td>
+      <td>${t.party || '-'}</td>
+      <td>${t.category || '-'}</td>
+      <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString() : '-'}</td>
+      <td>${t.notes || '-'}</td>
+      <td><span class="status-badge ${t.status === 'completed' ? 'status-active' : 'status-pending'}">${t.status || 'completed'}</span></td>
+    </tr>
+  `).join('');
 }
 
 function openTransactionModal() {
