@@ -7,6 +7,11 @@ const API = {
   getToken() {
     return localStorage.getItem("agro_token") || "";
   },
+  getUser() {
+    const token = this.getToken();
+    if (!token) return null;
+    try { return JSON.parse(atob(token.split(".")[1])); } catch(e) { return null; }
+  },
 
   async getUsers() {
     const response = await fetch(`${API_BASE}/admin/users`);
@@ -227,49 +232,36 @@ document.addEventListener("DOMContentLoaded", async function () {
 // ==================== DATA LOADING ====================
 async function loadAllData() {
   showToast("Loading data...");
-  try {
-    const [stats, users, products, inquiries, prices, broadcasts, transactions] = await Promise.all([
-      API.getStats(),
-      API.getUsers(),
-      API.getProducts(),
-      API.getInquiries(),
-      API.getPrices(),
-      API.getBroadcasts(),
-      API.getTransactions()
-    ]);
-
-    statsData = stats;
-    usersData = users;
-    productsData = products;
-    inquiriesData = inquiries;
-    pricesData = prices;
-    broadcastData = broadcasts;
-    financeData = { totalIncome: stats.totalIncome || 0, totalOutgoing: stats.totalOutgoing || 0, netFlow: stats.netFlow || 0 };
-    transactionsData = transactions;
-
-    // Try to load chat messages (optional)
-    try {
-      const chatRes = await fetch("/api/chat/messages");
-      if (chatRes.ok) {
-        chatData = await chatRes.json();
-      }
-    } catch (e) { /* noop */ }
-
-    renderDashboard();
-    renderProductsTable();
-    renderFarmersTable();
-    renderBuyersTable();
-    renderOrdersTable();
-    renderTransactionsTable();
-    renderChatConversations();
-    renderPricesTable();
-    renderBroadcasts();
-    initCharts();
-
-    showToast("Data loaded successfully!");
-  } catch (err) {
-    showToast(err.message, true);
-  }
+  const safe = async (fn, fallback) => { try { return await fn(); } catch(e) { console.error(e.message); return fallback; } };
+  const [stats, users, products, inquiries, prices, broadcasts, transactions] = await Promise.all([
+    safe(() => API.getStats(), {}),
+    safe(() => API.getUsers(), []),
+    safe(() => API.getProducts(), []),
+    safe(() => API.getInquiries(), []),
+    safe(() => API.getPrices(), []),
+    safe(() => API.getBroadcasts(), []),
+    safe(() => API.getTransactions(), [])
+  ]);
+  statsData = stats;
+  usersData = users;
+  productsData = products;
+  inquiriesData = inquiries;
+  pricesData = prices;
+  broadcastData = broadcasts;
+  financeData = { totalIncome: stats.totalIncome || 0, totalOutgoing: stats.totalOutgoing || 0, netFlow: stats.netFlow || 0 };
+  transactionsData = transactions;
+  try { const r = await fetch("/api/chat/messages"); if (r.ok) chatData = await r.json(); } catch(e) {}
+  renderDashboard();
+  renderProductsTable();
+  renderFarmersTable();
+  renderBuyersTable();
+  renderOrdersTable();
+  renderTransactionsTable();
+  renderChatConversations();
+  renderPricesTable();
+  renderBroadcasts();
+  initCharts();
+  showToast("Data loaded successfully!");
 }
 
 // ==================== DASHBOARD ====================
