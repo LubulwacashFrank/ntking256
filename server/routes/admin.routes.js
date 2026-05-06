@@ -125,7 +125,12 @@ function adminRouter(state) {
   // ── PRICES ─────────────────────────────────────────────
   router.get('/prices', async (req, res) => {
     const prices = await LivePrice.find().sort({ crop: 1 }).lean();
-    return res.json(prices);
+    // Format lastUpdated as string for frontend
+    const formatted = prices.map(p => ({
+      ...p,
+      lastUpdated: p.lastUpdated ? new Date(p.lastUpdated).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'Just now'
+    }));
+    return res.json(formatted);
   });
 
   router.put('/prices/:crop', async (req, res) => {
