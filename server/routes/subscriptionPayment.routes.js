@@ -4,7 +4,8 @@ const {
   verifyPayment, 
   getSupportedNetworks,
   detectNetwork,
-  formatPhoneNumber 
+  formatPhoneNumber,
+  isPaymentConfigured
 } = require('../services/paymentService');
 const Subscription = require('../models/Subscription');
 const { User } = require('../models/User');
@@ -17,8 +18,26 @@ function subscriptionPaymentRouter() {
     res.json({ networks: getSupportedNetworks() });
   });
 
+  // Check if payment gateway is configured
+  router.get('/status', (req, res) => {
+    res.json({ 
+      configured: isPaymentConfigured(),
+      message: isPaymentConfigured() 
+        ? 'Payment gateway is ready' 
+        : 'Payment gateway not configured. Add Flutterwave API keys to .env file.'
+    });
+  });
+
   // Initiate subscription payment
   router.post('/subscription/initiate', async (req, res) => {
+    // Check if payment gateway is configured
+    if (!isPaymentConfigured()) {
+      return res.status(503).json({ 
+        error: 'Payment gateway not configured. Please contact administrator.',
+        configured: false
+      });
+    }
+
     const { userId, phone, email, fullname, subscriptionPlan } = req.body;
 
     if (!userId || !phone || !email || !fullname || !subscriptionPlan) {

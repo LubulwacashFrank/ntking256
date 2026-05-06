@@ -116,7 +116,7 @@
             </label>
           </div>
           <div style="font-size:.78rem;color:#047857;background:#D1FAE5;border-radius:8px;padding:10px;margin-top:10px">
-            <i class="fas fa-check-circle"></i> Payment will be verified by admin before account activation.
+            <i class="fas fa-check-circle"></i> <span id="paymentStatusMsg">Checking payment gateway...</span>
           </div>
         </div>
         <button type="submit" class="btn-submit" id="regBtn"><i class="fas fa-user-plus"></i> Create Account</button>
@@ -149,6 +149,27 @@
 
   <script src="/js/api.js"></script>
   <script>
+    // Check payment gateway status on page load
+    async function checkPaymentStatus() {
+      try {
+        const res = await fetch('/api/subscription-payment/status');
+        const data = await res.json();
+        const msgEl = document.getElementById('paymentStatusMsg');
+        if (data.configured) {
+          msgEl.innerHTML = '<i class="fas fa-check-circle"></i> Mobile money payment ready (MTN, Airtel, Vodafone)';
+          msgEl.parentElement.style.background = '#D1FAE5';
+          msgEl.parentElement.style.color = '#047857';
+        } else {
+          msgEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Payment gateway not configured. Manual verification required.';
+          msgEl.parentElement.style.background = '#FEF3C7';
+          msgEl.parentElement.style.color = '#92400E';
+        }
+      } catch (e) {
+        console.error('Payment status check failed:', e);
+      }
+    }
+    checkPaymentStatus();
+
     function toggleOrgField() {
       const role = document.getElementById('regRole').value;
       document.getElementById('orgGroup').style.display = role === 'bulk_buyer' ? 'block' : 'none';
@@ -203,6 +224,26 @@
         }
         const result = await API.register(payload);
         if (result.requiresPayment) {
+          // Check if payment gateway is configured
+          const statusRes = await fetch('/api/subscription-payment/status');
+          const statusData = await statusRes.json();
+          
+          if (!statusData.configured) {
+            // Payment not configured - show manual verification message
+            document.getElementById('registerForm').style.display = 'none';
+            const box = document.getElementById('pendingBox');
+            document.getElementById('pendingMsg').innerHTML = `
+              <strong>Registration Successful!</strong><br><br>
+              Your farmer account has been created.<br><br>
+              <strong>Subscription: ${result.payment.plan}</strong><br>
+              <strong>Amount: UGX ${result.payment.amount.toLocaleString()}</strong><br><br>
+              Please contact admin to complete payment and activate your account.<br><br>
+              <em>Note: Automatic mobile money payment is currently unavailable.</em>
+            `;
+            box.style.display = 'block';
+            return;
+          }
+          
           // Initiate payment
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing payment...';
           const paymentResult = await fetch('/api/subscription-payment/subscription/initiate', {

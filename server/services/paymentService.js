@@ -1,9 +1,27 @@
 const Flutterwave = require('flutterwave-node-v3');
 
-const flw = new Flutterwave(
-  process.env.FLW_PUBLIC_KEY,
-  process.env.FLW_SECRET_KEY
-);
+// Check if Flutterwave keys are configured
+const FLW_PUBLIC_KEY = process.env.FLW_PUBLIC_KEY;
+const FLW_SECRET_KEY = process.env.FLW_SECRET_KEY;
+
+const isConfigured = FLW_PUBLIC_KEY && 
+                     FLW_SECRET_KEY && 
+                     !FLW_PUBLIC_KEY.includes('XXXXX') && 
+                     !FLW_SECRET_KEY.includes('XXXXX');
+
+let flw = null;
+
+if (isConfigured) {
+  try {
+    flw = new Flutterwave(FLW_PUBLIC_KEY, FLW_SECRET_KEY);
+    console.log('✅ Flutterwave payment gateway initialized');
+  } catch (error) {
+    console.error('❌ Flutterwave initialization failed:', error.message);
+  }
+} else {
+  console.warn('⚠️  Flutterwave not configured. Add FLW_PUBLIC_KEY and FLW_SECRET_KEY to .env file.');
+  console.warn('⚠️  Payment features will be disabled until configured.');
+}
 
 /**
  * Initiate Mobile Money Payment
@@ -17,6 +35,13 @@ const flw = new Flutterwave(
  * @returns {Promise<Object>} Payment response
  */
 async function initiateMobileMoneyPayment(payload) {
+  if (!flw) {
+    return {
+      success: false,
+      error: 'Payment gateway not configured. Please contact administrator.'
+    };
+  }
+  
   try {
     const paymentPayload = {
       tx_ref: payload.txRef,
@@ -53,6 +78,14 @@ async function initiateMobileMoneyPayment(payload) {
  * @returns {Promise<Object>} Verification response
  */
 async function verifyPayment(transactionId) {
+  if (!flw) {
+    return {
+      success: false,
+      verified: false,
+      error: 'Payment gateway not configured'
+    };
+  }
+  
   try {
     const response = await flw.Transaction.verify({ id: transactionId });
     
@@ -135,5 +168,6 @@ module.exports = {
   verifyPayment,
   getSupportedNetworks,
   detectNetwork,
-  formatPhoneNumber
+  formatPhoneNumber,
+  isPaymentConfigured: () => isConfigured
 };
