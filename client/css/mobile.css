@@ -1,0 +1,200 @@
+/* Mobile Responsive Styles for Agro Tech Connect */
+
+/* Ensure proper viewport scaling */
+@viewport {
+    width: device-width;
+    zoom: 1.0;
+}
+
+/* Base mobile adjustments */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    /* Make all containers full width on mobile */
+    .container, .card, .product-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Stack grids vertically */
+    .stats-grid, .dashboard-grid, .products-grid, [style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* Make buttons full width */
+    .btn, .btn-primary, .btn-secondary, button {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    /* Form inputs full width */
+    .form-input, .form-select, .form-textarea, input, select, textarea {
+        width: 100% !important;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    /* Tables scroll horizontally */
+    .data-table, table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+
+    /* Reduce padding on mobile */
+    .page, section, main {
+        padding: 12px !important;
+    }
+
+    /* Stack flex containers */
+    [style*="display:flex"] {
+        flex-wrap: wrap !important;
+    }
+
+    /* Hide sidebar by default on mobile */
+    #sidebar, .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    #sidebar.open, .sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Show hamburger menu */
+    .mobile-toggle, [onclick*="toggleSidebar"] {
+        display: block !important;
+    }
+
+    /* Adjust main content margin */
+    #main, .main-content {
+        margin-left: 0 !important;
+    }
+
+    /* Modal adjustments */
+    .modal, .modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 10px !important;
+    }
+
+    /* Product cards */
+    .product-card {
+        margin-bottom: 16px;
+    }
+
+    /* Stat cards */
+    .stat-card {
+        padding: 16px !important;
+    }
+
+    /* Header adjustments */
+    header, .top-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 12px !important;
+    }
+
+    /* Search boxes */
+    .search-box, [type="search"] {
+        width: 100% !important;
+        margin-bottom: 8px;
+    }
+
+    /* Action buttons in tables */
+    .action-btns {
+        flex-direction: column !important;
+        gap: 4px !important;
+    }
+
+    /* Chat interface */
+    #chat-messages, .chat-area {
+        height: 50vh !important;
+    }
+
+    /* Reduce font sizes */
+    h1 { font-size: 24px !important; }
+    h2 { font-size: 20px !important; }
+    h3 { font-size: 18px !important; }
+    h4 { font-size: 16px !important; }
+
+    /* Touch-friendly tap targets */
+    a, button, .nav-link, .action-btn {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Prevent text overflow */
+    * {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Images responsive */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+    }
+
+    .stat-value {
+        font-size: 20px !important;
+    }
+
+    .card-title, .modal-title {
+        font-size: 16px !important;
+    }
+
+    /* Even smaller padding */
+    .page, section, main {
+        padding: 8px !important;
+    }
+
+    /* Stack all button groups */
+    .btn-group, [style*="gap"] {
+        flex-direction: column !important;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    #sidebar {
+        width: 200px;
+    }
+
+    .modal {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    #sidebar {
+        width: 220px;
+    }
+
+    #main {
+        margin-left: 220px;
+    }
+}
