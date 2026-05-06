@@ -1,0 +1,33 @@
+INSTRUCTIONS: Update Your .env File with REAL Flutterwave Keys
+
+1. Get your keys from: https://dashboard.flutterwave.com/settings/apis
+
+2. Open your .env file
+
+3. Replace these lines:
+
+   FROM (current fake keys):
+   FLW_PUBLIC_KEY=FLWPUBK_TEST-SANDBOXDEMOKEY123456789-X
+   FLW_SECRET_KEY=FLWSECK_TEST-SANDBOXDEMOKEY123456789-X
+   FLW_ENCRYPTION_KEY=FLWSECK_TEST-SANDBOXDEMOKEY123456789-X
+
+   TO (your real keys from Flutterwave):
+   FLW_PUBLIC_KEY=FLWPUBK_TEST-paste-your-real-public-key-here
+   FLW_SECRET_KEY=FLWSECK_TEST-paste-your-real-secret-key-here
+   FLW_ENCRYPTION_KEY=FLWSECK_TEST-paste-your-real-encryption-key-here
+
+4. Save the .env file
+
+5. Restart your server:
+   npm start
+
+6. Test at: http://localhost:3000/auth
+
+7. You should now see "Mobile money payment ready (MTN, Airtel, Vodafone)"
+
+8. Register as farmer with your real phone number and you'll get payment prompt!
+
+---
+
+IMPORTANT: The keys must be REAL keys from Flutterwave dashboard.
+Demo/fake keys will NOT work!
