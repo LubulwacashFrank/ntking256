@@ -370,6 +370,17 @@
             </div>
         </div>
 
+        <!-- My Orders -->
+        <div id="page-orders" class="page">
+            <div style="padding:24px">
+                <div style="background:#fff;border-radius:16px;border:1px solid #E5E7EB;padding:20px;margin-bottom:24px">
+                    <h3 style="font-weight:900;color:#111827;margin-bottom:16px">My Direct Orders</h3>
+                    <div id="orders-list" style="display:flex;flex-direction:column;gap:16px"></div>
+                    <div id="orders-empty" style="display:none;text-align:center;padding:32px;color:#9CA3AF">No orders yet</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Messages -->
         <!-- Messages -->
         <div id="page-messages" class="page">
@@ -451,6 +462,7 @@
         // Initialize
         populateFilters();
         loadProducts();
+        loadOrders();
 
         // Load real user from JWT
         const _user = API.getUser();
@@ -562,7 +574,7 @@
             grid.innerHTML = filtered.map(p => {
                 const id = String(p._id||p.id);
                 const price = Number(p.price||0);
-                const pJson = JSON.stringify(p).replace(/"/g,'&quot;');
+                const pForModal={_id:p._id||p.id,name:p.name,price:p.price,unit:p.unit};const pJson=JSON.stringify(pForModal).replace(/"/g,'&quot;');
                 return '<div class="product-card"><img src="'+(p.image||'https://picsum.photos/seed/'+id+'/400/200')+'" alt="'+p.name+'" style="width:100%;height:160px;object-fit:cover" onerror="this.src=\'https://picsum.photos/seed/'+id+'/400/200\'">'+'<div style="padding:16px"><h4 style="font-weight:700;color:#111827;margin-bottom:4px">'+p.name+'</h4><p style="font-size:12px;color:#6B7280;margin-bottom:8px">'+(p.category||'')+(p.district?' &bull; '+p.district:'')+'</p><p style="font-weight:700;color:#10B981;margin-bottom:12px">UGX '+price.toLocaleString()+'/'+(p.unit||'kg')+'</p><div style="display:flex;gap:8px"><button onclick="sendInquiry(\''+id+'\')" class="btn-secondary" style="flex:1;font-size:12px;padding:8px"><i class="fas fa-clipboard-list"></i> Inquiry</button><button onclick="openOrderModal('+pJson+')" class="btn-primary" style="flex:1;font-size:12px;padding:8px"><i class="fas fa-shopping-bag"></i> Order</button></div></div></div>';
             }).join('') || '<p style="text-align:center;color:#9CA3AF;padding:32px">No products found</p>';
         }
