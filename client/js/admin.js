@@ -1,4 +1,4 @@
-﻿// Admin Panel JavaScript - Full API Integration
+// Admin Panel JavaScript - Full API Integration
 // Covers CRUD for products, users, orders, and price management
 
 // ==================== API LAYER ====================
@@ -1287,30 +1287,47 @@ async function deleteReview(id) {
 async function loadAndRenderPayments() {
   const el = document.getElementById('payments-body');
   if (!el) return;
+  el.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#9CA3AF">Loading...</td></tr>';
   try {
     const token = API.getToken();
-    const res = await fetch('/api/payments', { headers: { Authorization: 'Bearer ' + token } });
+    const res = await fetch('/api/payments/all', { headers: { Authorization: 'Bearer ' + token } });
     const payments = res.ok ? await res.json() : [];
     if (!payments.length) {
-      el.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#9CA3AF">No payments yet</td></tr>';
+      el.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#9CA3AF">No payments submitted yet</td></tr>';
       return;
     }
-    const statusBg = { pending: '#FEF3C7', paid: '#D1FAE5', failed: '#FEE2E2' };
-    const statusColor = { pending: '#92400E', paid: '#065F46', failed: '#991B1B' };
-    el.innerHTML = payments.map(p => `<tr>
-      <td><strong>${p.reference || p._id?.slice(-8)}</strong></td>
-      <td>${p.buyerId?.name || 'Buyer'}</td>
-      <td>${p.inquiryId?.product || '-'} &bull; ${p.inquiryId?.quantity || 0}kg</td>
-      <td><strong>UGX ${Number(p.amount).toLocaleString()}</strong></td>
-      <td>${p.method === 'mobile_money' ? 'ðŸ“± Mobile Money' : 'ðŸ¦ Bank'} &bull; ${p.phone || '-'}</td>
-      <td><span style="background:${statusBg[p.status]||'#F3F4F6'};color:${statusColor[p.status]||'#374151'};padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">${p.status}</span></td>
-      <td>${p.createdAt ? new Date(p.createdAt).toLocaleDateString() : '-'}</td>
-      <td>
-        <div class="action-btns">
-          ${p.status === 'pending' ? `<button class="action-btn approve" title="Confirm" onclick="confirmPayment('${p._id}')"><i class="fas fa-check"></i></button><button class="action-btn delete" title="Reject" onclick="rejectPayment('${p._id}')"><i class="fas fa-times"></i></button>` : ''}
-        </div>
-      </td>
-    </tr>`).join('');
+    const sBg = { pending: '#FEF3C7', paid: '#D1FAE5', failed: '#FEE2E2' };
+    const sCol = { pending: '#92400E', paid: '#065F46', failed: '#991B1B' };
+    const sLbl = { pending: 'Pending Verification', paid: 'Confirmed', failed: 'Rejected' };
+    el.innerHTML = payments.map(p => {
+      const method = p.method === 'mobile_money' ? 'Mobile Money' : 'Bank Transfer';
+      const phone = p.phone ? ' - ' + p.phone : '';
+      const btns = p.status === 'pending'
+        ? '<button class="action-btn approve" title="Confirm" onclick="confirmPayment(\'' + p._id + '\')">' +
+          '<i class="fas fa-check"></i></button>' +
+          '<button class="action-btn delete" title="Reject" onclick="rejectPayment(\'' + p._id + '\')">' +
+          '<i class="fas fa-times"></i></button>'
+        : '';
+      const bg = sBg[p.status] || '#F3F4F6';
+      const col = sCol[p.status] || '#374151';
+      const lbl = sLbl[p.status] || p.status;
+      const ref = p.reference || (p._id ? p._id.slice(-8) : '');
+      const buyer = (p.buyerId && p.buyerId.name) ? p.buyerId.name : 'Buyer';
+      const email = (p.buyerId && p.buyerId.email) ? p.buyerId.email : '';
+      const product = (p.inquiryId && p.inquiryId.product) ? p.inquiryId.product : '-';
+      const qty = (p.inquiryId && p.inquiryId.quantity) ? p.inquiryId.quantity : 0;
+      const date = p.createdAt ? new Date(p.createdAt).toLocaleDateString() : '-';
+      return '<tr>' +
+        '<td><strong>' + ref + '</strong></td>' +
+        '<td>' + buyer + '<div style="font-size:11px;color:#6B7280">' + email + '</div></td>' +
+        '<td>' + product + ' &bull; ' + qty + 'kg</td>' +
+        '<td><strong>UGX ' + Number(p.amount).toLocaleString() + '</strong></td>' +
+        '<td>' + method + phone + '</td>' +
+        '<td><span style="background:' + bg + ';color:' + col + ';padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">' + lbl + '</span></td>' +
+        '<td>' + date + '</td>' +
+        '<td><div class="action-btns">' + btns + '</div></td>' +
+        '</tr>';
+    }).join('');
   } catch(e) { showToast(e.message, true); }
 }
 

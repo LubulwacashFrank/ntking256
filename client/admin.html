@@ -1569,9 +1569,25 @@
 
          <!-- PAYMENTS SECTION -->
          <section class="content-section" id="section-payments">
+             <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,#FFF9C4,#FEF3C7);border:2px solid #F59E0B;">
+                 <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
+                     <div style="font-size:2rem">🏦</div>
+                     <div>
+                         <div style="font-weight:800;font-size:1rem;color:#92400E">Manual Payment Verification</div>
+                         <div style="font-size:0.88rem;color:#78350F;margin-top:2px">No payment gateway configured. Buyers pay directly to the platform bank account below. Confirm or reject each payment after verifying your bank statement.</div>
+                     </div>
+                 </div>
+                 <div style="margin-top:14px;background:white;border-radius:10px;padding:14px 18px;display:flex;flex-wrap:wrap;gap:24px;border-left:4px solid #F59E0B">
+                     <div><div style="font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase">Bank</div><div style="font-weight:800">Equity Bank Uganda</div></div>
+                     <div><div style="font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase">Account Number</div><div style="font-weight:800">1003102577764</div></div>
+                     <div><div style="font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase">Account Name</div><div style="font-weight:800">Daniel Seryazi</div></div>
+                     <div><div style="font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase">Mobile Money</div><div style="font-weight:800">MTN / Airtel — same number as phone</div></div>
+                 </div>
+             </div>
              <div class="card">
                  <div class="card-header">
-                     <h3 class="card-title"><i class="fas fa-credit-card"></i> Payment Management</h3>
+                     <h3 class="card-title"><i class="fas fa-credit-card"></i> Payment Verification Queue</h3>
+                     <button class="btn btn-primary" onclick="loadAndRenderPayments()"><i class="fas fa-sync"></i> Refresh</button>
                  </div>
                  <table class="data-table">
                      <thead>
