@@ -11,6 +11,7 @@ const { authRouter } = require("./routes/auth.routes");
 const { adminRouter } = require("./routes/admin.routes");
 const { paymentsRouter } = require("./routes/payments.routes");
 const { reviewsRouter } = require("./routes/reviews.routes");
+const { subscriptionPaymentRouter } = require("./routes/subscriptionPayment.routes");
 
 function createApp(state) {
   const app = express();
@@ -31,6 +32,7 @@ function createApp(state) {
   app.use("/api/admin", adminRouter(state));
   app.use("/api/payments", paymentsRouter(state));
   app.use("/api/reviews", reviewsRouter());
+  app.use("/api/subscription-payment", subscriptionPaymentRouter());
 
   app.get("/", (req, res) => res.sendFile(path.join(clientDir, "index.html")));
   app.get("/admin", (req, res) => res.sendFile(path.join(clientDir, "admin.html")));

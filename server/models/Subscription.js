@@ -6,9 +6,12 @@ const subscriptionSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date, required: true },
-  status: { type: String, enum: ['active', 'expired', 'cancelled'], default: 'active' },
+  status: { type: String, enum: ['pending', 'active', 'expired', 'cancelled'], default: 'pending' },
   paymentMethod: { type: String, default: 'mobile_money' },
   paymentReference: { type: String },
+  paymentProvider: { type: String, default: 'flutterwave' },
+  paymentNetwork: { type: String },
+  paymentVerifiedAt: { type: Date },
   createdAt: { type: Date, default: Date.now }
 });
 

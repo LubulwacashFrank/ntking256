@@ -16,7 +16,7 @@ function authRouter() {
   const router = express.Router();
 
   router.post("/register", async (req, res) => {
-    const { name, email, password, role, district = "", organization = "", payoutPhone = "", payoutAccount = "", payoutBank = "", subscriptionPlan, paymentReference } = req.body || {};
+    const { name, email, password, role, district = "", organization = "", payoutPhone = "", payoutAccount = "", payoutBank = "", subscriptionPlan, phone } = req.body || {};
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: "name, email, password and role are required." });
@@ -26,9 +26,13 @@ function authRouter() {
       return res.status(400).json({ error: "role must be either farmer or bulk_buyer." });
     }
 
-    // Farmers must select subscription plan
+    // Farmers must select subscription plan and provide phone
     if (role === 'farmer' && !subscriptionPlan) {
       return res.status(400).json({ error: "Subscription plan is required for farmers." });
+    }
+
+    if (role === 'farmer' && !phone) {
+      return res.status(400).json({ error: "Phone number is required for payment." });
     }
 
     if (role === 'farmer' && !['monthly', 'yearly'].includes(subscriptionPlan)) {
@@ -55,33 +59,24 @@ function authRouter() {
       isVerified
     });
 
-    // Create subscription for farmers
+    // For farmers, return payment initiation info
     if (role === 'farmer') {
       const monthlyFee = 50000;
-      const yearlyFee = Math.round((monthlyFee * 12) / 3); // One third of yearly total
+      const yearlyFee = Math.round((monthlyFee * 12) / 3);
       const amount = subscriptionPlan === 'monthly' ? monthlyFee : yearlyFee;
-      const startDate = new Date();
-      const endDate = new Date();
-      if (subscriptionPlan === 'monthly') {
-        endDate.setMonth(endDate.getMonth() + 1);
-      } else {
-        endDate.setFullYear(endDate.getFullYear() + 1);
-      }
-
-      await Subscription.create({
-        userId: user._id,
-        plan: subscriptionPlan,
-        amount,
-        startDate,
-        endDate,
-        status: 'active',
-        paymentReference: paymentReference || 'PENDING'
-      });
 
       return res.status(201).json({
         pending: true,
-        message: `Registration successful! Subscription: ${subscriptionPlan} (UGX ${amount.toLocaleString()}). Your account is pending admin approval after payment verification.`,
-        subscription: { plan: subscriptionPlan, amount, endDate }
+        requiresPayment: true,
+        userId: String(user._id),
+        message: `Registration successful! Please complete payment to activate your account.`,
+        payment: {
+          amount,
+          plan: subscriptionPlan,
+          phone: String(phone).trim(),
+          email: user.email,
+          fullname: user.name
+        }
       });
     }
 

@@ -79,7 +79,8 @@
         <div class="form-group"><label>Password</label><input id="regPassword" type="password" placeholder="Min 6 characters" required minlength="6"></div>
         <div class="form-row">
           <div class="form-group"><label>District</label><input id="regDistrict" placeholder="e.g. Kampala"></div>
-          <div class="form-group" id="orgGroup"><label>Organization</label><input id="regOrganization" placeholder="Company name (optional)"></div>
+          <div class="form-group" id="phoneGroup"><label>Phone Number</label><input id="regPhone" placeholder="e.g. 0772123456" type="tel"></div>
+          <div class="form-group" id="orgGroup" style="display:none"><label>Organization</label><input id="regOrganization" placeholder="Company name (optional)"></div>
         </div>
         <!-- Farmer payout fields -->
         <div id="payoutGroup" style="border:2px solid #FDE68A;border-radius:12px;padding:16px;background:#FFFBEB;margin-bottom:16px">
@@ -151,6 +152,7 @@
     function toggleOrgField() {
       const role = document.getElementById('regRole').value;
       document.getElementById('orgGroup').style.display = role === 'bulk_buyer' ? 'block' : 'none';
+      document.getElementById('phoneGroup').style.display = role === 'farmer' ? 'block' : 'none';
       document.getElementById('payoutGroup').style.display = role === 'farmer' ? 'block' : 'none';
       document.getElementById('subscriptionGroup').style.display = role === 'farmer' ? 'block' : 'none';
       document.getElementById('roleHint').textContent = role === 'farmer'
@@ -180,7 +182,8 @@
           organization: document.getElementById('regOrganization').value,
           payoutPhone: document.getElementById('regPayoutPhone').value,
           payoutAccount: document.getElementById('regPayoutAccount').value,
-          payoutBank: document.getElementById('regPayoutBank').value
+          payoutBank: document.getElementById('regPayoutBank').value,
+          phone: document.getElementById('regPhone').value
         };
         if (payload.role === 'farmer') {
           const selectedPlan = document.querySelector('input[name="subscriptionPlan"]:checked');
@@ -190,10 +193,47 @@
             btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
             return;
           }
+          if (!payload.phone) {
+            showStatus('regStatus', 'Phone number is required for payment', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+            return;
+          }
           payload.subscriptionPlan = selectedPlan.value;
         }
         const result = await API.register(payload);
-        if (result.pending) {
+        if (result.requiresPayment) {
+          // Initiate payment
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing payment...';
+          const paymentResult = await fetch('/api/subscription-payment/subscription/initiate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: result.userId,
+              phone: result.payment.phone,
+              email: result.payment.email,
+              fullname: result.payment.fullname,
+              subscriptionPlan: result.payment.plan
+            })
+          });
+          const paymentData = await paymentResult.json();
+          if (paymentData.success) {
+            document.getElementById('registerForm').style.display = 'none';
+            const box = document.getElementById('pendingBox');
+            document.getElementById('pendingMsg').innerHTML = `
+              <strong>Payment request sent!</strong><br><br>
+              A payment prompt has been sent to <strong>${paymentData.phone}</strong> via <strong>${paymentData.network}</strong>.<br><br>
+              <strong>Amount: UGX ${paymentData.amount.toLocaleString()}</strong><br><br>
+              Please check your phone and enter your PIN to complete the payment.<br><br>
+              Your account will be activated automatically once payment is confirmed.
+            `;
+            box.style.display = 'block';
+          } else {
+            showStatus('regStatus', paymentData.error || 'Payment initiation failed', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+          }
+        } else if (result.pending) {
           document.getElementById('registerForm').style.display = 'none';
           const box = document.getElementById('pendingBox');
           document.getElementById('pendingMsg').textContent = result.message;
