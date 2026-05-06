@@ -1,0 +1,256 @@
+<!-- Rating Modal HTML - Add this to buyer.html before closing </body> tag -->
+
+<!-- FARMER RATING MODAL -->
+<div class="modal-overlay" id="ratingModal" style="display:none">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-star" style="color:#F59E0B"></i> Rate Farmer
+      </h3>
+      <button class="modal-close" onclick="closeRatingModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ratingFarmerId">
+      <input type="hidden" id="ratingOrderId">
+      
+      <!-- Farmer Info -->
+      <div style="background:#F0FDF4;border-radius:12px;padding:16px;margin-bottom:20px;border-left:4px solid #10B981">
+        <div style="font-weight:700;font-size:1.1rem;color:#065F46;margin-bottom:4px" id="ratingFarmerName">Farmer Name</div>
+        <div style="font-size:0.9rem;color:#047857" id="ratingOrderInfo">Order details</div>
+      </div>
+
+      <!-- Overall Rating -->
+      <div class="form-group">
+        <label class="form-label">Overall Rating *</label>
+        <div class="star-rating" id="overallRating">
+          <i class="fas fa-star" data-rating="1"></i>
+          <i class="fas fa-star" data-rating="2"></i>
+          <i class="fas fa-star" data-rating="3"></i>
+          <i class="fas fa-star" data-rating="4"></i>
+          <i class="fas fa-star" data-rating="5"></i>
+        </div>
+        <div style="font-size:0.85rem;color:#6B7280;margin-top:6px" id="ratingText">Click to rate</div>
+      </div>
+
+      <!-- Category Ratings -->
+      <div style="background:#F9FAFB;border-radius:12px;padding:16px;margin-bottom:20px">
+        <div style="font-weight:700;margin-bottom:12px;color:#374151">Rate by Category (Optional)</div>
+        
+        <div class="form-group" style="margin-bottom:12px">
+          <label style="font-size:0.85rem;color:#6B7280;margin-bottom:4px;display:block">Product Quality</label>
+          <div class="star-rating small" id="qualityRating">
+            <i class="fas fa-star" data-rating="1"></i>
+            <i class="fas fa-star" data-rating="2"></i>
+            <i class="fas fa-star" data-rating="3"></i>
+            <i class="fas fa-star" data-rating="4"></i>
+            <i class="fas fa-star" data-rating="5"></i>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:12px">
+          <label style="font-size:0.85rem;color:#6B7280;margin-bottom:4px;display:block">Delivery & Timeliness</label>
+          <div class="star-rating small" id="deliveryRating">
+            <i class="fas fa-star" data-rating="1"></i>
+            <i class="fas fa-star" data-rating="2"></i>
+            <i class="fas fa-star" data-rating="3"></i>
+            <i class="fas fa-star" data-rating="4"></i>
+            <i class="fas fa-star" data-rating="5"></i>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:12px">
+          <label style="font-size:0.85rem;color:#6B7280;margin-bottom:4px;display:block">Communication</label>
+          <div class="star-rating small" id="communicationRating">
+            <i class="fas fa-star" data-rating="1"></i>
+            <i class="fas fa-star" data-rating="2"></i>
+            <i class="fas fa-star" data-rating="3"></i>
+            <i class="fas fa-star" data-rating="4"></i>
+            <i class="fas fa-star" data-rating="5"></i>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0">
+          <label style="font-size:0.85rem;color:#6B7280;margin-bottom:4px;display:block">Value for Money</label>
+          <div class="star-rating small" id="valueRating">
+            <i class="fas fa-star" data-rating="1"></i>
+            <i class="fas fa-star" data-rating="2"></i>
+            <i class="fas fa-star" data-rating="3"></i>
+            <i class="fas fa-star" data-rating="4"></i>
+            <i class="fas fa-star" data-rating="5"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comment -->
+      <div class="form-group">
+        <label class="form-label">Your Review (Optional)</label>
+        <textarea id="ratingComment" class="form-textarea" rows="4" placeholder="Share your experience with this farmer..."></textarea>
+      </div>
+
+      <div style="background:#FEF3C7;border-radius:10px;padding:12px;font-size:0.85rem;color:#92400E">
+        <i class="fas fa-info-circle"></i> Your rating helps other buyers make informed decisions and helps farmers improve their service.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeRatingModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitRating()">
+        <i class="fas fa-paper-plane"></i> Submit Rating
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+.star-rating {
+  display: flex;
+  gap: 8px;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.star-rating.small {
+  font-size: 1.3rem;
+  gap: 4px;
+}
+
+.star-rating i {
+  color: #D1D5DB;
+  transition: all 0.2s ease;
+}
+
+.star-rating i:hover,
+.star-rating i.active {
+  color: #F59E0B;
+  transform: scale(1.1);
+}
+
+.star-rating i.active {
+  animation: starPop 0.3s ease;
+}
+
+@keyframes starPop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+</style>
+
+<script>
+let currentRating = 0;
+let categoryRatings = { quality: 0, delivery: 0, communication: 0, value: 0 };
+
+function initStarRatings() {
+  document.querySelectorAll('#overallRating i').forEach(star => {
+    star.addEventListener('click', function() {
+      currentRating = parseInt(this.dataset.rating);
+      updateStars('overallRating', currentRating);
+      document.getElementById('ratingText').textContent = getRatingText(currentRating);
+    });
+  });
+
+  ['quality', 'delivery', 'communication', 'value'].forEach(category => {
+    document.querySelectorAll(`#${category}Rating i`).forEach(star => {
+      star.addEventListener('click', function() {
+        categoryRatings[category] = parseInt(this.dataset.rating);
+        updateStars(`${category}Rating`, categoryRatings[category]);
+      });
+    });
+  });
+}
+
+function updateStars(containerId, rating) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('i').forEach((star, index) => {
+    if (index < rating) {
+      star.classList.add('active');
+    } else {
+      star.classList.remove('active');
+    }
+  });
+}
+
+function getRatingText(rating) {
+  const texts = {
+    1: '⭐ Poor',
+    2: '⭐⭐ Fair',
+    3: '⭐⭐⭐ Good',
+    4: '⭐⭐⭐⭐ Very Good',
+    5: '⭐⭐⭐⭐⭐ Excellent'
+  };
+  return texts[rating] || 'Click to rate';
+}
+
+function openRatingModal(farmerId, farmerName, orderId, orderInfo) {
+  document.getElementById('ratingFarmerId').value = farmerId;
+  document.getElementById('ratingOrderId').value = orderId || '';
+  document.getElementById('ratingFarmerName').textContent = farmerName;
+  document.getElementById('ratingOrderInfo').textContent = orderInfo || 'Rate your experience';
+  document.getElementById('ratingComment').value = '';
+  
+  currentRating = 0;
+  categoryRatings = { quality: 0, delivery: 0, communication: 0, value: 0 };
+  updateStars('overallRating', 0);
+  updateStars('qualityRating', 0);
+  updateStars('deliveryRating', 0);
+  updateStars('communicationRating', 0);
+  updateStars('valueRating', 0);
+  document.getElementById('ratingText').textContent = 'Click to rate';
+  
+  document.getElementById('ratingModal').style.display = 'flex';
+}
+
+function closeRatingModal() {
+  document.getElementById('ratingModal').style.display = 'none';
+}
+
+async function submitRating() {
+  const farmerId = document.getElementById('ratingFarmerId').value;
+  const orderId = document.getElementById('ratingOrderId').value;
+  const comment = document.getElementById('ratingComment').value.trim();
+
+  if (!currentRating) {
+    alert('Please select an overall rating');
+    return;
+  }
+
+  const token = localStorage.getItem('agro_token');
+  if (!token) {
+    alert('Please login to submit rating');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/ratings/farmer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        farmerId,
+        orderId: orderId || null,
+        rating: currentRating,
+        comment,
+        categories: categoryRatings
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert('✅ Rating submitted successfully! Thank you for your feedback.');
+      closeRatingModal();
+      if (typeof loadMyOrders === 'function') loadMyOrders();
+    } else {
+      alert('❌ ' + (data.error || 'Failed to submit rating'));
+    }
+
+  } catch (error) {
+    console.error('Submit rating error:', error);
+    alert('❌ Failed to submit rating. Please try again.');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initStarRatings();
+});
+</script>
