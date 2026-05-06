@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/User");
+const Subscription = require("../models/Subscription");
 
 function signAccessToken(user) {
   return jwt.sign(
@@ -15,7 +16,7 @@ function authRouter() {
   const router = express.Router();
 
   router.post("/register", async (req, res) => {
-    const { name, email, password, role, district = "", organization = "", payoutPhone = "", payoutAccount = "", payoutBank = "" } = req.body || {};
+    const { name, email, password, role, district = "", organization = "", payoutPhone = "", payoutAccount = "", payoutBank = "", subscriptionPlan, paymentReference } = req.body || {};
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: "name, email, password and role are required." });
@@ -23,6 +24,15 @@ function authRouter() {
 
     if (!["farmer", "bulk_buyer"].includes(role)) {
       return res.status(400).json({ error: "role must be either farmer or bulk_buyer." });
+    }
+
+    // Farmers must select subscription plan
+    if (role === 'farmer' && !subscriptionPlan) {
+      return res.status(400).json({ error: "Subscription plan is required for farmers." });
+    }
+
+    if (role === 'farmer' && !['monthly', 'yearly'].includes(subscriptionPlan)) {
+      return res.status(400).json({ error: "Invalid subscription plan. Choose monthly or yearly." });
     }
 
     const existing = await User.findOne({ email: String(email).toLowerCase().trim() }).lean();
@@ -45,10 +55,33 @@ function authRouter() {
       isVerified
     });
 
+    // Create subscription for farmers
     if (role === 'farmer') {
+      const monthlyFee = 50000;
+      const yearlyFee = Math.round((monthlyFee * 12) / 3); // One third of yearly total
+      const amount = subscriptionPlan === 'monthly' ? monthlyFee : yearlyFee;
+      const startDate = new Date();
+      const endDate = new Date();
+      if (subscriptionPlan === 'monthly') {
+        endDate.setMonth(endDate.getMonth() + 1);
+      } else {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      }
+
+      await Subscription.create({
+        userId: user._id,
+        plan: subscriptionPlan,
+        amount,
+        startDate,
+        endDate,
+        status: 'active',
+        paymentReference: paymentReference || 'PENDING'
+      });
+
       return res.status(201).json({
         pending: true,
-        message: 'Registration successful! Your account is pending admin approval. You will be able to log in once verified.'
+        message: `Registration successful! Subscription: ${subscriptionPlan} (UGX ${amount.toLocaleString()}). Your account is pending admin approval after payment verification.`,
+        subscription: { plan: subscriptionPlan, amount, endDate }
       });
     }
 

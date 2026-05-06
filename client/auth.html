@@ -93,6 +93,31 @@
           </div>
           <div class="form-group"><label>Bank Name</label><input id="regPayoutBank" placeholder="e.g. Equity Bank, Stanbic, MTN Mobile Money"></div>
         </div>
+        <!-- Subscription Plan -->
+        <div id="subscriptionGroup" style="border:2px solid #10B981;border-radius:12px;padding:16px;background:#F0FDF4;margin-bottom:16px">
+          <div style="font-weight:700;font-size:.88rem;color:#065F46;margin-bottom:12px"><i class="fas fa-credit-card" style="color:#10B981"></i> Subscription Plan <span style="font-weight:400;color:#047857">(required for farmers)</span></div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:10px;padding:12px;border:2px solid #D1FAE5;border-radius:10px;cursor:pointer;margin-bottom:10px" onclick="document.getElementById('planMonthly').checked=true">
+              <input type="radio" name="subscriptionPlan" id="planMonthly" value="monthly" checked>
+              <div style="flex:1">
+                <div style="font-weight:700;color:#065F46">Monthly Plan</div>
+                <div style="font-size:.8rem;color:#047857">UGX 50,000 per month</div>
+              </div>
+              <div style="font-size:1.2rem;font-weight:900;color:#10B981">50K</div>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;padding:12px;border:2px solid #D1FAE5;border-radius:10px;cursor:pointer;position:relative" onclick="document.getElementById('planYearly').checked=true">
+              <input type="radio" name="subscriptionPlan" id="planYearly" value="yearly">
+              <div style="flex:1">
+                <div style="font-weight:700;color:#065F46">Yearly Plan <span style="background:#F59E0B;color:#fff;font-size:.7rem;padding:2px 6px;border-radius:6px;margin-left:6px">SAVE 67%</span></div>
+                <div style="font-size:.8rem;color:#047857">UGX 200,000 per year (only 16,667/month)</div>
+              </div>
+              <div style="font-size:1.2rem;font-weight:900;color:#10B981">200K</div>
+            </label>
+          </div>
+          <div style="font-size:.78rem;color:#047857;background:#D1FAE5;border-radius:8px;padding:10px;margin-top:10px">
+            <i class="fas fa-check-circle"></i> Payment will be verified by admin before account activation.
+          </div>
+        </div>
         <button type="submit" class="btn-submit" id="regBtn"><i class="fas fa-user-plus"></i> Create Account</button>
         <div class="status-msg" id="regStatus"></div>
       </form>
@@ -127,8 +152,9 @@
       const role = document.getElementById('regRole').value;
       document.getElementById('orgGroup').style.display = role === 'bulk_buyer' ? 'block' : 'none';
       document.getElementById('payoutGroup').style.display = role === 'farmer' ? 'block' : 'none';
+      document.getElementById('subscriptionGroup').style.display = role === 'farmer' ? 'block' : 'none';
       document.getElementById('roleHint').textContent = role === 'farmer'
-        ? 'Farmers require admin verification before login.'
+        ? 'Farmers require subscription + admin verification before login.'
         : 'Bulk buyers get instant access after registration.';
     }
     toggleOrgField();
@@ -145,7 +171,7 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
       try {
-        const result = await API.register({
+        const payload = {
           name: document.getElementById('regName').value,
           email: document.getElementById('regEmail').value,
           password: document.getElementById('regPassword').value,
@@ -155,7 +181,18 @@
           payoutPhone: document.getElementById('regPayoutPhone').value,
           payoutAccount: document.getElementById('regPayoutAccount').value,
           payoutBank: document.getElementById('regPayoutBank').value
-        });
+        };
+        if (payload.role === 'farmer') {
+          const selectedPlan = document.querySelector('input[name="subscriptionPlan"]:checked');
+          if (!selectedPlan) {
+            showStatus('regStatus', 'Please select a subscription plan', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+            return;
+          }
+          payload.subscriptionPlan = selectedPlan.value;
+        }
+        const result = await API.register(payload);
         if (result.pending) {
           document.getElementById('registerForm').style.display = 'none';
           const box = document.getElementById('pendingBox');
