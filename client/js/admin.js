@@ -212,16 +212,30 @@ let transactionsData = [];
 
 // ==================== INITIALIZATION ====================
 document.addEventListener("DOMContentLoaded", async function () {
-  // Redirect to auth if no token
+  // Redirect to admin login if no token
   if (!API.getToken()) {
-    window.location.href = "/auth";
+    window.location.href = "/admin";
     return;
   }
+  
+  // Verify user is admin
+  const user = API.getUser();
+  if (!user || user.role !== 'admin') {
+    localStorage.removeItem('agro_token');
+    window.location.href = "/admin";
+    return;
+  }
+  
   try {
     await loadAllData();
   } catch (e) {
     console.error(e);
     showToast(e.message, true);
+    // If unauthorized, redirect to login
+    if (e.message.includes('401') || e.message.includes('unauthorized')) {
+      localStorage.removeItem('agro_token');
+      window.location.href = "/admin";
+    }
   }
 });
 

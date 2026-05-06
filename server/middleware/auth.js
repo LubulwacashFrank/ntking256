@@ -1,20 +1,30 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization || "";
-  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
-
-  if (!token) {
-    return res.status(401).json({ error: "Missing bearer token." });
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    req.user = null;
+    return next();
   }
 
+  const token = authHeader.substring(7);
+
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload;
-    return next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
   } catch (error) {
-    return res.status(401).json({ error: "Invalid or expired token." });
+    req.user = null;
+    next();
   }
 }
 
-module.exports = { requireAuth };
+function requireAuth(req, res, next) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  next();
+}
+
+module.exports = { authMiddleware, requireAuth };

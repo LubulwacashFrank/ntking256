@@ -11,7 +11,9 @@ const userSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     payoutPhone: { type: String, default: "" },
     payoutAccount: { type: String, default: "" },
-    payoutBank: { type: String, default: "" }
+    payoutBank: { type: String, default: "" },
+    rating: { type: Number, default: 0, min: 0, max: 5 },
+    totalRatings: { type: Number, default: 0 }
   },
   { timestamps: true }
 );
