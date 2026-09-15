@@ -183,7 +183,7 @@ const API = {
 
   logout() {
     localStorage.removeItem("agro_token");
-    window.location.href = "/";
+    window.location.href = "/admin";
   }
 };
 
@@ -212,15 +212,12 @@ let transactionsData = [];
 
 // ==================== INITIALIZATION ====================
 document.addEventListener("DOMContentLoaded", async function () {
-  // Redirect to admin login if no token
   if (!API.getToken()) {
     window.location.href = "/admin";
     return;
   }
-  
-  // Verify user is admin
   const user = API.getUser();
-  if (!user || user.role !== 'admin') {
+  if (!user || user.role !== 'admin' || user.exp * 1000 < Date.now()) {
     localStorage.removeItem('agro_token');
     window.location.href = "/admin";
     return;
