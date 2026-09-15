@@ -1,19 +1,26 @@
 const axios = require('axios');
 
-const SECRET_KEY = process.env.FLW_SECRET_KEY;
 const BASE_URL = 'https://api.flutterwave.com/v3';
 
-const isConfigured = !!(SECRET_KEY && SECRET_KEY.length > 10);
+function getSecretKey() {
+  return process.env.FLW_SECRET_KEY || '';
+}
+
+function isConfigured() {
+  const key = getSecretKey();
+  return !!(key && key.length > 10);
+}
 
 function getHeaders() {
-  return { Authorization: `Bearer ${SECRET_KEY}`, 'Content-Type': 'application/json' };
+  return { Authorization: `Bearer ${getSecretKey()}`, 'Content-Type': 'application/json' };
 }
 
 async function initiateMobileMoneyPayment(payload) {
-  if (!isConfigured) {
+  if (!isConfigured()) {
     return { success: false, error: 'Payment gateway not configured.' };
   }
   try {
+    const appUrl = (process.env.APP_URL || 'http://localhost:3000').replace(/\/$/, '');
     const body = {
       tx_ref: payload.txRef,
       amount: payload.amount,
@@ -22,10 +29,18 @@ async function initiateMobileMoneyPayment(payload) {
       email: payload.email,
       phone_number: payload.phone,
       fullname: payload.fullname,
-      redirect_url: `${process.env.APP_URL || 'http://localhost:3000'}/api/payments/callback`,
+      redirect_url: `${appUrl}/api/subscription-payment/callback`,
+      authorization: { mode: 'ussd' },
       meta: { userId: payload.userId || '' }
     };
-    const { data } = await axios.post(`${BASE_URL}/charges?type=mobile_money_uganda`, body, { headers: getHeaders() });
+    const { data } = await axios.post(
+      `${BASE_URL}/charges?type=mobile_money_uganda`,
+      body,
+      { headers: getHeaders() }
+    );
+    if (data.status === 'error') {
+      return { success: false, error: data.message };
+    }
     return { success: true, data };
   } catch (error) {
     const msg = error.response?.data?.message || error.message;
@@ -35,7 +50,7 @@ async function initiateMobileMoneyPayment(payload) {
 }
 
 async function verifyPayment(transactionId) {
-  if (!isConfigured) {
+  if (!isConfigured()) {
     return { success: false, verified: false, error: 'Payment gateway not configured.' };
   }
   try {
@@ -79,5 +94,5 @@ module.exports = {
   getSupportedNetworks,
   detectNetwork,
   formatPhoneNumber,
-  isPaymentConfigured: () => isConfigured
+  isPaymentConfigured: isConfigured
 };
