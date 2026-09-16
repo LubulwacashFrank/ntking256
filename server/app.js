@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const { requireAuth } = require("./middleware/auth");
+const { authMiddleware, requireAuth } = require("./middleware/auth");
 const { requireRole } = require("./middleware/requireRole");
 const { bootstrapRouter } = require("./routes/bootstrap.routes");
 const { productsRouter } = require("./routes/products.routes");
@@ -23,6 +23,7 @@ function createApp(state) {
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
   app.use(express.static(clientDir, { index: false }));
+  app.use(authMiddleware);
 
   app.use("/api/bootstrap", bootstrapRouter(state));
   app.use("/api/products", productsRouter(state));

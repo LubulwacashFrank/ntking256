@@ -331,7 +331,7 @@ function renderDashboard() {
     .filter(u => u.role === "farmer")
     .map(f => ({
       ...f,
-      productCount: productsData.filter(p => p.farmer === f.name).length
+      productCount: productsData.filter(p => String(p.farmerId) === String(f._id) || p.farmer === f.name).length
     }))
     .sort((a, b) => b.productCount - a.productCount)
     .slice(0, 5);
@@ -546,7 +546,7 @@ function renderFarmersTable(searchTerm = "") {
 
   const farmersWithStats = farmers.map(f => ({
     ...f,
-    productCount: productsData.filter(p => p.farmer === f.name).length
+    productCount: productsData.filter(p => String(p.farmerId) === String(f._id) || p.farmer === f.name).length
   }));
 
   const tbody = document.getElementById("farmersTableBody");

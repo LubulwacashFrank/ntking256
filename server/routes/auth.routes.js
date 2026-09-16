@@ -6,7 +6,7 @@ const Subscription = require("../models/Subscription");
 
 function signAccessToken(user) {
   return jwt.sign(
-    { id: String(user._id), email: user.email, role: user.role, name: user.name },
+    { id: String(user._id), email: user.email, role: user.role, name: user.name, district: user.district || '' },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
