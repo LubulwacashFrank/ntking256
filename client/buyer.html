@@ -942,9 +942,20 @@
         const _origNavigateTo = navigateTo;
         function navigateTo(page) {
             _origNavigateTo(page);
-            if (page === 'messages' && !_allContacts.length) loadContacts();
+            if (page==='messages'){if(!_allContacts.length){loadContacts().then(()=>_autoOpenFromParams())}else{_autoOpenFromParams()}}
         }
-
+        function _autoOpenFromParams(){
+            const p=new URLSearchParams(window.location.search);
+            const fId=p.get('farmerId');
+            const fName=decodeURIComponent(p.get('farmerName')||'');
+            const fDist=decodeURIComponent(p.get('district')||'');
+            if(!fId&&!fName)return;
+            let c=_allContacts.find(x=>(fId&&x.id===fId)||(fName&&x.name===fName));
+            if(!c&&fName){c={id:fId||fName,name:fName,district:fDist,product:''};_allContacts.unshift(c);renderContacts(_allContacts);}
+            if(c)openChat(c.id,c.name,c.district);
+            window.history.replaceState({},''','/buyer');
+        }
+        (function(){const p=new URLSearchParams(window.location.search);if(p.get('page')==='messages'){setTimeout(()=>navigateTo('messages'),400);}})();
 </script>
 </body>
 </html>
