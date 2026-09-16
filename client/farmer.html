@@ -723,8 +723,20 @@
     }
 
     async function loadConversations() {
-        // For now, keep local conversations data
-        // In future, this could come from API
+        // Load real buyers from API for Socket.IO chat
+        try {
+            const r = await fetch('/api/admin/users?role=bulk_buyer', { headers: { Authorization: 'Bearer ' + API.getToken() } });
+            const d = r.ok ? await r.json() : [];
+            const realBuyers = Array.isArray(d) ? d : (d.users || []);
+            if (realBuyers.length) {
+                // Merge real buyers into conversations list
+                realBuyers.forEach(b => {
+                    if (!conversations.find(c => String(c.buyerId) === String(b._id))) {
+                        conversations.unshift({ id: 'rt_' + b._id, buyerId: b._id, rtBuyer: b, messages: [], unread: 0, lastActive: 'Now' });
+                    }
+                });
+            }
+        } catch(e) { /* use local buyers as fallback */ }
         renderMessages();
     }
 
@@ -1064,7 +1076,7 @@
     function startConversation(buyerId){
         let conv=conversations.find(c=>c.buyerId===buyerId);
         if(!conv){conv={id:nextConvId++,buyerId,messages:[],unread:0,lastActive:'Now'};conversations.unshift(conv)}
-        activeConvId=conv.id;navigateTo('messages');setTimeout(()=>openChat(conv.id),100);
+        activeConvId=conv.id;navigateTo('messages');setTimeout(()=>openChat(String(conv.id)),100);
     }
 
     /* ============================================================
@@ -1074,31 +1086,71 @@
 
     function renderConversations(){
         const s=(document.getElementById('conv-search')?.value||'').toLowerCase();
-        let convs=conversations.map(c=>({...c,buyer:buyers.find(b=>b.id===c.buyerId)})).filter(c=>c.buyer&&(c.buyer.name.toLowerCase().includes(s)||c.buyer.contact.toLowerCase().includes(s)));
-        document.getElementById('conv-list').innerHTML=convs.length?convs.map(c=>`
-            <div class="flex items-center gap-3 px-4 py-3 cursor-pointer transition ${activeConvId===c.id?'bg-crop-50 border-r-2 border-crop-600':'hover:bg-gray-50'}" onclick="openChat(${c.id})">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br ${c.buyer.color} flex items-center justify-center text-white font-extrabold text-[11px] flex-shrink-0">${c.buyer.avatar}</div>
+        // Resolve buyer info — support both local buyers array and real API buyers (rtBuyer)
+        let convs=conversations.map(c=>{
+            const b = c.rtBuyer || buyers.find(x=>x.id===c.buyerId);
+            return b ? {...c, buyer: b, buyerName: b.name||b.contact, buyerSub: b.location||b.organization||b.district||'Buyer'} : null;
+        }).filter(c=>c&&(c.buyerName||'').toLowerCase().includes(s));
+        document.getElementById('conv-list').innerHTML=convs.length?convs.map(c=>{
+            const ini=(c.buyerName||'B').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+            const color=c.buyer.color||'from-harvest-400 to-harvest-600';
+            const avatar=c.buyer.avatar||ini;
+            const lastMsg=c.messages.length?c.messages[c.messages.length-1].text:'No messages yet';
+            return `<div class="flex items-center gap-3 px-4 py-3 cursor-pointer transition ${activeConvId===c.id?'bg-crop-50 border-r-2 border-crop-600':'hover:bg-gray-50'}" onclick="openChat('${c.id}')">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br ${color} flex items-center justify-center text-white font-extrabold text-[11px] flex-shrink-0">${avatar}</div>
                 <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between"><p class="text-sm font-bold text-gray-900 truncate">${c.buyer.name}</p><span class="text-[10px] text-gray-400 flex-shrink-0 ml-2">${c.lastActive}</span></div>
-                    <p class="text-[11px] text-gray-500 truncate mt-0.5">${c.messages.length?c.messages[c.messages.length-1].text:'No messages yet'}</p>
+                    <div class="flex items-center justify-between"><p class="text-sm font-bold text-gray-900 truncate">${c.buyerName}</p><span class="text-[10px] text-gray-400 flex-shrink-0 ml-2">${c.lastActive}</span></div>
+                    <p class="text-[11px] text-gray-500 truncate mt-0.5">${lastMsg}</p>
                 </div>
                 ${c.unread>0?`<span class="w-5 h-5 rounded-full bg-gradient-to-br from-crop-500 to-crop-700 text-white text-[9px] font-extrabold flex items-center justify-center flex-shrink-0 shadow">${c.unread}</span>`:''}
-            </div>`).join(''):'<div class="p-6 text-center text-gray-400 text-sm">No conversations yet</div>';
+            </div>`;
+        }).join(''):'<div class="p-6 text-center text-gray-400 text-sm">No conversations yet</div>';
     }
 
+    let _rtRoom=null, _rtBuyerId=null, _typingTimer=null;
+
     function openChat(convId){
-        activeConvId=convId;const conv=conversations.find(c=>c.id===convId);if(!conv)return;
-        const buyer=buyers.find(b=>b.id===conv.buyerId);if(!buyer)return;
+        convId = String(convId);
+        activeConvId=convId;
+        const conv=conversations.find(c=>String(c.id)===convId);if(!conv)return;
+        const buyer=conv.rtBuyer||buyers.find(b=>b.id===conv.buyerId);if(!buyer)return;
         conv.unread=0;updateUnreadBadge();
         document.getElementById('chat-empty').classList.add('hidden');
         document.getElementById('chat-active').classList.remove('hidden');document.getElementById('chat-active').classList.add('flex');
         document.getElementById('chat-panel').classList.remove('hidden');document.getElementById('chat-panel').classList.add('flex');
         if(window.innerWidth<640){document.getElementById('conv-list-panel').classList.add('hidden')}
-        document.getElementById('chat-avatar').textContent=buyer.avatar;
-        document.getElementById('chat-avatar').className=`w-9 h-9 rounded-full bg-gradient-to-br ${buyer.color} flex items-center justify-center text-white font-extrabold text-xs`;
-        document.getElementById('chat-name').textContent=buyer.name;
-        document.getElementById('chat-company').textContent=buyer.location+' · '+buyer.contact;
+        const ini=(buyer.name||'B').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+        const color=buyer.color||'from-harvest-400 to-harvest-600';
+        document.getElementById('chat-avatar').textContent=buyer.avatar||ini;
+        document.getElementById('chat-avatar').className=`w-9 h-9 rounded-full bg-gradient-to-br ${color} flex items-center justify-center text-white font-extrabold text-xs`;
+        document.getElementById('chat-name').textContent=buyer.name||'Buyer';
+        document.getElementById('chat-company').textContent=(buyer.location||buyer.organization||buyer.district||'Bulk Buyer')+' · '+(buyer.contact||'');
         renderChatMessages(conv);renderConversations();
+
+        // If this is a real buyer (has _id), set up Socket.IO room
+        if(buyer._id){
+            const user=API.getUser();
+            if(!user)return;
+            _rtBuyerId=String(buyer._id);
+            _rtRoom=RT.roomId(user.id, buyer._id);
+            RT.joinChat(_rtRoom);
+            RT.onChat(_rtRoom,function(msg){
+                const isMine=msg.from===user.id;
+                const time=msg.time||new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+                conv.messages.push({sender:isMine?'farmer':'buyer',text:msg.text,time,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
+                renderChatMessages(conv);
+            });
+            RT.onTyping(_rtRoom,function(){
+                const area=document.getElementById('chat-messages');
+                if(!area.querySelector('.typing-ind')){
+                    const d=document.createElement('div');d.className='typing-ind text-xs text-gray-400 px-2 py-1';d.textContent=(buyer.name||'Buyer')+' is typing...';
+                    area.appendChild(d);area.scrollTop=area.scrollHeight;
+                }
+            });
+            RT.onStopTyping(_rtRoom,function(){
+                document.getElementById('chat-messages').querySelector('.typing-ind')?.remove();
+            });
+        }
     }
 
     function renderChatMessages(conv){
@@ -1117,21 +1169,22 @@
     function sendMessage(){
         const input=document.getElementById('chat-input'),text=input.value.trim();
         if(!text||!activeConvId)return;
-        const conv=conversations.find(c=>c.id===activeConvId);if(!conv)return;
+        const conv=conversations.find(c=>String(c.id)===String(activeConvId));if(!conv)return;
         const now=new Date(),time=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}),date=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
         conv.messages.push({sender:'farmer',text,time,date});conv.lastActive='Now';
-        input.value='';input.style.height='auto';renderChatMessages(conv);renderConversations();
-        setTimeout(()=>{
-            const replies=['Thank you for the update. Let me get back to you.','That sounds great! I will discuss with my team.','Can you share more details about the pricing?','We are interested. What is the earliest delivery date?','Perfect, let us proceed with the order.','I appreciate the quick response!'];
-            const rt=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
-            conv.messages.push({sender:'buyer',text:replies[Math.floor(Math.random()*replies.length)],time:rt,date});conv.lastActive='Now';
-            if(activeConvId===conv.id)renderChatMessages(conv);renderConversations();
-            const buyer=buyers.find(b=>b.id===conv.buyerId);
-            if(buyer){notifications.unshift({id:Date.now(),text:`${buyer.name} replied to your message`,time:'Just now',icon:'fa-comment',read:false});updateNotifDot()}
-        },1500+Math.random()*2000);
+        input.value='';input.style.height='auto';
+        renderChatMessages(conv);renderConversations();
+        // Send via Socket.IO if real buyer, otherwise no fake bot reply
+        if(_rtRoom && _rtBuyerId){
+            RT.sendChatMessage(_rtRoom, text, _rtBuyerId);
+            RT.stopTyping(_rtRoom);
+        }
     }
 
-    function handleChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
+    function handleChatKey(e){
+        if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();return;}
+        if(_rtRoom){RT.sendTyping(_rtRoom,_rtBuyerId);clearTimeout(_typingTimer);_typingTimer=setTimeout(()=>RT.stopTyping(_rtRoom),2000);}
+    }
     function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'}
 
     /* ============================================================
@@ -1248,5 +1301,16 @@
         }
     }
     </script>
+<div id="rt-notif-container"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realtime.js"></script>
+<script>RT.connect();
+RT.onNotification(function(notif){
+    if(notif.type==='message'){
+        notifications.unshift({id:Date.now(),text:notif.body||'New message',time:'Just now',icon:'fa-comment',read:false});
+        updateNotifDot();
+    }
+});
+</script>
 </body>
 </html>
