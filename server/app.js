@@ -39,7 +39,10 @@ function createApp(state) {
   app.use("/api/subscription-payment", subscriptionPaymentRouter());
   app.use("/api/ratings", ratingsRouter());
 
-  app.get("/", (req, res) => res.sendFile(path.join(clientDir, "index.html")));
+  app.get("/", (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.sendFile(path.join(clientDir, "index.html"));
+  });
   app.get("/admin", (req, res) => res.sendFile(path.join(clientDir, "admin-login.html")));
   app.get("/admin/dashboard", (req, res) => res.sendFile(path.join(clientDir, "admin.html")));
   app.get("/auth", (req, res) => res.sendFile(path.join(clientDir, "auth.html")));
