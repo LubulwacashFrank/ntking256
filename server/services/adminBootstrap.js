@@ -11,21 +11,20 @@ async function ensureAdminUser() {
     return;
   }
 
-  const passwordHash = await bcrypt.hash(adminPassword, 12);
-  await User.updateOne(
-    { email: adminEmail },
-    {
-      $set: {
-        name: adminName,
-        role: "admin",
-        passwordHash
-      },
-      $setOnInsert: { email: adminEmail }
-    },
-    { upsert: true }
-  );
+  const existing = await User.findOne({ email: adminEmail });
 
-  console.log(`Bootstrapped admin user: ${adminEmail}`);
+  if (existing) {
+    // Only fix role if wrong, never overwrite password
+    if (existing.role !== 'admin') {
+      await User.updateOne({ email: adminEmail }, { $set: { role: 'admin' } });
+    }
+    console.log(`Admin user exists: ${adminEmail}`);
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(adminPassword, 12);
+  await User.create({ name: adminName, email: adminEmail, passwordHash, role: 'admin', isVerified: true });
+  console.log(`Created admin user: ${adminEmail}`);
 }
 
 module.exports = { ensureAdminUser };
